@@ -11,7 +11,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="container pt-20 pb-24 flex flex-col items-center justify-center text-center">
+      <div className="container pt-32 pb-24 flex flex-col items-center justify-center text-center">
         <div className="text-8xl mb-8 opacity-20">🛒</div>
         <h2 className="text-3xl font-black mb-4">Your cart is empty</h2>
         <p className="text-gray-500 mb-10 max-w-sm">Looks like you haven't added anything to your cart yet. Fresh milk and organic veggies are waiting!</p>
@@ -27,7 +27,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="pb-24 pt-20">
+    <div className="pb-24 pt-32">
       <div className="container">
         <div className="flex items-center gap-4 mb-10">
           <Link href="/" className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-accent transition-colors">

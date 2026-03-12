@@ -29,7 +29,7 @@ export default function ContactPage() {
   return (
     <div className="pb-20">
       {/* Header */}
-      <section className="bg-secondary text-secondary-foreground pt-20 pb-20 text-center">
+      <section className="bg-secondary text-secondary-foreground pt-32 pb-20 text-center">
         <div className="container">
           <h1 className="text-4xl md:text-5xl font-black mb-6">Get In Touch</h1>
           <p className="text-lg opacity-90 max-w-2xl mx-auto">

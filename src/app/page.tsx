@@ -25,7 +25,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col gap-16 pb-20 pt-12">
+    <div className="flex flex-col gap-16 pb-20 pt-20">
       <Hero />
       
       {/* Categories Grid */}
