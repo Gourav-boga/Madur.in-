@@ -20,7 +20,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const quantity = cartItem?.quantity || 0;
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+    <div className="bg-[#f2faf2] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
       {/* Image Container */}
       <div className="relative h-48 w-full bg-gray-50 overflow-hidden">
         <Image

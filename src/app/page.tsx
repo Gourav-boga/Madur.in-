@@ -45,7 +45,7 @@ export default function Home() {
             <Link 
               href={`/products?category=${encodeURIComponent(cat.name)}`} 
               key={cat.id}
-              className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center overflow-hidden"
+              className="group flex flex-col bg-[#f2faf2] rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center overflow-hidden"
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative overflow-hidden bg-gray-50">
                 {cat.image ? (
@@ -67,7 +67,7 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="bg-accent py-16">
+      <section className="bg-secondary/5 py-16">
         <div className="container">
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-2xl font-black flex items-center gap-3">

@@ -7,7 +7,7 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 export default function Hero() {
   return (
-    <section className="relative bg-[#fdfdf7] overflow-hidden pt-10 pb-20 md:py-24">
+    <section className="relative bg-[#f2faf2] overflow-hidden pt-10 pb-20 md:py-24">
       {/* Background patterns/blobs */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-secondary/5 rounded-l-[10rem] -z-0 transform translate-x-20"></div>
       
