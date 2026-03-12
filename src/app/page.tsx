@@ -44,7 +44,7 @@ export default function Home() {
               key={cat.id}
               className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center overflow-hidden"
             >
-              <div className="w-full aspect-square relative overflow-hidden bg-gray-50">
+              <div className="w-full aspect-[4/5] relative overflow-hidden bg-gray-50">
                 {cat.image ? (
                   <Image src={cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                 ) : (
