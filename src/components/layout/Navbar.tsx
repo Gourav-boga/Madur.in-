@@ -38,6 +38,7 @@ export default function Navbar() {
         isScrolled ? "bg-[#f2faf2] shadow-md py-2" : "bg-transparent py-4"
       }`}
     >
+      <StreamingTagline />
       <div className="container flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
@@ -127,7 +128,6 @@ export default function Navbar() {
           </Link>
         </div>
       )}
-      <StreamingTagline />
     </nav>
   );
 }
