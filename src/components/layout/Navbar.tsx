@@ -72,8 +72,9 @@ export default function Navbar() {
             priority
           />
         </Link>
+      </div>
 
-        {/* Desktop Search Bar (Swiggy Style) */}
+      {/* Desktop Search Bar (Swiggy Style) */}
         <form 
           onSubmit={handleSearch}
           className="hidden lg:flex flex-1 max-w-xl mx-8 items-center bg-accent rounded-lg px-4 py-2"
