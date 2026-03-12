@@ -100,16 +100,6 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white absolute top-full left-0 right-0 shadow-lg border-t py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
-          <form onSubmit={handleSearch} className="relative mb-2">
-            <FontAwesomeIcon icon={faSearch} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="w-full bg-accent rounded-xl py-3 pl-12 pr-4 text-sm outline-none focus:ring-2 ring-primary transition-all"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
           <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Home</Link>
           <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Services</Link>
           <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">About Us</Link>
