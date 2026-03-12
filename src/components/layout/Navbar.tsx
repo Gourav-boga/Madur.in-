@@ -97,6 +97,23 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Mobile Search Bar (Always visible on mobile/tablet) */}
+      <div className="container md:hidden mt-2 pb-2">
+        <form 
+          onSubmit={handleSearch}
+          className="flex items-center bg-accent rounded-xl px-4 py-2.5 shadow-inner"
+        >
+          <FontAwesomeIcon icon={faSearch} className="text-gray-400 mr-3 text-sm" />
+          <input
+            type="text"
+            placeholder="Search for milk, vegetables..."
+            className="bg-transparent border-none outline-none w-full text-xs placeholder:text-gray-400"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </form>
+      </div>
+
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white absolute top-full left-0 right-0 shadow-lg border-t py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
