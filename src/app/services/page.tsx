@@ -32,7 +32,7 @@ export default function ServicesPage() {
             >
               <div className="text-5xl mb-6 group-hover:scale-110 transition-transform">
                 {service.image ? (
-                  <div className="relative w-20 h-20 mx-auto">
+                  <div className="relative w-32 h-32 mx-auto transition-transform group-hover:scale-105">
                     <Image src={service.image} alt={service.name} fill className="object-contain" />
                   </div>
                 ) : (

@@ -46,7 +46,7 @@ export default function Home() {
             >
               <div className="text-4xl mb-4 group-hover:scale-125 transition-transform">
                 {cat.image ? (
-                  <div className="relative w-16 h-16">
+                  <div className="relative w-28 h-28">
                     <Image src={cat.image} alt={cat.name} fill className="object-contain" />
                   </div>
                 ) : (

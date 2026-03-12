@@ -48,7 +48,7 @@ function ProductsContent() {
             {categoryFilter ? (
               <>
                 {currentCategory?.image ? (
-                  <div className="relative w-12 h-12">
+                  <div className="relative w-20 h-20">
                     <Image src={currentCategory.image} alt={currentCategory.name} fill className="object-contain" />
                   </div>
                 ) : (
@@ -106,10 +106,10 @@ function ProductsContent() {
                 >
                   {cat.image ? (
                     <div className="flex items-center gap-3">
-                      <div className="relative w-6 h-6">
+                      <div className="relative w-10 h-10">
                         <Image src={cat.image} alt={cat.name} fill className="object-contain" />
                       </div>
-                      <span>{cat.name}</span>
+                      <span className="text-sm">{cat.name}</span>
                     </div>
                   ) : (
                     <span>{cat.icon} {cat.name}</span>
