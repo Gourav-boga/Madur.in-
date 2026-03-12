@@ -37,12 +37,12 @@ export default function Home() {
           </Link>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="flex overflow-x-auto gap-6 md:gap-8 pb-6 scrollbar-hide snap-x snap-mandatory">
           {categories.map((cat, index) => (
             <Link 
               href={`/products?category=${encodeURIComponent(cat.name)}`} 
               key={cat.id}
-              className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center overflow-hidden"
+              className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center overflow-hidden flex-shrink-0 w-[240px] md:w-[280px] snap-start"
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative overflow-hidden bg-gray-50">
                 {cat.image ? (
