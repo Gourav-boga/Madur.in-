@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,6 +14,8 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const { cartCount } = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -98,22 +100,24 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Search Bar (Always visible on mobile/tablet) */}
-      <div className="container md:hidden mt-2 pb-2">
-        <form 
-          onSubmit={handleSearch}
-          className="flex items-center bg-accent rounded-xl px-4 py-2.5 shadow-inner"
-        >
-          <FontAwesomeIcon icon={faSearch} className="text-gray-400 mr-3 text-sm" />
-          <input
-            type="text"
-            placeholder="Search for milk, vegetables..."
-            className="bg-transparent border-none outline-none w-full text-xs placeholder:text-gray-400"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </form>
-      </div>
+      {/* Mobile Search Bar (Only on Home Page for mobile/tablet) */}
+      {isHome && (
+        <div className="container md:hidden mt-2 pb-2">
+          <form 
+            onSubmit={handleSearch}
+            className="flex items-center bg-accent rounded-xl px-4 py-2.5 shadow-inner"
+          >
+            <FontAwesomeIcon icon={faSearch} className="text-gray-400 mr-3 text-sm" />
+            <input
+              type="text"
+              placeholder="Search for milk, vegetables..."
+              className="bg-transparent border-none outline-none w-full text-xs placeholder:text-gray-400"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </form>
+        </div>
+      )}
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
