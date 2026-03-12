@@ -6,7 +6,7 @@ export const categories = [
   { name: "Cold Pressed Oils", icon: "🏺", id: "oils", image: "/categories/cold-pressed-oils.png" },
   { name: "Pickles", icon: "🥒", id: "pickles", image: "/categories/pickles.png" },
   { name: "Traditional Snacks", icon: "🥨", id: "snacks", image: "/categories/snacks.png" },
-  { name: "Eggs", icon: "🥚", id: "eggs" },
+  { name: "Eggs", icon: "🥚", id: "eggs", image: "/categories/eggs.png" },
   { name: "Honey & Natural Products", icon: "🍯", id: "honey-natural" },
 ];
 
