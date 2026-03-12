@@ -8,7 +8,7 @@ import { faEnvelope, faPhone, faMapMarkerAlt } from "@fortawesome/free-solid-svg
 
 export default function Footer() {
   return (
-    <footer className="bg-white pt-16 pb-8 border-t border-gray-200 mt-20">
+    <footer className="bg-primary pt-16 pb-8 border-t border-gray-200 mt-20">
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}

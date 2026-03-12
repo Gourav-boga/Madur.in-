@@ -44,7 +44,7 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+        isScrolled ? "bg-primary shadow-md py-2" : "bg-transparent py-4"
       }`}
     >
       <StreamingTagline />
@@ -141,7 +141,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white absolute top-full left-0 right-0 shadow-lg border-t py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
+        <div className="md:hidden bg-primary absolute top-full left-0 right-0 shadow-lg border-t py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
           <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Home</Link>
           <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Services</Link>
           <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">About Us</Link>
