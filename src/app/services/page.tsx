@@ -30,13 +30,13 @@ export default function ServicesPage() {
               id={service.id}
               className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:border-secondary transition-all group"
             >
-              <div className="text-5xl mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-full aspect-video relative mb-6 rounded-2xl overflow-hidden bg-gray-50">
                 {service.image ? (
-                  <div className="relative w-32 h-32 mx-auto transition-transform group-hover:scale-105">
-                    <Image src={service.image} alt={service.name} fill className="object-contain" />
-                  </div>
+                  <Image src={service.image} alt={service.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                 ) : (
-                  service.icon
+                  <div className="w-full h-full flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
+                    {service.icon}
+                  </div>
                 )}
               </div>
               <h3 className="text-xl font-black mb-4">{service.name}</h3>

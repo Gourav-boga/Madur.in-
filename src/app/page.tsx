@@ -44,13 +44,13 @@ export default function Home() {
               key={cat.id}
               className="group flex flex-col items-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center"
             >
-              <div className="text-4xl mb-4 group-hover:scale-125 transition-transform">
+              <div className="w-full aspect-square relative mb-4 rounded-xl overflow-hidden bg-gray-50">
                 {cat.image ? (
-                  <div className="relative w-28 h-28">
-                    <Image src={cat.image} alt={cat.name} fill className="object-contain" />
-                  </div>
+                  <Image src={cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                 ) : (
-                  cat.icon
+                  <div className="w-full h-full flex items-center justify-center text-4xl group-hover:scale-125 transition-transform">
+                    {cat.icon}
+                  </div>
                 )}
               </div>
               <span className="text-sm font-bold text-gray-700 leading-tight">
