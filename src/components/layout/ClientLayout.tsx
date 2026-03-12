@@ -15,7 +15,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <CartProvider>
       <Navbar />
-      <main className={`min-h-screen ${isHome ? "pt-[180px] md:pt-[190px]" : "pt-[130px] md:pt-[144px]"}`}>
+      <main className={`min-h-screen ${isHome ? "pt-[170px] md:pt-[180px]" : "pt-[130px] md:pt-[144px]"}`}>
         {children}
       </main>
       <Footer />
