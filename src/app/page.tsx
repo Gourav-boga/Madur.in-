@@ -42,20 +42,22 @@ export default function Home() {
             <Link 
               href={`/products?category=${encodeURIComponent(cat.name)}`} 
               key={cat.id}
-              className="group flex flex-col items-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center"
+              className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center overflow-hidden"
             >
-              <div className="w-full aspect-square relative mb-4 rounded-xl overflow-hidden bg-gray-50 p-2">
+              <div className="w-full aspect-[4/3] relative overflow-hidden bg-gray-50">
                 {cat.image ? (
-                  <Image src={cat.image} alt={cat.name} fill className="object-contain p-4 group-hover:scale-110 transition-transform duration-500" />
+                  <Image src={cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-4xl group-hover:scale-125 transition-transform">
+                  <div className="w-full h-full flex items-center justify-center text-6xl group-hover:scale-110 transition-transform">
                     {cat.icon}
                   </div>
                 )}
               </div>
-              <span className="text-sm font-bold text-gray-700 leading-tight">
-                {cat.name}
-              </span>
+              <div className="p-4">
+                <span className="text-sm font-bold text-gray-700 leading-tight">
+                  {cat.name}
+                </span>
+              </div>
             </Link>
           ))}
         </div>
