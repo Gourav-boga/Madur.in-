@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 export default function StreamingTagline() {
   const pathname = usePathname();
 
-  // Only show on the home page
-  if (pathname !== "/") return null;
+  // Show on all pages
 
   return (
     <div className="bg-secondary text-secondary-foreground py-2 overflow-hidden whitespace-nowrap border-b border-white/10">

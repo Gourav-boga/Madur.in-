@@ -6,7 +6,14 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faShoppingCart, faUser, faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { 
+  faBars, 
+  faSearch, 
+  faTimes, 
+  faUser, 
+  faShoppingCart,
+  faChevronLeft
+} from "@fortawesome/free-solid-svg-icons";
 import StreamingTagline from "./StreamingTagline";
 
 export default function Navbar() {
@@ -42,8 +49,20 @@ export default function Navbar() {
     >
       <StreamingTagline />
       <div className="container flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          {/* Back Button (Only on non-home pages) */}
+          {!isHome && (
+            <button
+              onClick={() => router.back()}
+              className="p-2 -ml-2 hover:bg-black/5 rounded-full transition-colors flex items-center justify-center text-gray-700"
+              aria-label="Go back"
+            >
+              <FontAwesomeIcon icon={faChevronLeft} className="text-xl" />
+            </button>
+          )}
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2">
           <Image 
             src="/brand-logo-transparent.png" 
             alt="MADUR.IN Logo" 
