@@ -48,8 +48,8 @@ function ProductsContent() {
             {categoryFilter ? (
               <>
                 {currentCategory?.image ? (
-                  <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-md">
-                    <Image src={currentCategory.image} alt={currentCategory.name} fill className="object-cover" />
+                  <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-md bg-white p-2">
+                    <Image src={currentCategory.image} alt={currentCategory.name} fill className="object-contain p-2" />
                   </div>
                 ) : (
                   <span className="text-4xl">{currentCategory?.icon}</span>
@@ -106,8 +106,8 @@ function ProductsContent() {
                 >
                   {cat.image ? (
                     <div className="flex items-center gap-3">
-                      <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
-                        <Image src={cat.image} alt={cat.name} fill className="object-cover" />
+                      <div className="relative w-12 h-12 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0 bg-white p-1">
+                        <Image src={cat.image} alt={cat.name} fill className="object-contain p-1" />
                       </div>
                       <span className="text-sm line-clamp-1">{cat.name}</span>
                     </div>
