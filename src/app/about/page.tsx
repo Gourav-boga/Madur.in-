@@ -10,7 +10,7 @@ export default function AboutPage() {
   return (
     <div className="pb-20">
       {/* Hero Section */}
-      <section className="bg-secondary/10 pt-32 pb-20 overflow-hidden">
+      <section className="bg-secondary/10 pt-20 pb-20 overflow-hidden">
         <div className="container flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1">
             <h1 className="text-4xl md:text-6xl font-black mb-8 leading-tight">

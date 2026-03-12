@@ -12,7 +12,7 @@ export default function ServicesPage() {
   return (
     <div className="pb-20">
       {/* Header */}
-      <section className="bg-primary pt-32 pb-24 text-center">
+      <section className="bg-primary pt-20 pb-24 text-center">
         <div className="container">
           <h1 className="text-4xl md:text-5xl font-black mb-6">Our Services & Products</h1>
           <p className="text-lg opacity-90 max-w-2xl mx-auto">
