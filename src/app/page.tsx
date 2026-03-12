@@ -8,6 +8,7 @@ import ProductCard from "@/components/common/ProductCard";
 import HomeBanners from "@/components/home/HomeBanners";
 import Link from "next/link";
 import Image from "next/image";
+import Hero from "@/components/home/Hero";
 
 export default function Home() {
   
@@ -24,7 +25,9 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col gap-16 pb-20 pt-32">
+    <div className="flex flex-col gap-16 pb-20 pt-20">
+      <Hero />
+      
       {/* Categories Grid */}
       <section className="container">
         <div className="flex items-center justify-between mb-8">
