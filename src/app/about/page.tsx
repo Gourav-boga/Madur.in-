@@ -10,7 +10,7 @@ export default function AboutPage() {
   return (
     <div className="pb-20">
       {/* Hero Section */}
-      <section className="bg-secondary/10 pt-32 pb-20 overflow-hidden">
+      <section className="bg-background pt-32 pb-20 overflow-hidden">
         <div className="container flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1">
             <h1 className="text-4xl md:text-6xl font-black mb-8 leading-tight">
@@ -67,7 +67,7 @@ export default function AboutPage() {
         </div>
       </section>
       {/* Why Choose Madur */}
-      <section className="bg-white py-20 relative overflow-hidden">
+      <section className="bg-background py-20 relative overflow-hidden">
         <div className="container relative z-10">
           <div className="flex items-center justify-center gap-4 mb-16">
             <div className="h-[2px] bg-secondary/30 flex-1 hidden md:block"></div>
@@ -119,7 +119,7 @@ export default function AboutPage() {
       </section>
 
       {/* Founder Section */}
-      <section className="bg-accent py-24">
+      <section className="bg-background py-24">
         <div className="container max-w-4xl mx-auto rounded-[3rem] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row items-stretch">
            <div className="md:w-1/3 relative min-h-[300px]">
               <Image 

@@ -94,7 +94,7 @@ export default function CartPage() {
 
           {/* Sumary Card */}
           <div className="lg:w-1/3">
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-50 sticky top-28">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-50 sticky top-48">
               <h3 className="text-xl font-black mb-8 pb-4 border-b">Order Summary</h3>
               
               <div className="flex flex-col gap-4 mb-8">

@@ -8,7 +8,7 @@ export default function HomeBanners() {
     <section className="container py-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Card: Customer Reviews */}
-        <div className="relative overflow-hidden rounded-[2rem] shadow-xl border border-orange-100 bg-[#fdf8e9] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6">
+        <div className="relative overflow-hidden rounded-[2rem] shadow-xl border-2 border-primary bg-white p-8 md:p-10 flex flex-col md:flex-row items-center gap-6">
           <div className="flex-1 z-10">
             <h3 className="text-2xl font-black text-[#5d4037] mb-6">Customer Reviews</h3>
             <div className="relative">
@@ -30,7 +30,7 @@ export default function HomeBanners() {
         </div>
 
         {/* Right Card: Join Our Subscription Plans */}
-        <div className="relative overflow-hidden rounded-[2rem] shadow-xl border border-yellow-200 bg-[#fff59d] p-8 md:p-10 flex flex-col md:flex-row items-center gap-6">
+        <div className="relative overflow-hidden rounded-[2rem] shadow-xl border-2 border-secondary bg-white p-8 md:p-10 flex flex-col md:flex-row items-center gap-6">
           <div className="flex-1 z-10">
             <h3 className="text-3xl font-black text-[#33691e] mb-2">Join Our Subscription Plans</h3>
             <p className="text-[#558b2f] font-bold text-lg mb-1">Daily Milk Delivery to Your Home</p>

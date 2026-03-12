@@ -29,7 +29,7 @@ export default function ContactPage() {
   return (
     <div className="pb-20">
       {/* Header */}
-      <section className="bg-secondary text-secondary-foreground pt-32 pb-20 text-center">
+      <section className="bg-background text-foreground pt-32 pb-20 text-center border-b border-black/5">
         <div className="container">
           <h1 className="text-4xl md:text-5xl font-black mb-6">Get In Touch</h1>
           <p className="text-lg opacity-90 max-w-2xl mx-auto">
@@ -155,7 +155,7 @@ export default function ContactPage() {
 
       {/* Map Section Placeholder */}
       <section className="container py-24">
-         <div className="w-full h-[400px] bg-accent rounded-[3rem] overflow-hidden relative shadow-inner border-4 border-white">
+         <div className="w-full h-[400px] bg-white rounded-[3rem] overflow-hidden relative shadow-xl border-4 border-white">
             <div className="absolute inset-0 flex items-center justify-center">
                <div className="text-center">
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="text-5xl text-primary mb-4" />
