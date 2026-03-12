@@ -41,20 +41,23 @@ function ProductsContent() {
   const currentCategory = categories.find(c => c.name.toLowerCase() === categoryFilter?.toLowerCase());
 
   return (
-    <div className="container pt-32 pb-24 min-h-screen">
+    <div className="container pt-4 pb-24 min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
         <div>
-          <h1 className="text-4xl font-black mb-2 flex items-center gap-4">
+          <h1 className="text-2xl md:text-4xl font-black mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {categoryFilter ? (
               <>
                 {currentCategory?.image ? (
-                  <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-md bg-gray-50">
+                  <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-md bg-gray-50 flex-shrink-0">
                     <Image src={currentCategory.image} alt={currentCategory.name} fill className="object-cover" />
                   </div>
                 ) : (
-                  <span className="text-4xl">{currentCategory?.icon}</span>
+                  <span className="text-3xl sm:text-4xl">{currentCategory?.icon}</span>
                 )}
-                <span className="text-secondary">{categoryFilter}</span> Products
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-secondary">{categoryFilter}</span> 
+                  <span>Products</span>
+                </div>
               </>
             ) : "All Products"}
           </h1>
