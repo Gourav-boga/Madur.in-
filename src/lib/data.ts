@@ -1,7 +1,7 @@
 export const categories = [
   { name: "Milk & Dairy", icon: "🥛", id: "milk-dairy", image: "/categories/milk-dairy.png" },
   { name: "Vegetables", icon: "🥦", id: "vegetables", image: "/categories/vegetables.png" },
-  { name: "Groceries / Staples", icon: "🛒", id: "groceries" },
+  { name: "Groceries / Staples", icon: "🛒", id: "groceries", image: "/categories/groceries.png" },
   { name: "Spices & Powders", icon: "🌶️", id: "spices" },
   { name: "Cold Pressed Oils", icon: "🏺", id: "oils", image: "/categories/cold-pressed-oils.png" },
   { name: "Pickles", icon: "🥒", id: "pickles" },
