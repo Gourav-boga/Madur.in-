@@ -1,65 +1,211 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { categories, products } from "@/lib/data";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch, faMapMarkerAlt, faArrowRight, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import ProductCard from "@/components/common/ProductCard";
+import HomeBanners from "@/components/home/HomeBanners";
+import Link from "next/link";
 import Image from "next/image";
 
 export default function Home() {
+  
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    message: ""
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert("Thank you for your inquiry! We will get back to you soon.");
+    setFormData({ name: "", phone: "", message: "" });
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col gap-16 pb-20 pt-32">
+      {/* Categories Grid */}
+      <section className="container">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-black flex items-center gap-3">
+            <span className="w-2 h-8 bg-secondary rounded-full"></span>
+            Shop by Category
+          </h2>
+          <Link href="/services" className="text-secondary font-bold flex items-center gap-2 hover:underline">
+            View All <FontAwesomeIcon icon={faArrowRight} size="xs" />
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+        
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          {categories.map((cat, index) => (
+            <Link 
+              href={`/products?category=${encodeURIComponent(cat.name)}`} 
+              key={cat.id}
+              className="group flex flex-col items-center p-6 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center"
+            >
+              <div className="text-4xl mb-4 group-hover:scale-125 transition-transform">
+                {cat.image ? (
+                  <div className="relative w-16 h-16">
+                    <Image src={cat.image} alt={cat.name} fill className="object-contain" />
+                  </div>
+                ) : (
+                  cat.icon
+                )}
+              </div>
+              <span className="text-sm font-bold text-gray-700 leading-tight">
+                {cat.name}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="bg-accent py-16">
+        <div className="container">
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-2xl font-black flex items-center gap-3">
+              <span className="w-2 h-8 bg-primary rounded-full"></span>
+              Popular Products
+            </h2>
+            <Link href="/products" className="text-primary font-bold flex items-center gap-2 hover:underline text-sm md:text-base">
+              See more Fresh Items <FontAwesomeIcon icon={faArrowRight} size="xs" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
+            {products.slice(0, 8).map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          <div className="flex justify-center">
+            <Link 
+              href="/products" 
+              className="bg-primary text-primary-foreground font-black px-10 py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center gap-3"
+            >
+              VIEW ALL PRODUCTS
+              <FontAwesomeIcon icon={faArrowRight} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Story Section */}
+      <section className="container py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="relative aspect-square md:aspect-auto md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
+            <Image 
+              src="/hero-banner.png"
+              alt="Farm fresh journey"
+              fill
+              className="object-contain"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div className="absolute bottom-10 left-10 p-6 bg-white/90 backdrop-blur rounded-2xl shadow-xl max-w-xs">
+              <p className="font-black text-primary text-xl mb-1">Purity First</p>
+              <p className="text-xs text-gray-600 font-bold">Reviving traditional ways for a healthier tomorrow.</p>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-3xl md:text-5xl font-black mb-8 leading-tight">
+              The Journey of <span className="text-primary">MADUR.IN</span>
+            </h2>
+            <p className="text-gray-600 text-lg leading-relaxed mb-8">
+              Madur.in is born out of a passion for purity and healthy living. We bridge the gap between rural pure produce and urban healthy living, delivering 100% natural and farm-fresh products directly to your doorstep.
+            </p>
+            
+            <div className="grid grid-cols-2 gap-6 mb-10">
+              <div className="bg-accent p-6 rounded-2xl border-l-4 border-secondary shadow-sm">
+                <h4 className="font-black text-3xl text-secondary mb-1">100%</h4>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Natural Produces</p>
+              </div>
+              <div className="bg-accent p-6 rounded-2xl border-l-4 border-primary shadow-sm">
+                <h4 className="font-black text-3xl text-primary mb-1">Farm</h4>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">To Home Delivery</p>
+              </div>
+            </div>
+
+            <Link href="/about" className="group bg-secondary text-secondary-foreground font-black px-10 py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all flex items-center gap-3 w-fit">
+              READ FULL STORY
+              <FontAwesomeIcon icon={faArrowRight} className="group-hover:translate-x-2 transition-transform" />
+            </Link>
+          </div>
         </div>
-      </main>
+      </section>
+
+      <HomeBanners />
+
+      {/* Contact Form Section (Replaced Image Preview) */}
+      <section className="container py-10">
+        <div className="bg-secondary/10 rounded-[2rem] p-8 md:p-16 flex flex-col lg:flex-row items-center gap-12">
+          <div className="flex-1">
+            <h2 className="text-3xl md:text-4xl font-black mb-6 leading-tight">
+              Purely Natural. <br />
+              Part of Your Healthy Life.
+            </h2>
+            <p className="text-gray-600 mb-8 leading-relaxed">
+              At Madur.in, we believe in the power of pure, natural nutrition. Have questions about our products or delivery? We're here to help you live a healthier, purer life.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/contact" className="bg-secondary text-secondary-foreground font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all flex items-center gap-3">
+                VIEW CONTACT DETAILS
+                <FontAwesomeIcon icon={faArrowRight} />
+              </Link>
+            </div>
+          </div>
+          
+          <div className="flex-1 w-full max-w-lg">
+            <div className="bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-white/50">
+              <h3 className="text-2xl font-black mb-6">Send an Inquiry</h3>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Full Name</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="Enter your name"
+                    className="bg-accent/50 border-none rounded-xl p-4 text-sm outline-none focus:ring-2 ring-primary transition-all"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Phone Number</label>
+                  <input 
+                    type="tel" 
+                    required
+                    placeholder="Enter phone number"
+                    className="bg-accent/50 border-none rounded-xl p-4 text-sm outline-none focus:ring-2 ring-primary transition-all"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">How can we help?</label>
+                  <textarea 
+                    rows={3}
+                    required
+                    placeholder="Your message"
+                    className="bg-accent/50 border-none rounded-xl p-4 text-sm outline-none focus:ring-2 ring-primary resize-none transition-all"
+                    value={formData.message}
+                    onChange={(e) => setFormData({...formData, message: e.target.value})}
+                  ></textarea>
+                </div>
+                <button 
+                  type="submit"
+                  className="bg-primary text-primary-foreground font-black py-4 rounded-xl shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-3 mt-2"
+                >
+                  <FontAwesomeIcon icon={faPaperPlane} />
+                  SUBMIT FORM
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

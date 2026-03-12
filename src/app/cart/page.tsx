@@ -1,0 +1,133 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useCart } from "@/context/CartContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faMinus, faTrash, faArrowLeft, faShoppingBag } from "@fortawesome/free-solid-svg-icons";
+
+export default function CartPage() {
+  const { cart, removeFromCart, updateQuantity, cartTotal } = useCart();
+
+  if (cart.length === 0) {
+    return (
+      <div className="container pt-32 pb-24 flex flex-col items-center justify-center text-center">
+        <div className="text-8xl mb-8 opacity-20">🛒</div>
+        <h2 className="text-3xl font-black mb-4">Your cart is empty</h2>
+        <p className="text-gray-500 mb-10 max-w-sm">Looks like you haven't added anything to your cart yet. Fresh milk and organic veggies are waiting!</p>
+        <Link 
+          href="/" 
+          className="bg-primary text-primary-foreground font-black px-10 py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all active:scale-95 flex items-center gap-3"
+        >
+          <FontAwesomeIcon icon={faShoppingBag} />
+          Start Shopping
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pb-24 pt-32">
+      <div className="container">
+        <div className="flex items-center gap-4 mb-10">
+          <Link href="/" className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-accent transition-colors">
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </Link>
+          <h1 className="text-3xl font-black">Shopping Cart</h1>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* Item List */}
+          <div className="lg:w-2/3 flex flex-col gap-6">
+            {cart.map((item, index) => (
+              <div 
+                key={item.id} 
+                className="bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-6"
+              >
+                <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-md shrink-0">
+                  <Image 
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
+                <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold text-secondary mb-1">{item.category}</p>
+                    <h3 className="text-lg font-black text-gray-800 mb-1">{item.name}</h3>
+                    <p className="text-primary font-black">₹{item.price}</p>
+                  </div>
+
+                  <div className="flex items-center justify-between md:justify-end gap-8">
+                    {/* Quantity Selector */}
+                    <div className="flex items-center gap-4 bg-accent rounded-xl px-2 py-1">
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-gray-500"
+                      >
+                        <FontAwesomeIcon icon={faMinus} size="sm" />
+                      </button>
+                      <span className="font-black w-6 text-center">{item.quantity}</span>
+                      <button 
+                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-gray-500"
+                      >
+                        <FontAwesomeIcon icon={faPlus} size="sm" />
+                      </button>
+                    </div>
+
+                    <p className="font-black text-lg hidden md:block">₹{item.price * item.quantity}</p>
+
+                    <button 
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-gray-300 hover:text-red-500 transition-colors p-2"
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Sumary Card */}
+          <div className="lg:w-1/3">
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-50 sticky top-28">
+              <h3 className="text-xl font-black mb-8 pb-4 border-b">Order Summary</h3>
+              
+              <div className="flex flex-col gap-4 mb-8">
+                <div className="flex justify-between text-gray-500">
+                  <span>Subtotal</span>
+                  <span className="font-bold text-gray-800">₹{cartTotal}</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>Delivery Charge</span>
+                  <span className="text-green-600 font-bold">FREE</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>GST (Tax)</span>
+                  <span className="font-bold text-gray-800">₹0</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-6 border-t mb-10">
+                <span className="text-xl font-black">Total Payable</span>
+                <span className="text-3xl font-black text-primary">₹{cartTotal}</span>
+              </div>
+
+              <button className="w-full bg-primary text-primary-foreground font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 mb-4">
+                Proceed to Checkout
+              </button>
+              
+              <p className="text-[10px] text-center text-gray-400 font-bold uppercase tracking-widest">
+                Secure 256-bit SSL encrypted payment
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
