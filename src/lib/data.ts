@@ -3,7 +3,7 @@ export const categories = [
   { name: "Vegetables", icon: "🥦", id: "vegetables" },
   { name: "Groceries / Staples", icon: "🛒", id: "groceries" },
   { name: "Spices & Powders", icon: "🌶️", id: "spices" },
-  { name: "Cold Pressed Oils", icon: "🏺", id: "oils" },
+  { name: "Cold Pressed Oils", icon: "🏺", id: "oils", image: "/categories/cold-pressed-oils.png" },
   { name: "Pickles", icon: "🥒", id: "pickles" },
   { name: "Traditional Snacks", icon: "🥨", id: "snacks" },
   { name: "Eggs", icon: "🥚", id: "eggs" },
