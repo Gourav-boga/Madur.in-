@@ -35,7 +35,7 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+        isScrolled ? "bg-white shadow-md py-1" : "bg-transparent py-2"
       }`}
     >
       <div className="container flex items-center justify-between">
@@ -46,7 +46,7 @@ export default function Navbar() {
             alt="MADUR.IN Logo" 
             width={400} 
             height={120} 
-            className="h-28 md:h-36 w-auto object-contain"
+            className="h-16 md:h-20 w-auto object-contain"
             priority
           />
         </Link>
