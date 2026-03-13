@@ -41,7 +41,7 @@ export default function CartPage() {
           <div className="lg:w-2/3 flex flex-col gap-6">
             {cart.map((item, index) => (
               <div 
-                key={item.id} 
+                key={`${item.id}-${item.selectedUnit}-${index}`} 
                 className="bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-6"
               >
                 <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-md shrink-0">
@@ -56,7 +56,14 @@ export default function CartPage() {
                 <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-bold text-secondary mb-1">{item.category}</p>
-                    <h3 className="text-lg font-black text-gray-800 mb-1">{item.name}</h3>
+                    <h3 className="text-lg font-black text-gray-800 mb-1 flex items-center gap-2">
+                      {item.name}
+                      {item.selectedUnit && (
+                        <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
+                          {item.selectedUnit}
+                        </span>
+                      )}
+                    </h3>
                     <p className="text-primary font-black">₹{item.price}</p>
                   </div>
 
@@ -64,14 +71,14 @@ export default function CartPage() {
                     {/* Quantity Selector */}
                     <div className="flex items-center gap-4 bg-accent rounded-xl px-2 py-1">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedUnit)}
                         className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-gray-500"
                       >
                         <FontAwesomeIcon icon={faMinus} size="sm" />
                       </button>
                       <span className="font-black w-6 text-center">{item.quantity}</span>
                       <button 
-                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                         onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedUnit)}
                         className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-gray-500"
                       >
                         <FontAwesomeIcon icon={faPlus} size="sm" />
@@ -81,7 +88,7 @@ export default function CartPage() {
                     <p className="font-black text-lg hidden md:block">₹{item.price * item.quantity}</p>
 
                     <button 
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.id, item.selectedUnit)}
                       className="text-gray-300 hover:text-red-500 transition-colors p-2"
                     >
                       <FontAwesomeIcon icon={faTrash} />
