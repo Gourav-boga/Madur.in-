@@ -2,76 +2,84 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, EffectFade } from "swiper/modules";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/effect-fade";
+import "swiper/css/pagination";
+
+const heroImages = [
+  "/hero/hero-1.png",
+  "/hero/hero-2.png",
+  "/hero/hero-3.png",
+  "/hero/hero-4.png",
+  "/hero/hero-5.png",
+];
+
 export default function Hero() {
   return (
-    <section className="relative bg-background overflow-hidden pt-0 pb-20 md:pt-0 md:pb-24">
-      {/* Background patterns/blobs */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-secondary/5 rounded-l-[10rem] -z-0 transform translate-x-20"></div>
+    <section className="relative w-full h-[600px] md:h-[800px] overflow-hidden">
+      {/* Background Swiper */}
+      <div className="absolute inset-0 z-0">
+        <Swiper
+          modules={[Autoplay, EffectFade]}
+          effect="fade"
+          autoplay={{
+            delay: 5000,
+            disableOnInteraction: false,
+          }}
+          loop={true}
+          className="w-full h-full"
+        >
+          {heroImages.map((src, index) => (
+            <SwiperSlide key={index}>
+              <div className="relative w-full h-full">
+                <Image 
+                  src={src} 
+                  alt={`Hero Background ${index + 1}`} 
+                  fill 
+                  className="object-cover"
+                  priority={index === 0}
+                />
+                {/* Dark Overlay - matches the reference aesthetic */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
       
-      <div className="container relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left Content */}
-          <div className="flex flex-col items-start gap-6 md:gap-8 max-w-2xl">
-            <div className="inline-flex items-center px-4 py-2 bg-secondary/20 text-secondary-foreground rounded-full text-xs md:text-sm font-bold tracking-tight">
-              Farm Fresh & Pure
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 leading-[1.1]">
-              Freshness Delivered <br />
-              From Our <span className="text-secondary">Farm To</span> <br />
-              Your Door
-            </h1>
-            
-            <p className="text-gray-600 text-lg md:text-xl leading-relaxed font-medium">
-              Get premium quality milk, groceries, and traditional homemade products with the trust of Madur.in.
+      {/* Content Overlay */}
+      <div className="container relative z-10 h-full flex flex-col justify-center items-start px-6 md:px-12">
+        <div className="max-w-4xl space-y-3 md:space-y-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white italic leading-tight uppercase tracking-tighter">
+            empowering every <br />
+            <span className="text-primary inline-block underline decoration-primary decoration-2 md:decoration-4 underline-offset-[8px] md:underline-offset-[10px]">freshness</span> <br />
+            from farm to <br />
+            <span className="underline decoration-white decoration-2 md:decoration-4 underline-offset-[8px] md:underline-offset-[10px]">your door</span>
+          </h1>
+          
+          <div className="max-w-xl bg-black/30 backdrop-blur-sm p-3 rounded-xl border-l-2 border-primary">
+            <p className="text-white text-sm md:text-base font-bold leading-relaxed shadow-black drop-shadow-lg">
+              Freshness Delivered with Trust. Get premium quality milk, groceries, and traditional 
+              homemade products directly from local farms.
             </p>
-            
-            <div className="flex flex-wrap gap-4 pt-4">
-              <Link 
-                href="/products" 
-                className="bg-primary text-primary-foreground font-black px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2"
-              >
-                Shop Now
-              </Link>
-              <Link 
-                href="/services" 
-                className="bg-white border-2 border-gray-100 text-gray-700 font-black px-8 py-4 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-2"
-              >
-                View Services
-              </Link>
-            </div>
           </div>
-
-          {/* Right Visuals */}
-          <div className="relative h-[400px] md:h-[500px] flex items-center justify-center lg:justify-end mt-12 lg:mt-0">
-            {/* Image Card 1 - Vegetables */}
-            <div className="absolute top-0 right-10 md:right-20 w-[240px] md:w-[320px] aspect-[4/5] bg-white rounded-3xl shadow-2xl overflow-hidden border-8 border-white transform rotate-6 hover:rotate-0 transition-transform duration-500 z-10">
-              <Image 
-                src="/categories/vegetables.png" 
-                alt="Fresh Vegetables" 
-                fill 
-                className="object-cover"
-              />
-            </div>
-            
-            {/* Image Card 2 - Milk */}
-            <div className="absolute bottom-0 left-10 md:left-20 lg:left-0 w-[220px] md:w-[280px] aspect-[3/4] bg-white rounded-3xl shadow-2xl overflow-hidden border-8 border-white transform -rotate-6 hover:rotate-0 transition-transform duration-500 z-20">
-              <Image 
-                src="/categories/milk-dairy.png" 
-                alt="Fresh Milk" 
-                fill 
-                className="object-cover"
-              />
-            </div>
-
-            {/* Subtext tag on image */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl z-30 transform hover:scale-105 transition-all text-center border border-secondary/20">
-                <span className="block text-primary font-black text-xs md:text-sm uppercase tracking-widest mb-1 leading-tight">100% Organic</span>
-                <span className="block text-gray-800 font-black text-base md:text-lg leading-tight italic">Direct From Farm</span>
-            </div>
+          
+          <div className="pt-4 md:pt-8">
+            <Link 
+              href="/services" 
+              className="group bg-primary text-black font-black px-6 py-4 md:px-10 md:py-6 rounded-xl shadow-2xl hover:bg-white transition-all flex items-center gap-4 w-fit active:scale-95"
+            >
+              <div className="w-8 h-8 md:w-12 md:h-12 bg-black/10 rounded-full flex items-center justify-center text-black group-hover:bg-primary transition-colors">
+                <FontAwesomeIcon icon={faArrowRight} className="text-lg md:text-xl" />
+              </div>
+              <span className="text-base md:text-xl uppercase tracking-widest">Explore Services</span>
+            </Link>
           </div>
         </div>
       </div>
