@@ -45,15 +45,18 @@ export default function CartPage() {
                 className="bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-6"
               >
                 <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-md shrink-0 bg-gray-50 flex items-center justify-center">
-                  {item.image ? (
+                  {(item.image || (item as any).image_url) ? (
                     <Image 
-                      src={item.image}
+                      src={item.image || (item as any).image_url}
                       alt={item.name}
                       fill
                       className="object-cover"
                     />
                   ) : (
-                    <span className="text-2xl">📦</span>
+                    <div className="flex flex-col items-center text-gray-300">
+                      <span className="text-2xl mb-1">📦</span>
+                      <span className="text-[8px] font-black uppercase">No Image</span>
+                    </div>
                   )}
                 </div>
 
