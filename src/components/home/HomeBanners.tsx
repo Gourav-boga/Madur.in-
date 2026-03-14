@@ -2,8 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import React, { useState } from "react";
+import SubscriptionModal from "./SubscriptionModal";
 
 export default function HomeBanners() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section className="container py-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -35,12 +39,12 @@ export default function HomeBanners() {
             <h3 className="text-3xl font-black text-[#33691e] mb-2">Join Our Subscription Plans</h3>
             <p className="text-[#558b2f] font-bold text-lg mb-1">Daily Milk Delivery to Your Home</p>
             <p className="text-[#33691e] font-black text-xl mb-6 tracking-wide underline decoration-wavy underline-offset-4">Choose Your Plan</p>
-            <Link 
-              href="/register" 
+            <button 
+              onClick={() => setIsModalOpen(true)}
               className="bg-[#689f38] text-white font-black px-8 py-4 rounded-xl shadow-lg hover:bg-[#558b2f] transition-all inline-block active:scale-95"
             >
               Subscribe Now
-            </Link>
+            </button>
           </div>
           <div className="w-48 h-48 md:w-56 md:h-56 relative flex-shrink-0">
              <Image 
@@ -52,6 +56,11 @@ export default function HomeBanners() {
           </div>
         </div>
       </div>
+
+      <SubscriptionModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 }

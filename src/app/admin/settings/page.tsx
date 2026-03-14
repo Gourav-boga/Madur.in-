@@ -1,0 +1,115 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faSave, faCog } from "@fortawesome/free-solid-svg-icons";
+import { supabase } from "@/lib/supabase";
+
+export default function AdminSettingsPage() {
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [subscriptionFee, setSubscriptionFee] = useState("599");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const isAdmin = localStorage.getItem("isAdminAuthenticated");
+    if (isAdmin !== "true") {
+      router.push("/admin/login");
+    } else {
+      setIsAuthorized(true);
+      fetchSettings();
+    }
+  }, [router]);
+
+  async function fetchSettings() {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from("settings")
+      .select("value")
+      .eq("key", "subscription_fee")
+      .single();
+    
+    if (data && !error) {
+      setSubscriptionFee(data.value);
+    }
+    setIsLoading(false);
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setIsSaving(true);
+    const { error } = await supabase
+      .from("settings")
+      .update({ value: subscriptionFee })
+      .eq("key", "subscription_fee");
+    
+    if (error) {
+      alert("Error saving settings!");
+    } else {
+      alert("Settings saved successfully!");
+    }
+    setIsSaving(false);
+  }
+
+  if (!isAuthorized || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-accent/30">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-accent/30 p-4 md:p-8">
+      <div className="container mx-auto max-w-4xl">
+        <div className="flex items-center gap-4 mb-8">
+          <Link href="/admin" className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all shadow-sm">
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </Link>
+          <h1 className="text-3xl font-black text-black">Global Settings</h1>
+        </div>
+
+        <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-8 md:p-12">
+          <div className="flex items-center gap-4 mb-10 pb-6 border-b border-gray-100">
+             <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-primary">
+                <FontAwesomeIcon icon={faCog} className="text-xl" />
+             </div>
+             <div>
+                <h3 className="text-xl font-black text-black">Subscription Configuration</h3>
+                <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">Manage your subscription parameters</p>
+             </div>
+          </div>
+
+          <form onSubmit={handleSave} className="space-y-8">
+            <div>
+              <label className="text-xs font-black text-gray-500 uppercase tracking-widest block mb-4 ml-1 text-black">Monthly Subscription Fee (₹)</label>
+              <div className="relative">
+                <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-gray-300">₹</span>
+                <input 
+                  type="number"
+                  required
+                  className="w-full bg-accent/30 border-none rounded-2xl py-6 pl-12 pr-6 text-2xl font-black text-black outline-none focus:ring-4 ring-primary/20 transition-all"
+                  value={subscriptionFee}
+                  onChange={(e) => setSubscriptionFee(e.target.value)}
+                />
+              </div>
+              <p className="text-xs text-gray-400 font-bold mt-4 px-2">This value will be displayed to users in the Subscription Modal and used for all new registrations.</p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="w-full bg-primary text-black font-black py-5 rounded-2xl shadow-xl shadow-primary/20 hover:opacity-90 transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
+            >
+              <FontAwesomeIcon icon={faSave} />
+              {isSaving ? "Saving..." : "Save Configuration"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}

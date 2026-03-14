@@ -12,6 +12,17 @@ import Image from "next/image";
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const isAdmin = pathname?.startsWith("/admin");
+
+  if (isAdmin) {
+    return (
+      <CartProvider>
+        <main className="min-h-screen bg-accent/30">
+          {children}
+        </main>
+      </CartProvider>
+    );
+  }
 
   return (
     <CartProvider>

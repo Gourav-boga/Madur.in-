@@ -14,7 +14,7 @@ export default function AboutPage() {
         <div className="container flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1">
             <h1 className="text-4xl md:text-6xl font-black mb-8 leading-tight">
-              Bringing the <span className="text-secondary">Farm</span> <br /> Closer to You.
+              Bringing the <span className="text-brown">Farm</span> <br /> Closer to You.
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed mb-8">
               Madur.in is a local farm-fresh grocery and dairy brand focused on delivering pure, natural, and high-quality products directly to customers' homes. Our mission is to provide fresh milk, vegetables, groceries, traditional sweets, and homemade food products with trusted quality and affordable prices.
@@ -79,7 +79,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="flex flex-col items-center text-center">
-              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden border-8 border-accent shadow-xl">
+              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden shadow-xl">
                  <Image src="/about/delivery-man.png" alt="Daily Fresh Delivery" fill className="object-cover" />
               </div>
               <div className="flex items-center gap-3 mb-4">
@@ -91,7 +91,7 @@ export default function AboutPage() {
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden border-8 border-accent shadow-xl">
+              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden shadow-xl">
                  <Image src="/about/quality-seal.png" alt="Best Quality Products" fill className="object-cover" />
               </div>
               <div className="flex items-center gap-3 mb-4">
@@ -103,7 +103,7 @@ export default function AboutPage() {
             </div>
 
             <div className="flex flex-col items-center text-center">
-              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden border-8 border-accent shadow-xl">
+              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden shadow-xl">
                  <Image src="/about/delivery-van.png" alt="Free Home Delivery" fill className="object-cover" />
               </div>
               <div className="flex items-center gap-3 mb-4">

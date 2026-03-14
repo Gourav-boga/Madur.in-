@@ -1,22 +1,38 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { categories, products } from "@/lib/data";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faMapMarkerAlt, faArrowRight, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faArrowRight, faPaperPlane, faBox } from "@fortawesome/free-solid-svg-icons";
 import ProductCard from "@/components/common/ProductCard";
 import HomeBanners from "@/components/home/HomeBanners";
 import Link from "next/link";
 import Image from "next/image";
 import Hero from "@/components/home/Hero";
+import { supabase } from "@/lib/supabase";
 
 export default function Home() {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     message: ""
   });
+
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      const { data: catData } = await supabase.from("categories").select("*");
+      const { data: prodData } = await supabase.from("products").select("*, categories(name)").limit(8);
+      
+      setCategories(catData || []);
+      setProducts(prodData || []);
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,28 +47,30 @@ export default function Home() {
       {/* Categories Grid */}
       <section className="container">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-black flex items-center gap-3">
+          <h2 className="text-2xl font-black flex items-center gap-3 text-black">
             <span className="w-2 h-8 bg-secondary rounded-full"></span>
             Shop by Category
           </h2>
-          <Link href="/services" className="text-secondary font-bold flex items-center gap-2 hover:underline">
+          <Link href="/products" className="text-secondary font-bold flex items-center gap-2 hover:underline">
             View All <FontAwesomeIcon icon={faArrowRight} size="xs" />
           </Link>
         </div>
         
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {categories.map((cat, index) => (
+          {isLoading ? (
+            [...Array(4)].map((_, i) => <div key={i} className="h-48 bg-gray-100 animate-pulse rounded-2xl"></div>)
+          ) : categories.map((cat, index) => (
             <Link 
               href={`/products?category=${encodeURIComponent(cat.name)}`} 
               key={cat.id}
               className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-secondary transition-all text-center overflow-hidden"
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative overflow-hidden bg-gray-50">
-                {cat.image ? (
-                  <Image src={cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                {cat.image_url || cat.image ? (
+                  <Image src={cat.image_url || cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-6xl group-hover:scale-110 transition-transform">
-                    {cat.icon}
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <FontAwesomeIcon icon={faBox} className="text-gray-200 text-4xl" />
                   </div>
                 )}
               </div>
@@ -70,7 +88,7 @@ export default function Home() {
       <section className="bg-secondary/5 py-16">
         <div className="container">
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-2xl font-black flex items-center gap-3">
+            <h2 className="text-2xl font-black flex items-center gap-3 text-black">
               <span className="w-2 h-8 bg-primary rounded-full"></span>
               Popular Products
             </h2>
@@ -80,7 +98,9 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
-            {products.slice(0, 8).map(product => (
+            {isLoading ? (
+                [...Array(4)].map((_, i) => <div key={i} className="h-80 bg-white/50 animate-pulse rounded-3xl"></div>)
+            ) : products.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -115,7 +135,7 @@ export default function Home() {
           </div>
 
           <div>
-            <h2 className="text-3xl md:text-5xl font-black mb-8 leading-tight">
+            <h2 className="text-3xl md:text-5xl font-black mb-8 leading-tight text-black">
               The Journey of <span className="text-primary">MADUR.IN</span>
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed mb-8">
@@ -143,11 +163,11 @@ export default function Home() {
 
       <HomeBanners />
 
-      {/* Contact Form Section (Replaced Image Preview) */}
+      {/* Contact Form Section */}
       <section className="container py-10">
         <div className="bg-secondary/10 rounded-[2rem] p-8 md:p-16 flex flex-col lg:flex-row items-center gap-12">
           <div className="flex-1">
-            <h2 className="text-3xl md:text-4xl font-black mb-6 leading-tight">
+            <h2 className="text-3xl md:text-4xl font-black mb-6 leading-tight text-black">
               Purely Natural. <br />
               Part of Your Healthy Life.
             </h2>
@@ -164,9 +184,9 @@ export default function Home() {
           
           <div className="flex-1 w-full max-w-lg">
             <div className="bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-white/50">
-              <h3 className="text-2xl font-black mb-6">Send an Inquiry</h3>
+              <h3 className="text-2xl font-black mb-6 text-black">Send an Inquiry</h3>
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 text-black">
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Full Name</label>
                   <input 
                     type="text" 
@@ -177,7 +197,7 @@ export default function Home() {
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                   />
                 </div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 text-black">
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Phone Number</label>
                   <input 
                     type="tel" 
@@ -188,7 +208,7 @@ export default function Home() {
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   />
                 </div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 text-black">
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">How can we help?</label>
                   <textarea 
                     rows={3}

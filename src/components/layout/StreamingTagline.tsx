@@ -8,7 +8,7 @@ export default function StreamingTagline() {
   // Show on all pages
 
   return (
-    <div className="bg-secondary text-secondary-foreground py-2 overflow-hidden whitespace-nowrap border-b border-white/10">
+    <div className="bg-red-600 text-white py-2 overflow-hidden whitespace-nowrap border-b border-red-700">
       <div className="flex items-center">
         <div className="animate-marquee inline-block">
           <span className="px-4 text-sm font-bold uppercase tracking-wider">
