@@ -2,23 +2,17 @@ import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
+// Helper to get Razorpay client only at runtime
+function getRazorpayClient() {
+  const Razorpay = require("razorpay");
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_dummy_key",
+    key_secret: process.env.RAZORPAY_KEY_SECRET || "dummy_secret",
+  });
+}
+
 export async function POST(request: Request) {
   try {
-    // Check credentials first to prevent initialization if they are missing
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      console.error("Razorpay Error: Missing Key ID or Secret");
-      return NextResponse.json(
-        { error: "Razorpay credentials are not configured" },
-        { status: 500 }
-      );
-    }
-
-    const Razorpay = require("razorpay");
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_dummy_key",
-      key_secret: process.env.RAZORPAY_KEY_SECRET || "dummy_secret",
-    });
-
     const { amount, currency = "INR" } = await request.json();
 
     if (!amount) {
@@ -28,19 +22,21 @@ export async function POST(request: Request) {
       );
     }
 
+    // Initialize client only when needed
+    const razorpay = getRazorpayClient();
+
     const options = {
-      amount: amount * 100, // amount in smallest currency unit (paise)
+      amount: amount * 100, // paise
       currency,
-      receipt: `receipt_sub_${Date.now()}`,
+      receipt: `rcpt_${Date.now()}`,
     };
 
     const order = await razorpay.orders.create(options);
-
     return NextResponse.json(order);
-  } catch (error) {
-    console.error("Razorpay Order Error:", error);
+  } catch (error: any) {
+    console.error("Razorpay Error:", error);
     return NextResponse.json(
-      { error: "Failed to create Razorpay order" },
+      { error: error.message || "Failed to create order" },
       { status: 500 }
     );
   }

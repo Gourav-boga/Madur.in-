@@ -44,13 +44,17 @@ export default function CartPage() {
                 key={`${item.id}-${item.selectedUnit}-${index}`} 
                 className="bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-6"
               >
-                <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-md shrink-0">
-                  <Image 
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-cover"
-                  />
+                <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-md shrink-0 bg-gray-50 flex items-center justify-center">
+                  {item.image ? (
+                    <Image 
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <span className="text-2xl">📦</span>
+                  )}
                 </div>
 
                 <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">

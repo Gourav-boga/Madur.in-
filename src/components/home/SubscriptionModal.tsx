@@ -19,7 +19,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
     location: "",
     address: "",
     street: "",
-    payment_screenshot_url: "",
+    payment_screenshot_url: null as string | null,
   });
 
   const [subscriptionAmount, setSubscriptionAmount] = useState(599);
