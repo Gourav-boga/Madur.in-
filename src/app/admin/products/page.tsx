@@ -16,6 +16,7 @@ interface Product {
   price: number;
   image_url: string;
   description: string;
+  is_out_of_stock: boolean;
   categories?: { name: string };
 }
 
@@ -39,7 +40,8 @@ export default function AdminProductsPage() {
     unit: "",
     price: 0,
     image_url: "",
-    description: ""
+    description: "",
+    is_out_of_stock: false
   });
   const [uploading, setUploading] = useState(false);
 
@@ -121,7 +123,7 @@ export default function AdminProductsPage() {
 
       setIsModalOpen(false);
       setEditingProduct(null);
-      setFormData({ name: "", category_id: "", unit: "", price: 0, image_url: "", description: "" });
+      setFormData({ name: "", category_id: "", unit: "", price: 0, image_url: "", description: "", is_out_of_stock: false });
       fetchData();
     } catch (error) {
       console.error("Error saving product:", error);
@@ -151,11 +153,12 @@ export default function AdminProductsPage() {
         unit: product.unit,
         price: product.price,
         image_url: product.image_url,
-        description: product.description
+        description: product.description,
+        is_out_of_stock: product.is_out_of_stock || false
       });
     } else {
       setEditingProduct(null);
-      setFormData({ name: "", category_id: categories[0]?.id || "", unit: "1litre", price: 0, image_url: "", description: "" });
+      setFormData({ name: "", category_id: categories[0]?.id || "", unit: "1litre", price: 0, image_url: "", description: "", is_out_of_stock: false });
     }
     setIsModalOpen(true);
   };
@@ -214,6 +217,7 @@ export default function AdminProductsPage() {
                   <th className="px-8 py-5">Category</th>
                   <th className="px-8 py-5">Price</th>
                   <th className="px-8 py-5">Unit</th>
+                  <th className="px-8 py-5">Status</th>
                   <th className="px-8 py-5 text-right">Actions</th>
                 </tr>
               </thead>
@@ -243,6 +247,17 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="px-8 py-5 font-black text-primary text-lg">₹{product.price}</td>
                     <td className="px-8 py-5 font-bold text-sm">{product.unit}</td>
+                    <td className="px-8 py-5">
+                      {product.is_out_of_stock ? (
+                        <span className="bg-red-100 text-red-600 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
+                          Out of Stock
+                        </span>
+                      ) : (
+                        <span className="bg-green-100 text-green-600 font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
+                          In Stock
+                        </span>
+                      )}
+                    </td>
                     <td className="px-8 py-5 text-right">
                       <div className="flex justify-end gap-3">
                         <button 
@@ -322,6 +337,19 @@ export default function AdminProductsPage() {
                     <option value="1000grms">1000grms</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-4 bg-accent/30 rounded-2xl border-2 border-dashed border-gray-100">
+                <input 
+                  type="checkbox"
+                  id="is_out_of_stock"
+                  className="w-5 h-5 accent-primary cursor-pointer"
+                  checked={formData.is_out_of_stock}
+                  onChange={(e) => setFormData({...formData, is_out_of_stock: e.target.checked})}
+                />
+                <label htmlFor="is_out_of_stock" className="text-sm font-black text-gray-700 cursor-pointer uppercase tracking-tight">
+                  Mark as Out of Stock
+                </label>
               </div>
 
               <div className="space-y-2">

@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import StreamingTagline from "@/components/layout/StreamingTagline";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/common/WhatsAppButton";
+import SplashScreen from "@/components/layout/SplashScreen";
 
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -26,6 +27,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <CartProvider>
+      <SplashScreen />
       <Navbar />
       <main className={`min-h-screen ${isHome ? "pt-[230px] md:pt-[190px]" : "pt-[175px] md:pt-[180px]"}`}>
         {children}
