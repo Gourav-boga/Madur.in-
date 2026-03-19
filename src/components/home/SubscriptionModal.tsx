@@ -20,6 +20,8 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
     address: "",
     street: "",
     payment_screenshot_url: null as string | null,
+    product_id: "",
+    quantity: 1,
   });
 
   const [subscriptionAmount, setSubscriptionAmount] = useState(599);
@@ -28,22 +30,32 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [dairyProducts, setDairyProducts] = useState<any[]>([]);
 
   // Fetch subscription fee from settings
   React.useEffect(() => {
-    async function fetchFee() {
-      const { data, error } = await supabase
-        .from("settings")
-        .select("value")
-        .eq("key", "subscription_fee")
-        .single();
-      
-      if (data && !error) {
-        setSubscriptionAmount(parseInt(data.value));
+    async function fetchDetails() {
+      // Fetch fee
+      const { data: feeData } = await supabase.from("settings").select("value").eq("key", "subscription_fee").maybeSingle();
+      if (feeData) setSubscriptionAmount(parseInt(feeData.value));
+
+      // Fetch Milk Products
+      const { data: catData } = await supabase.from("categories").select("id").ilike("name", "%Milk%").limit(1).maybeSingle();
+      let prods: any[] = [];
+      if (catData) {
+        const { data: milkProds } = await supabase.from("products").select("*").eq("category_id", catData.id);
+        prods = milkProds || [];
       }
+      if (prods.length === 0) {
+        const { data: allProds } = await supabase.from("products").select("*").limit(10);
+        prods = allProds || [];
+      }
+      setDairyProducts(prods);
+      if (prods.length > 0) setFormData(prev => ({ ...prev, product_id: prods[0].id }));
     }
+
     if (isOpen) {
-      fetchFee();
+      fetchDetails();
       setIsSuccess(false);
       setCurrentStep(1);
     }
@@ -142,6 +154,8 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
         payment_screenshot_url: formData.payment_screenshot_url,
         amount_paid: subscriptionAmount,
         status: 'active',
+        product_id: formData.product_id,
+        quantity: formData.quantity,
         plan_details: `Monthly Subscription (₹${subscriptionAmount})`
       }]);
 
@@ -252,21 +266,35 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                           </div>
                         </div>
 
+                        <div className="relative">
+                          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Phone Number</label>
+                          <div className="relative">
+                            <FontAwesomeIcon icon={faPhone} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
+                            <input 
+                              required
+                              type="tel" 
+                              name="phone"
+                              placeholder="Your Phone"
+                              className="w-full bg-accent/30 border border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 ring-primary transition-all font-bold"
+                              value={formData.phone}
+                              onChange={handleChange}
+                            />
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="relative">
-                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Phone Number</label>
-                            <div className="relative">
-                              <FontAwesomeIcon icon={faPhone} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
-                              <input 
-                                required
-                                type="tel" 
-                                name="phone"
-                                placeholder="Your Phone"
-                                className="w-full bg-accent/30 border border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 ring-primary transition-all font-bold"
-                                value={formData.phone}
-                                onChange={handleChange}
-                              />
-                            </div>
+                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Daily Qty (Litres)</label>
+                            <input 
+                              required
+                              type="number" 
+                              step="0.1"
+                              min="0.1"
+                              name="quantity"
+                              className="w-full bg-accent/30 border border-gray-100 rounded-2xl py-4 px-4 text-sm outline-none focus:ring-2 ring-primary transition-all font-bold"
+                              value={formData.quantity}
+                              onChange={(e) => setFormData(p => ({...p, quantity: parseFloat(e.target.value)}))}
+                            />
                           </div>
                           <div className="relative">
                             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1 flex justify-between items-center">
@@ -289,21 +317,6 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                                 placeholder="Locate me or paste link"
                                 className="w-full bg-accent/30 border border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 ring-primary transition-all font-bold"
                                 value={formData.location}
-                                onChange={handleChange}
-                              />
-                            </div>
-                          </div>
-                          <div className="relative">
-                            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 block ml-1">Street/Landmark</label>
-                            <div className="relative">
-                              <FontAwesomeIcon icon={faRoad} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
-                              <input 
-                                required
-                                type="text" 
-                                name="street"
-                                placeholder="Street name or landmark"
-                                className="w-full bg-accent/30 border border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 ring-primary transition-all font-bold"
-                                value={formData.street}
                                 onChange={handleChange}
                               />
                             </div>

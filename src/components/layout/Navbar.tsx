@@ -15,15 +15,32 @@ import {
   faChevronLeft
 } from "@fortawesome/free-solid-svg-icons";
 import StreamingTagline from "./StreamingTagline";
+import { supabase } from "@/lib/supabase";
+
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname === "/";
   const { cartCount } = useCart();
+
+  useEffect(() => {
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user || null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,8 +115,25 @@ export default function Navbar() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-6 ml-4">
-          <Link href="/cart" className="relative p-2 ml-2 transition-colors text-black hover:text-gray-600">
+        <div className="flex items-center gap-4 md:gap-6 ml-4">
+          
+          {user ? (
+            <Link href="/account" className="flex items-center gap-2 text-black hover:text-primary transition-colors">
+              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
+                <FontAwesomeIcon icon={faUser} className="text-sm" />
+              </div>
+              <span className="hidden md:block text-sm font-black uppercase tracking-widest">Account</span>
+            </Link>
+          ) : (
+            <Link href="/login" className="flex items-center gap-2 text-black hover:text-primary transition-colors">
+              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center">
+                <FontAwesomeIcon icon={faUser} className="text-sm" />
+              </div>
+              <span className="hidden md:block text-sm font-black uppercase tracking-widest">Sign In</span>
+            </Link>
+          )}
+
+          <Link href="/cart" className="relative p-2 transition-colors text-black hover:text-gray-600">
             <FontAwesomeIcon icon={faShoppingCart} className="text-xl" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">

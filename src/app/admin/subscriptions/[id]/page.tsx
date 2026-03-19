@@ -21,6 +21,13 @@ interface Subscription {
   street?: string;
   payment_screenshot_url?: string;
   amount_paid?: number;
+  product_id?: string;
+  quantity?: number;
+  products?: {
+    name: string;
+    unit: string;
+    price: number;
+  };
 }
 
 interface Delivery {
@@ -28,6 +35,7 @@ interface Delivery {
   delivery_date: string;
   status: string;
   notes: string;
+  quantity?: number;
 }
 
 export default function SubscriberDetailsPage() {
@@ -39,9 +47,10 @@ export default function SubscriberDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingPast, setIsAddingPast] = useState(false);
   const [pastDate, setPastDate] = useState(new Date().toISOString().split('T')[0]);
+  const [pastQuantity, setPastQuantity] = useState<number>(1);
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminAuthenticated");
+    const isAdmin = sessionStorage.getItem("isAdminAuthenticated");
     if (isAdmin !== "true") {
       router.push("/admin/login");
     } else {
@@ -60,6 +69,18 @@ export default function SubscriberDetailsPage() {
       .eq("id", id)
       .single();
 
+    if (subData?.product_id) {
+      const { data: prodData } = await supabase
+        .from("products")
+        .select("name, unit, price")
+        .eq("id", subData.product_id)
+        .single();
+      
+      if (prodData) {
+        subData.products = prodData;
+      }
+    }
+
     if (subError) {
       console.error("Error fetching subscriber:", subError);
       router.push("/admin/subscriptions");
@@ -67,6 +88,7 @@ export default function SubscriberDetailsPage() {
     }
 
     setSubscriber(subData);
+    setPastQuantity(subData.quantity || 1);
 
     // Fetch delivery history
     const { data: delData } = await supabase
@@ -91,7 +113,8 @@ export default function SubscriberDetailsPage() {
     const { error } = await supabase.from("deliveries").insert([{
       subscription_id: id,
       delivery_date: pastDate,
-      status: 'delivered'
+      status: 'delivered',
+      quantity: pastQuantity
     }]);
 
     if (error) {
@@ -133,48 +156,101 @@ export default function SubscriberDetailsPage() {
                 <p className="text-gray-500 font-bold text-sm uppercase tracking-widest">Customer Folder: {subscriber?.id.slice(0, 8)}</p>
               </div>
            </div>
-           <div className="flex gap-3">
-              <button 
-                onClick={handleDeleteSub}
-                className="bg-red-50 text-red-600 font-bold px-6 py-3 rounded-xl border border-red-100 hover:bg-red-100 transition-all flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faTrash} />
-                Delete Folder
-              </button>
-           </div>
+            <div className="flex gap-3">
+               <button 
+                 onClick={async () => {
+                    const { error } = await supabase.from("deliveries").insert([{
+                      subscription_id: id,
+                      delivery_date: new Date().toISOString().split('T')[0],
+                      status: 'delivered',
+                      quantity: subscriber?.quantity || 1
+                    }]);
+                    if (error) {
+                      if (error.code === '23505') alert("Today's delivery already marked!");
+                      else alert("Error logging today's delivery");
+                    } else fetchData();
+                 }}
+                 className="bg-primary text-black font-black px-6 py-3 rounded-xl shadow-lg hover:opacity-90 transition-all flex items-center gap-2"
+               >
+                 <FontAwesomeIcon icon={faCheckCircle} />
+                 Log Today
+               </button>
+               <button 
+                 onClick={handleDeleteSub}
+                 className="bg-red-50 text-red-600 font-bold px-6 py-3 rounded-xl border border-red-100 hover:bg-red-100 transition-all flex items-center gap-2"
+               >
+                 <FontAwesomeIcon icon={faTrash} />
+                 Delete Folder
+               </button>
+            </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
            {/* Left Column: Personal Info Card */}
            <div className="lg:col-span-1 space-y-6">
-              <div className="bg-white p-8 rounded-[3rem] shadow-xl border border-gray-100">
-                 <div className="w-20 h-20 bg-secondary/10 text-secondary rounded-[2rem] flex items-center justify-center text-3xl mb-6 mx-auto">
-                    <FontAwesomeIcon icon={faUser} />
-                 </div>
-                 <h2 className="text-2xl font-black text-center mb-1 text-black uppercase tracking-tight">{subscriber?.customer_name}</h2>
-                 <p className="text-primary font-black text-center text-xs uppercase tracking-[0.2em] mb-8">{subscriber?.plan_details}</p>
-                 
-                 <div className="space-y-4 pt-6 border-t border-gray-100">
-                    <div className="flex items-center gap-4 text-gray-800">
-                       <span className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-gray-400"><FontAwesomeIcon icon={faPhone} size="xs" /></span>
-                       <span className="font-bold">{subscriber?.customer_phone}</span>
-                    </div>
-                    <div className="flex items-center gap-4 text-gray-800">
-                       <span className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-gray-400"><FontAwesomeIcon icon={faEnvelope} size="xs" /></span>
-                       <span className="font-bold text-sm line-clamp-1">{subscriber?.customer_email || 'No email provided'}</span>
-                    </div>
-                     <div className="flex items-start gap-4 text-gray-800">
-                       <span className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-gray-400 mt-1 shrink-0"><FontAwesomeIcon icon={faMapMarkerAlt} size="xs" /></span>
-                       <div className="flex flex-col gap-1">
-                          <span className="font-bold text-sm leading-relaxed">{subscriber?.address}</span>
-                          {subscriber?.street && <span className="text-[10px] font-black uppercase text-gray-400">Street: {subscriber.street}</span>}
-                          {subscriber?.location_link && (
-                            <a href={subscriber.location_link} target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline font-black text-[10px] uppercase tracking-widest mt-1">View on Google Maps</a>
-                          )}
-                       </div>
-                    </div>
-                 </div>
-              </div>
+               <div className="bg-white p-8 rounded-[3rem] shadow-xl border border-gray-100">
+                  <div className="flex items-center gap-4 mb-8">
+                     <div className="w-12 h-12 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center text-xl">
+                        <FontAwesomeIcon icon={faUser} />
+                     </div>
+                     <div>
+                        <h2 className="text-xl font-black text-black uppercase tracking-tight leading-tight">{subscriber?.customer_name}</h2>
+                        <span className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">{subscriber?.quantity} {subscriber?.products?.unit || 'L'} {subscriber?.products?.name || 'Milk'}</span>
+                     </div>
+                  </div>
+                  
+                  <div className="space-y-6">
+                     {/* Identity Section */}
+                     <div>
+                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 pb-1 border-b border-gray-50">Customer Identity</h4>
+                        <div className="grid grid-cols-1 gap-4">
+                           <div className="bg-accent/30 p-4 rounded-2xl">
+                              <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Phone Number</label>
+                              <span className="text-sm font-black text-black">{subscriber?.customer_phone}</span>
+                           </div>
+                           <div className="bg-accent/30 p-4 rounded-2xl">
+                              <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Email Address</label>
+                              <span className="text-sm font-black text-black truncate block">{subscriber?.customer_email || 'Not provided'}</span>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Delivery Section */}
+                     <div>
+                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 pb-1 border-b border-gray-50">Delivery Address</h4>
+                        <div className="space-y-4">
+                           <div className="bg-accent/30 p-4 rounded-2xl">
+                              <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Full Address</label>
+                              <span className="text-sm font-bold text-black leading-relaxed block">{subscriber?.address}</span>
+                           </div>
+                           <div className="grid grid-cols-2 gap-4">
+                              <div className="bg-accent/30 p-4 rounded-2xl">
+                                 <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Street/Landmark</label>
+                                 <span className="text-xs font-black text-black">{subscriber?.street || 'Not specified'}</span>
+                              </div>
+                              <div className="bg-accent/30 p-4 rounded-2xl flex flex-col justify-between">
+                                 <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Location</label>
+                                 {subscriber?.location_link ? (
+                                    <a href={subscriber.location_link} target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline font-black text-[10px] uppercase">Link</a>
+                                 ) : (
+                                    <span className="text-xs font-black text-gray-300 italic">No link</span>
+                                 )}
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Plan Section */}
+                     <div>
+                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 pb-1 border-b border-gray-50">Subscription Plan</h4>
+                        <div className="bg-secondary/5 p-4 rounded-2xl border border-secondary/10">
+                           <div className="flex justify-between items-center">
+                              <span className="text-[10px] font-black text-secondary uppercase tracking-widest">{subscriber?.plan_details}</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
 
               {subscriber?.payment_screenshot_url && (
                 <div className="bg-white p-8 rounded-[3rem] shadow-xl border border-gray-100">
@@ -183,7 +259,7 @@ export default function SubscriberDetailsPage() {
                     <Image src={subscriber.payment_screenshot_url} alt="Payment" fill className="object-cover" />
                   </div>
                   <div className="mt-4 flex justify-between items-center px-1">
-                    <span className="text-[10px] font-black uppercase text-gray-400">Amount Paid</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Amount Paid</span>
                     <span className="text-lg font-black text-primary">₹{subscriber?.amount_paid || '0'}</span>
                   </div>
                 </div>
@@ -195,80 +271,120 @@ export default function SubscriberDetailsPage() {
                     <span className="text-5xl font-black">{deliveries.length}</span>
                     <span className="font-black text-sm mb-2 text-black/60">Days Delivered</span>
                  </div>
+                 <div className="flex items-end gap-2 mb-4">
+                    <span className="text-2xl font-black">{(deliveries.reduce((acc, del) => acc + (del.quantity || 0), 0)).toFixed(1)}</span>
+                    <span className="font-black text-[10px] mb-1 text-black/60 uppercase tracking-widest">Total {subscriber?.products?.unit || 'L'} Received</span>
+                 </div>
                  <p className="text-xs font-bold text-black/60 leading-relaxed uppercase tracking-widest">Since {new Date(subscriber?.created_at || '').toDateString()}</p>
               </div>
-           </div>
-
-           {/* Right Column: delivery History Log */}
+           </div>           {/* Right Column: Register Book */}
            <div className="lg:col-span-2">
-              <div className="bg-white rounded-[3rem] shadow-xl border border-gray-100 overflow-hidden min-h-[600px] flex flex-col">
-                 <div className="p-8 border-b flex justify-between items-center">
-                    <div>
-                      <h3 className="text-xl font-black text-black">Delivery History</h3>
-                      <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">Manual logging system</p>
+              <div className="bg-white rounded-[3rem] shadow-xl border border-gray-100 overflow-hidden flex flex-col">
+                 
+                 {/* Register Book Header */}
+                 <div className="p-8 border-b bg-gray-50/80">
+                    <div className="flex items-center justify-between mb-1">
+                       <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
+                             <FontAwesomeIcon icon={faCalendarAlt} className="text-black" />
+                          </div>
+                          <div>
+                             <h3 className="text-xl font-black text-black">Delivery Register</h3>
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Daily milk log for {subscriber?.customer_name}</p>
+                          </div>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-3xl font-black text-black">{deliveries.length}</p>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Days</p>
+                       </div>
                     </div>
-                    <button 
-                      onClick={() => setIsAddingPast(true)}
-                      className="bg-accent text-primary font-black px-5 py-3 rounded-xl hover:bg-primary hover:text-white transition-all flex items-center gap-2"
-                    >
-                      <FontAwesomeIcon icon={faCalendarPlus} />
-                      Log Past Delivery
-                    </button>
+                    <div className="mt-4 grid grid-cols-2 gap-4">
+                       <div className="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                          <p className="text-2xl font-black text-primary">{(deliveries.reduce((acc, del) => acc + (del.quantity || subscriber?.quantity || 1), 0)).toFixed(1)}</p>
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Total {subscriber?.products?.unit || 'L'} Delivered</p>
+                       </div>
+                       <div className="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                          <p className="text-2xl font-black text-secondary">₹{((deliveries.reduce((acc, del) => acc + (del.quantity || subscriber?.quantity || 1), 0)) * (subscriber?.products?.price || 0)).toFixed(0)}</p>
+                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Est. Total Value</p>
+                       </div>
+                    </div>
                  </div>
 
-                 {isAddingPast && (
-                   <div className="p-8 bg-primary/5 border-b animate-in slide-in-from-top duration-300">
-                      <div className="flex items-end gap-4">
-                         <div className="flex-1">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Select Date</label>
-                            <input 
-                              type="date" 
-                              className="w-full bg-white border-none rounded-xl py-3 px-4 font-bold outline-none ring-2 ring-primary/20 focus:ring-primary"
-                              value={pastDate}
-                              onChange={e => setPastDate(e.target.value)}
-                            />
-                         </div>
-                         <button 
-                           onClick={handleAddDelivery}
-                           className="bg-primary text-black font-black px-6 py-3 rounded-xl shadow-lg h-[48px]"
-                         >
-                           Add Log
-                         </button>
-                         <button 
-                           onClick={() => setIsAddingPast(false)}
-                           className="bg-white border border-gray-200 text-gray-500 font-bold px-6 py-3 rounded-xl h-[48px]"
-                         >
-                           Cancel
-                         </button>
-                      </div>
-                   </div>
-                 )}
+                 {/* Add Log Form — Always Visible */}
+                 <div className="p-6 border-b bg-primary/5">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">➕ Add New Delivery Entry</p>
+                    <div className="flex items-end gap-3">
+                       <div className="flex-1">
+                          <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Date</label>
+                          <input 
+                            type="date" 
+                            className="w-full bg-white border border-gray-100 rounded-xl py-3 px-4 font-bold outline-none ring-2 ring-transparent focus:ring-primary text-sm"
+                            value={pastDate}
+                            onChange={e => setPastDate(e.target.value)}
+                          />
+                       </div>
+                       <div className="w-28">
+                          <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Qty ({subscriber?.products?.unit || 'L'})</label>
+                          <input 
+                            type="number" 
+                            step="0.1"
+                            className="w-full bg-white border border-gray-100 rounded-xl py-3 px-4 font-bold outline-none ring-2 ring-transparent focus:ring-primary text-sm"
+                            value={pastQuantity}
+                            onChange={e => setPastQuantity(parseFloat(e.target.value) || 0)}
+                          />
+                       </div>
+                       <button 
+                         onClick={handleAddDelivery}
+                         className="bg-primary text-black font-black px-6 py-3 rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all flex items-center gap-2 whitespace-nowrap"
+                       >
+                         <FontAwesomeIcon icon={faCheckCircle} />
+                         Add Entry
+                       </button>
+                    </div>
+                 </div>
 
-                 <div className="flex-1 p-8">
+                 {/* Register Entries */}
+                 <div className="flex-1 p-6 overflow-y-auto max-h-[600px]">
                     {deliveries.length === 0 ? (
-                       <div className="h-full flex flex-col items-center justify-center text-center opacity-30">
+                       <div className="h-full flex flex-col items-center justify-center text-center opacity-30 py-20">
                           <FontAwesomeIcon icon={faCalendarAlt} className="text-5xl mb-4" />
-                          <p className="font-black italic">No history logged yet</p>
+                          <p className="font-black italic">No entries logged yet</p>
+                          <p className="text-xs font-bold mt-1">Use the form above to add the first delivery.</p>
                        </div>
                     ) : (
-                       <div className="space-y-4">
-                          {deliveries.map((del) => (
-                            <div key={del.id} className="group flex items-center justify-between p-5 rounded-2xl bg-accent/30 border border-gray-50 hover:bg-accent/50 transition-all">
-                               <div className="flex items-center gap-5">
-                                  <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg shadow-green-100">
-                                     <FontAwesomeIcon icon={faCheckCircle} />
-                                  </div>
-                                  <div>
-                                     <span className="font-black text-gray-800 block text-lg">{new Date(del.delivery_date).toDateString()}</span>
-                                     <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">Delivered Successfully</span>
-                                  </div>
+                       <div className="space-y-2">
+                          {/* Table Header */}
+                          <div className="grid grid-cols-12 gap-2 px-4 py-2 text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                             <span className="col-span-1">#</span>
+                             <span className="col-span-5">Date</span>
+                             <span className="col-span-3 text-center">Qty ({subscriber?.products?.unit || 'L'})</span>
+                             <span className="col-span-2 text-center">Status</span>
+                             <span className="col-span-1"></span>
+                          </div>
+                          
+                          {deliveries.map((del, index) => (
+                            <div key={del.id} className="group grid grid-cols-12 gap-2 items-center p-4 rounded-2xl bg-accent/20 hover:bg-accent/40 transition-all border border-transparent hover:border-primary/10">
+                               <span className="col-span-1 text-[10px] font-black text-gray-300">#{deliveries.length - index}</span>
+                               <div className="col-span-5">
+                                  <span className="font-black text-gray-800 text-sm block">{new Date(del.delivery_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                                  <span className="text-[9px] font-bold text-gray-400">{new Date(del.delivery_date).toLocaleDateString('en-IN', { weekday: 'long' })}</span>
                                </div>
-                               <button 
-                                 onClick={() => removeDelivery(del.id)}
-                                 className="opacity-0 group-hover:opacity-100 w-10 h-10 rounded-xl bg-red-100 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"
-                               >
-                                  <FontAwesomeIcon icon={faTrash} size="sm" />
-                               </button>
+                               <div className="col-span-3 text-center">
+                                  <span className="font-black text-primary">{del.quantity || subscriber?.quantity || 1}</span>
+                               </div>
+                               <div className="col-span-2 flex justify-center">
+                                  <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[8px] font-black uppercase px-2 py-1 rounded-full">
+                                     <FontAwesomeIcon icon={faCheckCircle} size="xs" /> Done
+                                  </span>
+                               </div>
+                               <div className="col-span-1 flex justify-end">
+                                  <button 
+                                    onClick={() => removeDelivery(del.id)}
+                                    className="opacity-0 group-hover:opacity-100 w-8 h-8 rounded-lg bg-red-50 text-red-400 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"
+                                  >
+                                     <FontAwesomeIcon icon={faTrash} size="xs" />
+                                  </button>
+                               </div>
                             </div>
                           ))}
                        </div>

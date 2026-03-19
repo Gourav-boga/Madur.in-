@@ -1,29 +1,47 @@
--- Update Subscriptions table with new fields
-ALTER TABLE subscriptions 
-ADD COLUMN IF NOT EXISTS location_link TEXT,
-ADD COLUMN IF NOT EXISTS street TEXT,
-ADD COLUMN IF NOT EXISTS payment_screenshot_url TEXT,
-ADD COLUMN IF NOT EXISTS amount_paid NUMERIC;
+-- FULL DATABASE SETUP FOR SUBSCRIPTIONS AND INVENTORY --
+-- Run this in your Supabase SQL Editor
 
--- Ensure RLS allows public insertion for registrations
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Public Insert Access" ON subscriptions;
-CREATE POLICY "Public Insert Access" ON subscriptions FOR INSERT WITH CHECK (true);
+-- 1. Ensure uuid extension is enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Ensure admin has all access (for dashboard)
-DROP POLICY IF EXISTS "Admin All Access" ON subscriptions;
-CREATE POLICY "Admin All Access" ON subscriptions FOR ALL USING (true) WITH CHECK (true);
-CREATE TABLE IF NOT EXISTS settings (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  key TEXT NOT NULL UNIQUE,
-  value TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+-- 2. Create Subscriptions Table (with inventory support)
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT,
+    location_link TEXT,
+    payment_screenshot_url TEXT,
+    plan_details TEXT,
+    product_id UUID REFERENCES products(id),
+    quantity NUMERIC DEFAULT 1,
+    status TEXT DEFAULT 'active',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- Initialize subscription fee (default ₹599)
-INSERT INTO settings (key, value) 
-VALUES ('subscription_fee', '599')
-ON CONFLICT (key) DO NOTHING;
+-- 3. Create Deliveries Table (to log daily milk)
+CREATE TABLE IF NOT EXISTS deliveries (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    subscription_id UUID REFERENCES subscriptions(id) ON DELETE CASCADE,
+    delivery_date DATE NOT NULL,
+    quantity_delivered NUMERIC DEFAULT 1,
+    status TEXT DEFAULT 'delivered',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
 
--- Storage policies for screenshots (if not already handled)
--- Note: Assuming 'madur' bucket exists based on products page logic.
+-- 4. Fix existing table if it was missing columns
+DO $$ 
+BEGIN 
+    BEGIN
+        ALTER TABLE subscriptions ADD COLUMN product_id UUID REFERENCES products(id);
+    EXCEPTION WHEN duplicate_column THEN
+    END;
+    
+    BEGIN
+        ALTER TABLE subscriptions ADD COLUMN quantity NUMERIC DEFAULT 1;
+    EXCEPTION WHEN duplicate_column THEN
+    END;
+END $$;
+
+-- 5. Grant permissions if needed
+-- GRANT ALL ON TABLE subscriptions TO anon, authenticated, service_role;
+-- GRANT ALL ON TABLE deliveries TO anon, authenticated, service_role;

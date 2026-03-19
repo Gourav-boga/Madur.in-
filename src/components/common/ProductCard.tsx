@@ -6,6 +6,8 @@ import { faPlus, faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { useCart } from "@/context/CartContext";
 import { motion } from "framer-motion";
 import QuantityModal from "./QuantityModal";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: string;
@@ -23,10 +25,24 @@ interface Product {
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
   
   const displayImage = product.image_url || product.image;
   const displayCategory = product.categories?.name || product.category;
   const isOutOfStock = product.is_out_of_stock;
+
+  const handleOpenModal = async () => {
+    if (isOutOfStock) return;
+    
+    // Check if user is logged in before allowing add to cart
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      router.push("/login");
+      return;
+    }
+    
+    setIsModalOpen(true);
+  };
 
   const handleAddToCart = (quantity: number, selectedUnit: string) => {
     if (isOutOfStock) return;
@@ -67,7 +83,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {!isOutOfStock && (
             <div className="absolute top-4 right-4 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
                <button 
-                 onClick={() => setIsModalOpen(true)}
+                 onClick={handleOpenModal}
                  className="w-12 h-12 bg-black text-white rounded-2xl shadow-xl flex items-center justify-center active:scale-90 hover:bg-gray-800 transition-colors"
                >
                  <FontAwesomeIcon icon={faCartPlus} />
@@ -102,7 +118,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
           
           <button 
-            onClick={() => !isOutOfStock && setIsModalOpen(true)}
+            onClick={handleOpenModal}
             disabled={isOutOfStock}
             className={`font-black px-6 py-4 rounded-2xl flex items-center gap-2 transition-all text-xs uppercase tracking-widest ${isOutOfStock ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800 text-white active:scale-95"}`}
           >
