@@ -29,14 +29,9 @@ export default function AdminCategoriesPage() {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminAuthenticated");
-    if (isAdmin !== "true") {
-      router.push("/admin/login");
-    } else {
-      setIsAuthorized(true);
-      fetchCategories();
-    }
-  }, [router]);
+    fetchCategories();
+    setIsAuthorized(true);
+  }, []);
 
   async function fetchCategories() {
     setIsLoading(true);

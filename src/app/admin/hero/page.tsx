@@ -24,14 +24,9 @@ export default function AdminHeroPage() {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminAuthenticated");
-    if (isAdmin !== "true") {
-      router.push("/admin/login");
-    } else {
-      setIsAuthorized(true);
-      fetchImages();
-    }
-  }, [router]);
+    fetchImages();
+    setIsAuthorized(true);
+  }, []);
 
   async function fetchImages() {
     setIsLoading(true);

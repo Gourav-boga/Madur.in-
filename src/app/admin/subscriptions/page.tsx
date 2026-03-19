@@ -50,14 +50,9 @@ export default function AdminSubscriptionsPage() {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminAuthenticated");
-    if (isAdmin !== "true") {
-      router.push("/admin/login");
-    } else {
-      setIsAuthorized(true);
-      fetchData();
-    }
-  }, [router]);
+    fetchData();
+    setIsAuthorized(true);
+  }, []);
 
   async function fetchData() {
     setIsLoading(true);

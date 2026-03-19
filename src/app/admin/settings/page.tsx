@@ -15,14 +15,9 @@ export default function AdminSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminAuthenticated");
-    if (isAdmin !== "true") {
-      router.push("/admin/login");
-    } else {
-      setIsAuthorized(true);
-      fetchSettings();
-    }
-  }, [router]);
+    fetchSettings();
+    setIsAuthorized(true);
+  }, []);
 
   async function fetchSettings() {
     setIsLoading(true);

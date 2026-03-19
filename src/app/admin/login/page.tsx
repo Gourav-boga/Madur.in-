@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
 
   // Redirect if already logged in
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminAuthenticated");
+    const isAdmin = sessionStorage.getItem("isAdminAuthenticated");
     if (isAdmin === "true") {
       router.push("/admin");
     }
@@ -28,13 +28,12 @@ export default function AdminLoginPage() {
     setIsLoading(true);
     setError("");
 
-    // Simulate authentication check
-    // In a real app, use Supabase: const { error } = await supabase.auth.signInWithPassword(...)
-    const dummyEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@madur.in";
-    const dummyPassword = "admin123"; // This would normally come from a secure source
+    // Use specific admin credentials
+    const adminEmail = "MADUR.IN@GMAIL.COM";
+    const adminPassword = "MADURFOODS.IN";
 
-    if (formData.email === dummyEmail && formData.password === dummyPassword) {
-      localStorage.setItem("isAdminAuthenticated", "true");
+    if (formData.email.toUpperCase() === adminEmail && formData.password === adminPassword) {
+      sessionStorage.setItem("isAdminAuthenticated", "true");
       router.push("/admin");
     } else {
       setError("Invalid admin credentials. Please try again.");

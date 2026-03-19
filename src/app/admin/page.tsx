@@ -20,14 +20,9 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminAuthenticated");
-    if (isAdmin !== "true") {
-      router.push("/admin/login");
-    } else {
-      setIsAuthorized(true);
-      fetchDashboardData();
-    }
-  }, [router]);
+    fetchDashboardData();
+    setIsAuthorized(true);
+  }, []);
 
   async function fetchDashboardData() {
     setIsLoading(true);
@@ -57,7 +52,7 @@ export default function AdminDashboard() {
 
   // Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem("isAdminAuthenticated");
+    sessionStorage.removeItem("isAdminAuthenticated");
     router.push("/admin/login");
   };
 

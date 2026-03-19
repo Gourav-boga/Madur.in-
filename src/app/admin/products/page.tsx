@@ -46,14 +46,9 @@ export default function AdminProductsPage() {
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminAuthenticated");
-    if (isAdmin !== "true") {
-      router.push("/admin/login");
-    } else {
-      setIsAuthorized(true);
-      fetchData();
-    }
-  }, [router]);
+    fetchData();
+    setIsAuthorized(true);
+  }, []);
 
   async function fetchData() {
     setIsLoading(true);
