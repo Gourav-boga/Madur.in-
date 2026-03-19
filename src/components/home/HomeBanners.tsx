@@ -1,12 +1,9 @@
-"use client";
-
+import React from "react";
 import Image from "next/image";
-import Link from "next/link";
-import React, { useState } from "react";
-import SubscriptionModal from "./SubscriptionModal";
+import { useSubscription } from "@/context/SubscriptionContext";
 
 export default function HomeBanners() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { openSubscriptionModal } = useSubscription();
 
   return (
     <section className="container py-10">
@@ -40,7 +37,7 @@ export default function HomeBanners() {
             <p className="text-[#558b2f] font-bold text-lg mb-1">Daily Milk Delivery to Your Home</p>
             <p className="text-[#33691e] font-black text-xl mb-6 tracking-wide underline decoration-wavy underline-offset-4">Choose Your Plan</p>
             <button 
-              onClick={() => setIsModalOpen(true)}
+              onClick={openSubscriptionModal}
               className="bg-[#689f38] text-white font-black px-8 py-4 rounded-xl shadow-lg hover:bg-[#558b2f] transition-all inline-block active:scale-95"
             >
               Subscribe Now
@@ -56,11 +53,6 @@ export default function HomeBanners() {
           </div>
         </div>
       </div>
-
-      <SubscriptionModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
     </section>
   );
 }

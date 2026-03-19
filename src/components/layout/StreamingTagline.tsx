@@ -1,15 +1,14 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { useSubscription } from "@/context/SubscriptionContext";
 
 export default function StreamingTagline() {
-  const pathname = usePathname();
+  const { openSubscriptionModal } = useSubscription();
 
   return (
-    <Link 
-      href="/register" 
-      className="block bg-red-600 hover:bg-red-700 text-white py-2 overflow-hidden whitespace-nowrap border-b border-red-700 transition-colors"
+    <div 
+      onClick={openSubscriptionModal}
+      className="cursor-pointer block bg-red-600 hover:bg-red-700 text-white py-2 overflow-hidden whitespace-nowrap border-b border-red-700 transition-colors"
     >
       <div className="flex items-center">
         <div className="animate-marquee inline-block">
@@ -27,6 +26,6 @@ export default function StreamingTagline() {
           </span>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

@@ -10,6 +10,8 @@ import SplashScreen from "@/components/layout/SplashScreen";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
+
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -27,13 +29,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <CartProvider>
-      <SplashScreen />
-      <Navbar />
-      <main className={`min-h-screen ${isHome ? "pt-[230px] md:pt-[190px]" : "pt-[175px] md:pt-[180px]"}`}>
-        {children}
-      </main>
-      <Footer />
-      <WhatsAppButton />
+      <SubscriptionProvider>
+        <SplashScreen />
+        <Navbar />
+        <main className={`min-h-screen ${isHome ? "pt-[230px] md:pt-[190px]" : "pt-[175px] md:pt-[180px]"}`}>
+          {children}
+        </main>
+        <Footer />
+        <WhatsAppButton />
+      </SubscriptionProvider>
     </CartProvider>
   );
 }
