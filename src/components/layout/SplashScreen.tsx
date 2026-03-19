@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function SplashScreen() {
+export default function SplashScreen({ onComplete }: { onComplete?: () => void }) {
   const [isVisible, setIsVisible] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -12,14 +12,17 @@ export default function SplashScreen() {
     const hasVisited = sessionStorage.getItem("hasVisited");
     if (!hasVisited) {
       setIsVisible(true);
+    } else if (onComplete) {
+      onComplete();
     }
-  }, []);
+  }, [onComplete]);
 
   const handleEnter = () => {
     setIsExiting(true);
     sessionStorage.setItem("hasVisited", "true");
     setTimeout(() => {
       setIsVisible(false);
+      if (onComplete) onComplete();
     }, 1200); 
   };
 

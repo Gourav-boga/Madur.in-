@@ -11,11 +11,25 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
+import { useState, useEffect } from "react";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [showContent, setShowContent] = useState(false);
   const isHome = pathname === "/";
   const isAdmin = pathname?.startsWith("/admin");
+
+  useEffect(() => {
+    // If we've already visited this session, show content immediately
+    const hasVisited = sessionStorage.getItem("hasVisited");
+    if (hasVisited || isAdmin) {
+      setShowContent(true);
+    }
+  }, [isAdmin]);
+
+  const handleSplashComplete = () => {
+    setShowContent(true);
+  };
 
   if (isAdmin) {
     return (
@@ -30,13 +44,18 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <CartProvider>
       <SubscriptionProvider>
-        <SplashScreen />
-        <Navbar />
-        <main className={`min-h-screen ${isHome ? "pt-[230px] md:pt-[190px]" : "pt-[175px] md:pt-[180px]"}`}>
-          {children}
-        </main>
-        <Footer />
-        <WhatsAppButton />
+        {!isAdmin && <SplashScreen onComplete={handleSplashComplete} />}
+        
+        {showContent && (
+          <div className="animate-in fade-in duration-700">
+            <Navbar />
+            <main className={`min-h-screen ${isHome ? "pt-[230px] md:pt-[190px]" : "pt-[175px] md:pt-[180px]"}`}>
+              {children}
+            </main>
+            <Footer />
+            <WhatsAppButton />
+          </div>
+        )}
       </SubscriptionProvider>
     </CartProvider>
   );
