@@ -5,9 +5,32 @@ import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faMinus, faTrash, faArrowLeft, faShoppingBag } from "@fortawesome/free-solid-svg-icons";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import CheckoutModal from "@/components/checkout/CheckoutModal";
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, cartTotal } = useCart();
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function checkAuth() {
+      const res = await fetch("/api/auth/session");
+      const session = await res.json();
+      setIsLoggedIn(!!session);
+    }
+    checkAuth();
+  }, []);
+
+  const handleCheckoutClick = () => {
+    if (!isLoggedIn) {
+      router.push("/login?redirect=/cart");
+      return;
+    }
+    setIsCheckoutOpen(true);
+  };
 
   if (cart.length === 0) {
     return (
@@ -131,7 +154,10 @@ export default function CartPage() {
                 <span className="text-3xl font-black text-primary">₹{cartTotal}</span>
               </div>
 
-              <button className="w-full bg-primary text-primary-foreground font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 mb-4">
+              <button 
+                onClick={handleCheckoutClick}
+                className="w-full bg-primary text-primary-foreground font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 mb-4"
+              >
                 Proceed to Checkout
               </button>
               
@@ -142,6 +168,11 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+
+      <CheckoutModal 
+        isOpen={isCheckoutOpen} 
+        onClose={() => setIsCheckoutOpen(false)} 
+      />
     </div>
   );
 }

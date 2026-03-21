@@ -14,7 +14,9 @@ import {
   faCheckCircle, 
   faSpinner 
 } from "@fortawesome/free-solid-svg-icons";
+import { logoutAction } from "@/lib/actions/auth";
 import { supabase } from "@/lib/supabase";
+import InvoiceModal from "@/components/common/InvoiceModal";
 
 interface Order {
   id: string;
@@ -23,43 +25,97 @@ interface Order {
   created_at: string;
 }
 
+interface Subscription {
+  id: string;
+  plan_details: string;
+  status: string;
+  quantity: number;
+  customer_name: string;
+  created_at: string;
+  deliveries?: Delivery[];
+}
+
+interface Delivery {
+  id: string;
+  subscription_id: string;
+  delivery_date: string;
+  quantity_delivered: number;
+  status: string;
+}
+
 export default function AccountPage() {
   const [user, setUser] = useState<any>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+
   useEffect(() => {
     async function fetchUserData() {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        router.push("/login");
-        return;
-      }
-      
-      setUser(session.user);
+      try {
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        
+        if (!session) {
+          router.push("/login");
+          return;
+        }
+        
+        setUser(session.user);
 
-      // Fetch user's orders
-      const { data: orderData, error } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false });
+        // Fetch user's orders
+        const { data: orderData } = await supabase
+          .from("orders")
+          .select("*")
+          .ilike("user_email", session.user.email)
+          .order("created_at", { ascending: false });
 
-      if (!error && orderData) {
-        setOrders(orderData);
+        if (orderData) setOrders(orderData);
+
+        // Fetch user's subscriptions
+        const { data: subData } = await supabase
+          .from("subscriptions")
+          .select("*")
+          .ilike("customer_email", session.user.email)
+          .order("created_at", { ascending: false });
+
+        if (subData && subData.length > 0) {
+          // Fetch deliveries for these subscriptions (last 30 days)
+          const subIds = subData.map(s => s.id);
+          const thirtyDaysAgo = new Date();
+          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          
+          const { data: delData } = await supabase
+            .from("deliveries")
+            .select("*")
+            .in("subscription_id", subIds)
+            .gte("delivery_date", thirtyDaysAgo.toISOString().split('T')[0])
+            .order("delivery_date", { ascending: false });
+
+          const enrichedSubs = subData.map(sub => ({
+            ...sub,
+            deliveries: delData?.filter(d => d.subscription_id === sub.id) || []
+          }));
+          
+          setSubscriptions(enrichedSubs);
+        }
+      } catch (err) {
+        console.error("Error fetching session:", err);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     }
 
     fetchUserData();
   }, [router]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await logoutAction();
     router.push("/");
+    router.refresh();
   };
 
   const getStatusIcon = (status: string) => {
@@ -125,6 +181,94 @@ export default function AccountPage() {
             <div className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-2xl border border-gray-100">
               <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
                 <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 shadow-inner">
+                    <FontAwesomeIcon icon={faClock} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-gray-800">Milk Subscription Logs</h3>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                      Daily tracking for your active plans
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {subscriptions.length > 0 ? (
+                <div className="space-y-8 mb-16">
+                  {subscriptions.map((sub) => (
+                    <div key={sub.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                      <div className="p-6 bg-accent/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                          <h4 className="font-black text-lg text-gray-800 uppercase tracking-tight">{sub.plan_details}</h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider ${sub.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+                              {sub.status}
+                            </span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                              {sub.quantity}L per day
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Total Deliveries</p>
+                          <p className="text-2xl font-black text-primary leading-none">{sub.deliveries?.length || 0}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-6">
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Last 7 Deliveries</p>
+                        <div className="grid grid-cols-7 gap-2">
+                          {[...Array(7)].map((_, i) => {
+                            const date = new Date();
+                            date.setDate(date.getDate() - i);
+                            const dateStr = date.toISOString().split('T')[0];
+                            const delivery = sub.deliveries?.find(d => d.delivery_date === dateStr);
+                            const isToday = i === 0;
+
+                            return (
+                              <div key={i} className="flex flex-col items-center gap-2">
+                                <div className={`w-full aspect-square rounded-xl flex items-center justify-center transition-all ${
+                                  delivery 
+                                    ? 'bg-secondary text-secondary-foreground shadow-md' 
+                                    : 'bg-accent/30 text-gray-300'
+                                } ${isToday ? 'ring-2 ring-primary ring-offset-2' : ''}`}>
+                                  <FontAwesomeIcon icon={delivery ? faCheckCircle : faClock} className={delivery ? 'text-lg' : 'text-xs'} />
+                                </div>
+                                <span className="text-[8px] font-black text-gray-400 uppercase">{isToday ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        
+                        {sub.deliveries && sub.deliveries.length > 7 && (
+                          <div className="mt-6 pt-6 border-t border-gray-50">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Recent History</p>
+                            <div className="space-y-3 max-h-48 overflow-y-auto pr-2 scrollbar-hide">
+                              {sub.deliveries.slice(0, 30).map((del) => (
+                                <div key={del.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 rounded-full bg-secondary"></div>
+                                    <span className="text-xs font-bold text-gray-700">{new Date(del.delivery_date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                  </div>
+                                  <span className="text-xs font-black text-secondary uppercase tracking-widest">Delivered: {del.quantity_delivered}L</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-accent/10 rounded-3xl p-8 text-center mb-16 border-2 border-dashed border-accent/30">
+                  <FontAwesomeIcon icon={faClock} className="text-3xl text-gray-300 mb-4" />
+                  <p className="text-sm font-bold text-gray-500 italic">No active milk subscriptions found for your email.</p>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
+                <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center text-primary shadow-inner">
                     <FontAwesomeIcon icon={faBoxOpen} />
                   </div>
@@ -161,9 +305,20 @@ export default function AccountPage() {
                       
                         <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2">
                           <span className="text-xl font-black text-primary">₹{order.total_amount}</span>
-                          <button className="text-[10px] bg-white border border-gray-100 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-gray-500 hover:bg-primary hover:text-white transition-colors">
-                            Details
-                          </button>
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setIsInvoiceOpen(true);
+                              }}
+                              className="text-[10px] bg-primary/10 border border-primary/20 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-colors"
+                            >
+                              Invoice
+                            </button>
+                            <button className="text-[10px] bg-white border border-gray-100 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-colors">
+                              Details
+                            </button>
+                          </div>
                         </div>
                     </div>
                   ))}
@@ -193,6 +348,13 @@ export default function AccountPage() {
           
         </div>
       </div>
+      
+      {/* Invoice Modal */}
+      <InvoiceModal 
+        isOpen={isInvoiceOpen} 
+        onClose={() => setIsInvoiceOpen(false)} 
+        order={selectedOrder} 
+      />
     </div>
   );
 }

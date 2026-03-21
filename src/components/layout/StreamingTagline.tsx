@@ -1,14 +1,17 @@
 "use client";
 
 import { useSubscription } from "@/context/SubscriptionContext";
+import { usePathname } from "next/navigation";
 
 export default function StreamingTagline() {
   const { openSubscriptionModal } = useSubscription();
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   return (
     <div 
       onClick={openSubscriptionModal}
-      className="cursor-pointer block bg-red-600 hover:bg-red-700 text-white py-2 overflow-hidden whitespace-nowrap border-b border-red-700 transition-colors"
+      className={`cursor-pointer block bg-red-600 hover:bg-red-700 text-white overflow-hidden whitespace-nowrap border-b border-red-700 transition-colors ${isHome ? "py-3" : "py-2"}`}
     >
       <div className="flex items-center">
         <div className="animate-marquee inline-block">

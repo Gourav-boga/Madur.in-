@@ -29,18 +29,22 @@ export default function Navbar() {
   const { cartCount } = useCart();
 
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    // Check active session via our API
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/auth/session");
+        const session = await res.json();
+        setUser(session?.user || null);
+      } catch (err) {
+        setUser(null);
+      }
+    }
+    
+    checkSession();
+    
+    // We can't easily listen for events with custom cookies without a complex setup,
+    // so we rely on router.refresh() from other components to trigger a re-render if needed.
+  }, [pathname]); // Check on every navigation
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,18 +64,18 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-custom-blue shadow-md ${
-        isScrolled ? "py-2" : "py-4"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background shadow-md border-b border-black ${
+        isHome && !isScrolled ? "py-6" : isScrolled ? "py-2" : "py-4"
       }`}
     >
       <StreamingTagline />
-      <div className="container flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="container flex items-center justify-between gap-4">
+        <div className="flex items-center -ml-6 md:-ml-12 relative">
           {/* Back Button (Only on non-home pages) */}
           {!isHome && (
             <button
               onClick={() => router.back()}
-              className="p-2 -ml-2 text-white hover:bg-white/10 rounded-full transition-colors flex items-center justify-center"
+              className="absolute -left-12 md:-left-16 p-2 text-black hover:bg-black/10 rounded-full transition-colors flex items-center justify-center z-20"
               aria-label="Go back"
             >
               <FontAwesomeIcon icon={faChevronLeft} className="text-xl" />
@@ -79,22 +83,22 @@ export default function Navbar() {
           )}
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-          <Image 
-            src="/brand-logo-transparent.png" 
-            alt="MADUR.IN Logo" 
-            width={400} 
-            height={120} 
-            className="h-28 md:h-36 w-auto object-contain grayscale brightness-0"
-            priority
-          />
-        </Link>
-      </div>
+          <Link href="/" className="flex items-center p-0 m-0 leading-none relative z-10">
+            <Image 
+              src="/brand-logo-transparent.png" 
+              alt="MADUR.IN Logo" 
+              width={400} 
+              height={120} 
+              className="h-24 md:h-28 w-auto object-contain scale-150 origin-left select-none"
+              priority
+            />
+          </Link>
+        </div>
 
       {/* Desktop Search Bar (Swiggy Style) */}
         <form 
           onSubmit={handleSearch}
-          className="hidden lg:flex flex-1 max-w-xl mx-8 items-center bg-black rounded-lg px-4 py-2"
+          className="hidden lg:flex flex-1 max-w-md mx-4 items-center bg-black rounded-lg px-4 py-2"
         >
           <FontAwesomeIcon icon={faSearch} className="text-white mr-3" />
           <input
@@ -143,7 +147,7 @@ export default function Navbar() {
           </Link>
 
           <button
-            className="md:hidden p-2 text-white"
+            className="md:hidden p-2 text-black"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-xl" />
@@ -172,12 +176,11 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-custom-blue text-black absolute top-full left-0 right-0 shadow-lg border-t border-white/10 py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
+        <div className="md:hidden bg-background text-black absolute top-full left-0 right-0 shadow-lg border-t border-white/10 py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
           <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Home</Link>
           <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Services</Link>
           <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">About Us</Link>
           <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Contact</Link>
-
         </div>
       )}
     </nav>

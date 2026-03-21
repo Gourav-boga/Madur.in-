@@ -338,6 +338,15 @@ export default function AdminSubscriptionsPage() {
                   onChange={e => setFormData({ ...formData, customer_name: e.target.value })}
                 />
               </div>
+              <div>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Customer Email (to link with account)</label>
+                <input required type="email"
+                  className="w-full bg-accent/50 rounded-2xl py-4 px-6 font-bold outline-none border-none focus:ring-4 ring-primary/20 text-black"
+                  placeholder="customer@email.com"
+                  value={formData.customer_email}
+                  onChange={e => setFormData({ ...formData, customer_email: e.target.value })}
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone</label>

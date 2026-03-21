@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faKey, faArrowRight, faTriangleExclamation, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+import { sendOtpAction, verifyOtpAction } from "@/lib/actions/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -17,12 +17,9 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        router.push("/account");
-      }
-    });
+    // Check if already logged in via cookie
+    // Since we're in a client component, we'll check via a simpler way or an API
+    // For now, we'll just let the server-side redirection handle it if they visit /account
   }, [router]);
 
   const handleSendOtp = async (e: React.FormEvent) => {
@@ -37,15 +34,10 @@ export default function LoginPage() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: true, // Allow new signups automatically
-      },
-    });
+    const res = await sendOtpAction(email);
 
-    if (error) {
-      setError(error.message);
+    if (res.error) {
+      setError(res.error);
     } else {
       setSuccess("We've sent a secure code to your email. Please check your inbox.");
       setStep("otp");
@@ -65,18 +57,15 @@ export default function LoginPage() {
       return;
     }
 
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: "email",
-    });
+    const res = await verifyOtpAction(email, otp);
 
-    if (error) {
-      setError(error.message || "Invalid or expired code. Please try again.");
+    if (res.error) {
+      setError(res.error);
       setIsLoading(false);
     } else {
-      // Successfully logged in
+      // Successfully logged in via cookie
       router.push("/account");
+      router.refresh(); // Refresh to update server-side auth state
     }
   };
 

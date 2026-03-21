@@ -8,7 +8,7 @@ import { faEnvelope, faPhone, faMapMarkerAlt, faPhoneAlt } from "@fortawesome/fr
 
 export default function Footer() {
   return (
-    <footer className="bg-custom-blue text-black pt-16 pb-8 border-t border-black/5 mt-20">
+    <footer className="bg-background text-black pt-16 pb-8 border-t border-black/5 mt-20">
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
@@ -17,9 +17,9 @@ export default function Footer() {
               <Image 
                 src="/brand-logo-transparent.png" 
                 alt="MADUR.IN Logo" 
-                width={400} 
-                height={120} 
-                className="h-32 w-auto object-contain grayscale brightness-0"
+                width={500} 
+                height={150} 
+                className="h-44 w-auto object-contain"
               />
             </Link>
             <p className="text-black/90 text-sm leading-relaxed mb-6">

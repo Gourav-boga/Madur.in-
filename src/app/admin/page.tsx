@@ -116,7 +116,7 @@ export default function AdminDashboard() {
   const stats = [
     { label: "Today's Revenue", value: `₹${counts.todayRevenue.toLocaleString()}`, icon: faChartLine, color: "bg-green-500" },
     { label: "Yesterday's Revenue", value: `₹${counts.yesterdayRevenue.toLocaleString()}`, icon: faUsers, color: "bg-purple-500" },
-    { label: "Pending Orders", value: counts.pendingOrders.toString(), icon: faShoppingBag, color: "bg-orange-500" },
+    { label: "Active Subscriptions", value: counts.pendingOrders.toString(), icon: faShoppingBag, color: "bg-orange-500" },
     { label: "Deliveries Done", value: counts.completedDeliveries.toString(), icon: faPlus, color: "bg-indigo-500" },
     { label: "Total Products", value: counts.products.toString(), icon: faBox, color: "bg-blue-500" },
   ];

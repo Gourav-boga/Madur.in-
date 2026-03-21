@@ -34,9 +34,15 @@ export default function ProductCard({ product }: { product: Product }) {
   const handleOpenModal = async () => {
     if (isOutOfStock) return;
     
-    // Check if user is logged in before allowing add to cart
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // Check if user is logged in via our custom session API
+    try {
+      const res = await fetch("/api/auth/session");
+      const session = await res.json();
+      if (!session) {
+        router.push("/login");
+        return;
+      }
+    } catch (err) {
       router.push("/login");
       return;
     }
