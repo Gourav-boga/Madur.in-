@@ -65,13 +65,13 @@ export default function Navbar() {
   return (
     <nav
       style={{ backgroundColor: '#E9CF6A' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-md border-b border-black ${
-        isHome && !isScrolled ? "py-6" : isScrolled ? "py-2" : "py-4"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-md border-b border-black flex flex-col ${
+        isHome && !isScrolled ? "h-24 md:h-32" : "h-16 md:h-20"
       }`}
     >
       <StreamingTagline />
-      <div className="container flex items-center justify-between gap-4">
-        <div className="flex items-center -ml-6 md:-ml-12 relative">
+      <div className="container flex-1 flex items-center justify-between gap-4">
+        <div className="flex items-center -ml-6 md:-ml-12 relative h-full">
           {/* Back Button (Only on non-home pages) */}
           {!isHome && (
             <button
@@ -84,13 +84,13 @@ export default function Navbar() {
           )}
 
           {/* Logo */}
-          <Link href="/" className="flex items-center p-0 m-0 leading-none relative z-10 transition-transform active:scale-95">
+          <Link href="/" className="flex items-center h-full p-0 m-0 leading-none z-10 transition-transform active:scale-95">
             <Image 
               src="/madur-logo-official.png" 
               alt="MADUR.IN Logo" 
               width={400}
-              height={120}
-              className="h-24 md:h-28 w-auto object-contain select-none mix-blend-multiply"
+              height={150}
+              className="h-[120%] md:h-[150%] w-auto object-contain select-none mix-blend-multiply max-w-none"
               priority
             />
           </Link>
@@ -99,13 +99,13 @@ export default function Navbar() {
       {/* Desktop Search Bar (Swiggy Style) */}
         <form 
           onSubmit={handleSearch}
-          className="hidden lg:flex flex-1 max-w-md mx-4 items-center bg-black rounded-lg px-4 py-2"
+          className="hidden lg:flex flex-1 max-w-md mx-4 items-center bg-white border border-black/10 rounded-lg px-4 py-2 shadow-sm"
         >
-          <FontAwesomeIcon icon={faSearch} className="text-white mr-3" />
+          <FontAwesomeIcon icon={faSearch} className="text-gray-500 mr-3" />
           <input
             type="text"
             placeholder="Search for milk, vegetables, groceries..."
-            className="bg-transparent border-none outline-none w-full text-sm text-white placeholder:text-gray-400"
+            className="bg-transparent border-none outline-none w-full text-sm text-black placeholder:text-gray-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -161,13 +161,13 @@ export default function Navbar() {
         <div className="container md:hidden mt-2 pb-2">
           <form 
             onSubmit={handleSearch}
-            className="flex items-center bg-black rounded-xl px-4 py-2.5 shadow-inner"
+            className="flex items-center bg-white border border-black/10 rounded-xl px-4 py-2.5 shadow-sm"
           >
-            <FontAwesomeIcon icon={faSearch} className="text-white mr-3 text-sm" />
+            <FontAwesomeIcon icon={faSearch} className="text-gray-500 mr-3 text-sm" />
             <input
               type="text"
               placeholder="Search for milk, vegetables..."
-              className="bg-transparent border-none outline-none w-full text-xs text-white placeholder:text-gray-400"
+              className="bg-transparent border-none outline-none w-full text-xs text-black placeholder:text-gray-400"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
