@@ -11,7 +11,7 @@ export default function StreamingTagline() {
   return (
     <div 
       onClick={openSubscriptionModal}
-      className={`cursor-pointer block bg-red-600 hover:bg-red-700 text-white overflow-hidden whitespace-nowrap border-b border-red-700 transition-colors ${isHome ? "py-3" : "py-2"}`}
+      className={`cursor-pointer block bg-black hover:bg-zinc-900 text-white overflow-hidden whitespace-nowrap border-b border-black transition-colors ${isHome ? "py-1.5" : "py-1"}`}
     >
       <div className="flex items-center">
         <div className="animate-marquee inline-block">

@@ -10,9 +10,9 @@ import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 export default function ServicesPage() {
 
   return (
-    <div className="pb-20">
+    <div className="pb-10 md:pb-20">
       {/* Header */}
-      <section className="bg-background pt-10 pb-24 text-center border-b border-black/5">
+      <section className="bg-background pt-6 pb-10 md:pt-10 md:pb-24 text-center border-b border-black/5">
         <div className="container">
           <h1 className="text-4xl md:text-5xl font-black mb-6">Our Services & Products</h1>
           <p className="text-lg opacity-90 max-w-2xl mx-auto">
@@ -23,7 +23,7 @@ export default function ServicesPage() {
 
       {/* Services Grid */}
       <section className="container -mt-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
           {categories.map((service, index) => (
             <div 
               key={service.id} 

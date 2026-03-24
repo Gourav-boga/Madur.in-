@@ -8,15 +8,15 @@ import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
 export default function AboutPage() {
 
   return (
-    <div className="pb-20">
+    <div className="pb-10 md:pb-20">
       {/* Hero Section */}
-      <section className="bg-background pt-10 pb-20 overflow-hidden">
-        <div className="container flex flex-col lg:flex-row items-center gap-16">
+      <section className="bg-background pt-6 pb-8 md:pt-10 md:pb-20 overflow-hidden">
+        <div className="container flex flex-col lg:flex-row items-center gap-6 md:gap-16">
           <div className="flex-1">
-            <h1 className="text-4xl md:text-6xl font-black mb-8 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-black mb-4 md:mb-8 leading-tight">
               Bringing the <span className="text-brown">Farm</span> <br /> Closer to You.
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+            <p className="text-lg text-gray-600 leading-relaxed mb-4 md:mb-8">
               Madur.in is a local farm-fresh grocery and dairy brand focused on delivering pure, natural, and high-quality products directly to customers' homes. Our mission is to provide fresh milk, vegetables, groceries, traditional sweets, and homemade food products with trusted quality and affordable prices.
             </p>
             <div className="bg-white p-6 rounded-2xl shadow-xl inline-block border-l-8 border-primary">
@@ -38,8 +38,8 @@ export default function AboutPage() {
       </section>
 
       {/* Our Mission */}
-      <section className="container py-24">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
+      <section className="container py-8 md:py-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 items-center">
            <div className="order-2 md:order-1 relative aspect-video rounded-3xl overflow-hidden shadow-2xl">
               <Image 
                 src="/brand-image.png"
@@ -67,9 +67,9 @@ export default function AboutPage() {
         </div>
       </section>
       {/* Why Choose Madur */}
-      <section className="bg-background py-20 relative overflow-hidden">
+      <section className="bg-background py-8 md:py-20 relative overflow-hidden">
         <div className="container relative z-10">
-          <div className="flex items-center justify-center gap-4 mb-16">
+          <div className="flex items-center justify-center gap-4 mb-8 md:mb-16">
             <div className="h-[2px] bg-secondary/30 flex-1 hidden md:block"></div>
             <h2 className="text-3xl md:text-4xl font-black text-center text-secondary-foreground whitespace-nowrap px-4 border-l-4 border-r-4 border-secondary">
               Why Choose Madur?
@@ -77,7 +77,7 @@ export default function AboutPage() {
             <div className="h-[2px] bg-secondary/30 flex-1 hidden md:block"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12">
             <div className="flex flex-col items-center text-center">
               <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden shadow-xl">
                  <Image src="/about/delivery-man.png" alt="Daily Fresh Delivery" fill className="object-cover" />
@@ -119,7 +119,7 @@ export default function AboutPage() {
       </section>
 
       {/* Founder Section */}
-      <section className="bg-background py-24">
+      <section className="bg-background py-8 md:py-24">
         <div className="container max-w-4xl mx-auto rounded-[3rem] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row items-stretch">
            <div className="md:w-1/3 relative min-h-[300px]">
               <Image 

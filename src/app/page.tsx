@@ -41,12 +41,12 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col gap-16 pb-20">
+    <div className="flex flex-col gap-6 md:gap-16 pb-10 md:pb-20">
       <Hero />
       
       {/* Categories Grid */}
       <section className="container">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4 md:mb-8">
           <h2 className="text-2xl font-black flex items-center gap-3 text-black">
             <span className="w-2 h-8 bg-secondary rounded-full"></span>
             Shop by Category
@@ -56,7 +56,7 @@ export default function Home() {
           </Link>
         </div>
         
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
           {isLoading ? (
             [...Array(4)].map((_, i) => <div key={i} className="h-48 bg-gray-100 animate-pulse rounded-2xl"></div>)
           ) : categories.map((cat, index) => (
@@ -85,9 +85,9 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="bg-secondary/5 py-16">
+      <section className="bg-secondary/5 py-6 md:py-16">
         <div className="container">
-          <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center justify-between mb-4 md:mb-10">
             <h2 className="text-2xl font-black flex items-center gap-3 text-black">
               <span className="w-2 h-8 bg-primary rounded-full"></span>
               Popular Products
@@ -97,7 +97,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8 mb-6 md:mb-12">
             {isLoading ? (
                 [...Array(4)].map((_, i) => <div key={i} className="h-80 bg-white/50 animate-pulse rounded-3xl"></div>)
             ) : products.map(product => (
@@ -118,8 +118,8 @@ export default function Home() {
       </section>
 
       {/* Our Story Section */}
-      <section className="container py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+      <section className="container py-4 md:py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16 items-center">
           <div className="relative aspect-square md:aspect-auto md:h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
             <Image 
               src="/hero-banner.png"
@@ -135,14 +135,14 @@ export default function Home() {
           </div>
 
           <div>
-            <h2 className="text-3xl md:text-5xl font-black mb-8 leading-tight text-black">
+            <h2 className="text-3xl md:text-5xl font-black mb-4 md:mb-8 leading-tight text-black">
               The Journey of <span className="text-primary">MADUR.IN</span>
             </h2>
-            <p className="text-gray-600 text-lg leading-relaxed mb-8">
+            <p className="text-gray-600 text-lg leading-relaxed mb-4 md:mb-8">
               Madur.in is born out of a passion for purity and healthy living. We bridge the gap between rural pure produce and urban healthy living, delivering 100% natural and farm-fresh products directly to your doorstep.
             </p>
             
-            <div className="grid grid-cols-2 gap-6 mb-10">
+            <div className="grid grid-cols-2 gap-4 mb-6 md:mb-10">
               <div className="bg-accent p-6 rounded-2xl border-l-4 border-secondary shadow-sm">
                 <h4 className="font-black text-3xl text-secondary mb-1">100%</h4>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Natural Produces</p>
@@ -164,14 +164,14 @@ export default function Home() {
       <HomeBanners />
 
       {/* Contact Form Section */}
-      <section className="container py-10">
-        <div className="bg-secondary/10 rounded-[2rem] p-8 md:p-16 flex flex-col lg:flex-row items-center gap-12">
+      <section className="container py-4 md:py-10">
+        <div className="bg-secondary/10 rounded-[2rem] p-5 md:p-16 flex flex-col lg:flex-row items-center gap-6 md:gap-12">
           <div className="flex-1">
-            <h2 className="text-3xl md:text-4xl font-black mb-6 leading-tight text-black">
+            <h2 className="text-3xl md:text-4xl font-black mb-4 md:mb-6 leading-tight text-black">
               Purely Natural. <br />
               Part of Your Healthy Life.
             </h2>
-            <p className="text-gray-600 mb-8 leading-relaxed">
+            <p className="text-gray-600 mb-4 md:mb-8 leading-relaxed">
               At Madur.in, we believe in the power of pure, natural nutrition. Have questions about our products or delivery? We're here to help you live a healthier, purer life.
             </p>
             <div className="flex flex-wrap gap-4">

@@ -61,8 +61,8 @@ function ProductsContent() {
   const currentCategory = categories.find(c => c.name.toLowerCase() === categoryFilter?.toLowerCase());
 
   return (
-    <div className="container pt-32 pb-24 min-h-screen text-black">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+    <div className="container pt-16 md:pt-32 pb-10 md:pb-24 min-h-screen text-black">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-12 gap-4 md:gap-6">
         <div>
           <h1 className="text-2xl md:text-4xl font-black mb-2 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             {categoryFilter ? (
@@ -153,11 +153,11 @@ function ProductsContent() {
         {/* Product Grid */}
         <div className="lg:col-span-3">
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
                {[...Array(6)].map((_, i) => <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-[2.5rem]"></div>)}
             </div>
           ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
               {filteredProducts.map((product) => (
                 <div key={product.id}>
                   <ProductCard product={product} />

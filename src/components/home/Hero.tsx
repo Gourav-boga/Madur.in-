@@ -54,11 +54,11 @@ export default function Hero() {
   }, []);
 
   if (loading) {
-    return <div className="w-full h-[600px] md:h-[800px] bg-black animate-pulse flex items-center justify-center text-primary font-black uppercase tracking-[0.5em]">Madur Freshness Loading...</div>
+    return <div className="w-full h-[250px] md:h-[800px] bg-black animate-pulse flex items-center justify-center text-primary font-black uppercase tracking-[0.5em]">Madur Freshness Loading...</div>
   }
 
   return (
-    <section className="relative w-full h-[600px] md:h-[800px] overflow-hidden">
+    <section className="relative w-full h-[250px] md:h-[800px] overflow-hidden">
       {/* Background Swiper */}
       <div className="absolute inset-0 z-0">
         <Swiper

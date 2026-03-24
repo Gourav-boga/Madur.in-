@@ -27,9 +27,9 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="pb-20">
+    <div className="pb-10 md:pb-20">
       {/* Header */}
-      <section className="bg-background text-foreground pt-32 pb-20 text-center border-b border-black/5">
+      <section className="bg-background text-foreground pt-16 pb-8 md:pt-32 md:pb-20 text-center border-b border-black/5">
         <div className="container">
           <h1 className="text-4xl md:text-5xl font-black mb-6">Get In Touch</h1>
           <p className="text-lg opacity-90 max-w-2xl mx-auto">
@@ -39,7 +39,7 @@ export default function ContactPage() {
       </section>
 
       <section className="container -mt-12">
-        <div className="flex flex-col lg:flex-row gap-12">
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-12">
           {/* Contact Information */}
           <div className="lg:w-1/3 flex flex-col gap-6">
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
@@ -154,7 +154,7 @@ export default function ContactPage() {
       </section>
 
       {/* Map Section Placeholder */}
-      <section className="container py-24">
+      <section className="container py-8 md:py-24">
          <div className="w-full h-[400px] bg-white rounded-[3rem] overflow-hidden relative shadow-xl border-4 border-white">
             <div className="absolute inset-0 flex items-center justify-center">
                <div className="text-center">
