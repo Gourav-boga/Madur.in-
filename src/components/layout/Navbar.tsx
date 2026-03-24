@@ -65,13 +65,13 @@ export default function Navbar() {
   return (
     <nav
       style={{ backgroundColor: '#E9CF6A' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-md border-b border-black ${
-        isHome && !isScrolled ? "py-4" : isScrolled ? "py-1" : "py-2"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-md border-b border-black flex flex-col items-center justify-center ${
+        isHome && !isScrolled ? "h-24 md:h-32" : "h-16 md:h-20"
       }`}
     >
       <StreamingTagline />
       <div className="container flex items-center justify-between gap-4">
-        <div className="flex items-center -ml-6 md:-ml-12 relative h-16 md:h-20 w-48">
+        <div className="flex items-center -ml-6 md:-ml-12 relative h-full">
           {/* Back Button (Only on non-home pages) */}
           {!isHome && (
             <button
@@ -84,11 +84,14 @@ export default function Navbar() {
           )}
 
           {/* Logo */}
-          <Link href="/" className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center p-0 m-0 leading-none z-10 transition-transform active:scale-95">
-            <img 
+          <Link href="/" className="flex items-center h-full p-0 m-0 leading-none z-10 transition-transform active:scale-95">
+            <Image 
               src="/madur-logo-official.png" 
               alt="MADUR.IN Logo" 
-              className="h-40 md:h-52 w-auto object-contain select-none mix-blend-multiply"
+              width={400}
+              height={150}
+              className="h-[120%] md:h-[150%] w-auto object-contain select-none mix-blend-multiply max-w-none"
+              priority
             />
           </Link>
         </div>
