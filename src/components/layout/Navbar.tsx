@@ -88,7 +88,7 @@ export default function Navbar() {
             <img 
               src="/madur-logo-official.png" 
               alt="MADUR.IN Logo" 
-              className="h-24 md:h-28 w-auto object-contain select-none"
+              className="h-24 md:h-28 w-auto object-contain select-none mix-blend-multiply"
             />
           </Link>
         </div>
