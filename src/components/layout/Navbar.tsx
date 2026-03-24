@@ -86,11 +86,11 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center p-0 m-0 leading-none relative z-10">
             <Image 
-              src="/logo-madur.png" 
+              src="/logo-final.png" 
               alt="MADUR.IN Logo" 
               width={400} 
               height={120} 
-              className="h-24 md:h-28 w-auto object-contain select-none mix-blend-multiply"
+              className="h-24 md:h-28 w-auto object-contain select-none"
               priority
             />
           </Link>
