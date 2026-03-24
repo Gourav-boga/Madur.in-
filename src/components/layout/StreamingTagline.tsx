@@ -11,20 +11,20 @@ export default function StreamingTagline() {
   return (
     <div 
       onClick={openSubscriptionModal}
-      className={`cursor-pointer block bg-black hover:bg-zinc-900 text-white overflow-hidden whitespace-nowrap border-b border-black transition-colors ${isHome ? "py-1.5" : "py-1"}`}
+      className={`cursor-pointer block bg-black hover:bg-zinc-900 text-white overflow-hidden whitespace-nowrap border-b border-black transition-colors ${isHome ? "py-1" : "py-0.5"}`}
     >
       <div className="flex items-center">
         <div className="animate-marquee inline-block">
-          <span className="px-4 text-sm font-bold uppercase tracking-wider">
+          <span className="px-4 text-xs font-bold uppercase tracking-wider">
             Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
           </span>
-          <span className="px-4 text-sm font-bold uppercase tracking-wider">
+          <span className="px-4 text-xs font-bold uppercase tracking-wider">
             Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
           </span>
-          <span className="px-4 text-sm font-bold uppercase tracking-wider">
+          <span className="px-4 text-xs font-bold uppercase tracking-wider">
             Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
           </span>
-          <span className="px-4 text-sm font-bold uppercase tracking-wider">
+          <span className="px-4 text-xs font-bold uppercase tracking-wider">
             Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
           </span>
         </div>
