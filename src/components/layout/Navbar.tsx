@@ -90,7 +90,7 @@ export default function Navbar() {
               alt="MADUR.IN Logo" 
               width={400} 
               height={120} 
-              className="h-24 md:h-28 w-auto object-contain select-none"
+              className="h-24 md:h-28 w-auto object-contain select-none mix-blend-multiply"
               priority
             />
           </Link>
