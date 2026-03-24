@@ -155,11 +155,11 @@ function ProductsContent() {
         {/* Product Grid */}
         <div className="lg:col-span-3">
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-3 gap-3 md:gap-8">
                {[...Array(6)].map((_, i) => <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-[2.5rem]"></div>)}
             </div>
           ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-8">
+            <div className="grid grid-cols-3 gap-3 md:gap-8">
               {filteredProducts.map((product) => (
                 <div key={product.id}>
                   <ProductCard product={product} />
