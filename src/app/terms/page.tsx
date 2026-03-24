@@ -48,9 +48,12 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-black mb-4">4. Payments and Cancellations</h2>
+            <h2 className="text-2xl font-black mb-4">4. Payments, Cancellations and Refunds</h2>
             <p className="text-gray-600 leading-relaxed text-sm">
               Payments for one-time orders and subscriptions must be made through our secure platform. Subscription cancellations require at least 24 hours notice to take effect for the next delivery cycle.
+            </p>
+            <p className="text-gray-600 leading-relaxed text-sm mt-4 font-bold">
+              Refund Policy: Refunds will be issued within 7 days only if the product is damaged.
             </p>
           </section>
 

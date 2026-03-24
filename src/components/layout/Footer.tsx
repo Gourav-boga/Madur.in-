@@ -103,7 +103,7 @@ export default function Footer() {
             Powered by <a href="https://www.codtechitsolutions.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors font-medium">CODTECH IT SOLUTIONS</a>
           </p>
           <div className="flex gap-8">
-            <Link href="/terms" className="text-white/60 hover:text-white transition-colors">Terms & Conditions</Link>
+            <Link href="/terms" className="text-white/60 hover:text-white transition-colors">Terms & Conditions & Refund Policy</Link>
             <Link href="/privacy" className="text-white/60 hover:text-white transition-colors">Privacy Policy</Link>
           </div>
         </div>
