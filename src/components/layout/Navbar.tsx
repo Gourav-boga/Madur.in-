@@ -84,14 +84,11 @@ export default function Navbar() {
           )}
 
           {/* Logo */}
-          <Link href="/" className="flex items-center p-0 m-0 leading-none relative z-10">
-            <Image 
-              src="/logo-final.png" 
+          <Link href="/" className="flex items-center p-0 m-0 leading-none relative z-10 transition-transform active:scale-95">
+            <img 
+              src="/madur-logo-official.png" 
               alt="MADUR.IN Logo" 
-              width={400} 
-              height={120} 
               className="h-24 md:h-28 w-auto object-contain select-none"
-              priority
             />
           </Link>
         </div>
