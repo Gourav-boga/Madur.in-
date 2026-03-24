@@ -96,13 +96,13 @@ export default function Navbar() {
       {/* Desktop Search Bar (Swiggy Style) */}
         <form 
           onSubmit={handleSearch}
-          className="hidden lg:flex flex-1 max-w-md mx-4 items-center bg-black rounded-lg px-4 py-2"
+          className="hidden lg:flex flex-1 max-w-md mx-4 items-center bg-white border border-black/10 rounded-lg px-4 py-2 shadow-sm"
         >
-          <FontAwesomeIcon icon={faSearch} className="text-white mr-3" />
+          <FontAwesomeIcon icon={faSearch} className="text-gray-500 mr-3" />
           <input
             type="text"
             placeholder="Search for milk, vegetables, groceries..."
-            className="bg-transparent border-none outline-none w-full text-sm text-white placeholder:text-gray-400"
+            className="bg-transparent border-none outline-none w-full text-sm text-black placeholder:text-gray-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -158,13 +158,13 @@ export default function Navbar() {
         <div className="container md:hidden mt-2 pb-2">
           <form 
             onSubmit={handleSearch}
-            className="flex items-center bg-black rounded-xl px-4 py-2.5 shadow-inner"
+            className="flex items-center bg-white border border-black/10 rounded-xl px-4 py-2.5 shadow-sm"
           >
-            <FontAwesomeIcon icon={faSearch} className="text-white mr-3 text-sm" />
+            <FontAwesomeIcon icon={faSearch} className="text-gray-500 mr-3 text-sm" />
             <input
               type="text"
               placeholder="Search for milk, vegetables..."
-              className="bg-transparent border-none outline-none w-full text-xs text-white placeholder:text-gray-400"
+              className="bg-transparent border-none outline-none w-full text-xs text-black placeholder:text-gray-400"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
