@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   description: "Order fresh milk, vegetables, groceries, and traditional food items online with home delivery in Hyderabad.",
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: Readonly<{
