@@ -99,7 +99,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mb-6 md:mb-12">
+          <div className="grid grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-8 mb-6 md:mb-12">
             {isLoading ? (
                 [...Array(4)].map((_, i) => <div key={i} className="h-80 bg-white/50 animate-pulse rounded-3xl"></div>)
             ) : products.map(product => (

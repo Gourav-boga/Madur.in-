@@ -64,7 +64,7 @@ export default function Navbar() {
 
   return (
     <nav
-      style={{ backgroundColor: '#3D513A' }}
+      style={{ backgroundColor: '#E9CF6A' }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-md border-b border-black ${
         isHome && !isScrolled ? "py-6" : isScrolled ? "py-2" : "py-4"
       }`}
@@ -86,7 +86,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center p-0 m-0 leading-none relative z-10">
             <Image 
-              src="/logo-transparent.png" 
+              src="/logo-new.png" 
               alt="MADUR.IN Logo" 
               width={400} 
               height={120} 
