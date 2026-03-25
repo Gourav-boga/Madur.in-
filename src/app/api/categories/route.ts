@@ -56,8 +56,9 @@ export async function DELETE(request: Request) {
   try {
     await mysql.remove('categories', 'id', id);
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API Categories DELETE Error:', error);
+    return NextResponse.json({ error: error.message || 'Failed' }, { status: 500 });
   }
 }
 
