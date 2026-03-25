@@ -83,18 +83,18 @@ export default function AdminProductsPage() {
       if (!e.target.files || e.target.files.length === 0) return;
 
       const file = e.target.files[0];
-      const formData = new FormData();
-      formData.append("file", file);
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
 
       const response = await fetch("/api/upload", {
         method: "POST",
-        body: formData
+        body: uploadFormData
       });
 
       if (!response.ok) throw new Error("Upload failed");
 
       const { publicUrl } = await response.json();
-      setFormData({ ...formData as any, image_url: publicUrl });
+      setFormData(prev => ({ ...prev, image_url: publicUrl }));
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Error uploading image!");
