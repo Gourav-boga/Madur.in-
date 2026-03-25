@@ -141,7 +141,7 @@ export default function Home() {
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative overflow-hidden bg-gray-50">
                 {cat.image_url || cat.image ? (
-                  <Image src={cat.image_url || cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <Image src={cat.image_url || cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100">
                     <FontAwesomeIcon icon={faBox} className="text-gray-200 text-4xl" />

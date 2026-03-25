@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS categories (
     id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    image_url VARCHAR(255),
+    image_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

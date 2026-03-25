@@ -77,6 +77,7 @@ export default function ProductCard({ product }: { product: Product }) {
               alt={product.name || "Product"} 
               fill 
               className={`object-cover transition-transform duration-700 ${!isOutOfStock ? "group-hover:scale-110" : ""}`} 
+              unoptimized
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-100 italic text-gray-400 text-[8px]">
