@@ -24,8 +24,8 @@ export default function AdminDashboard() {
   const [isCheckingCustom, setIsCheckingCustom] = useState(false);
 
   useEffect(() => {
+    setIsAuthorized(true); // Ensure UI renders
     fetchDashboardData();
-    setIsAuthorized(true);
   }, []);
 
   async function fetchDashboardData() {

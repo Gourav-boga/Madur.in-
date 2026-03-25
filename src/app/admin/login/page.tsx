@@ -28,9 +28,9 @@ export default function AdminLoginPage() {
     setIsLoading(true);
     setError("");
 
-    // Use specific admin credentials
-    const adminEmail = "MADUR.IN@GMAIL.COM";
-    const adminPassword = "MADURFOODS.IN";
+    // Use credentials from .env or fallback to project standards
+    const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@madur.in").toUpperCase();
+    const adminPassword = "admin123"; // Synced with .env
 
     if (formData.email.toUpperCase() === adminEmail && formData.password === adminPassword) {
       sessionStorage.setItem("isAdminAuthenticated", "true");

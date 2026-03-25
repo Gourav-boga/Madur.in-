@@ -9,8 +9,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    // Skip auth check for the login page
-    if (pathname === "/admin/login") {
+    // Skip auth check for the login page (handle trailing slashes)
+    const isLoginPage = pathname === "/admin/login" || pathname === "/admin/login/";
+    if (isLoginPage) {
       setIsAuthorized(true);
       return;
     }
