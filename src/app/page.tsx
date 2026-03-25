@@ -89,10 +89,10 @@ export default function Home() {
 
           <div className="flex items-center justify-between mb-2 md:mb-10">
             <h2 className="text-2xl font-black flex items-center gap-3 text-[#222222]">
-              <span className="w-2 h-8 bg-primary rounded-full"></span>
+              <span className="w-2 h-8 bg-secondary rounded-full"></span>
               Popular Products
             </h2>
-            <Link href="/products" className="text-primary font-bold flex items-center gap-2 hover:underline text-sm md:text-base">
+            <Link href="/products" className="text-secondary font-bold flex items-center gap-2 hover:underline text-sm md:text-base">
               See more Fresh Items <FontAwesomeIcon icon={faArrowRight} size="xs" />
             </Link>
           </div>
@@ -109,7 +109,7 @@ export default function Home() {
           <div className="flex justify-center mt-2">
             <Link 
               href="/products" 
-              className="bg-primary text-primary-foreground font-black px-5 py-2.5 md:px-10 md:py-5 text-xs md:text-base rounded-xl md:rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center gap-2 md:gap-3"
+              className="bg-secondary text-secondary-foreground font-black px-5 py-2.5 md:px-10 md:py-5 text-xs md:text-base rounded-xl md:rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center gap-2 md:gap-3"
             >
               VIEW ALL PRODUCTS
               <FontAwesomeIcon icon={faArrowRight} className="text-xs md:text-base" />
@@ -171,14 +171,14 @@ export default function Home() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
             <div className="absolute bottom-4 left-4 p-4 bg-white/90 backdrop-blur rounded-xl shadow-lg max-w-xs">
-              <p className="font-black text-primary text-xl mb-1">Purity First</p>
+              <p className="font-black text-secondary text-xl mb-1">Purity First</p>
               <p className="text-xs text-[#222222] font-bold">Reviving traditional ways for a healthier tomorrow.</p>
             </div>
           </div>
 
           <div>
             <h2 className="text-3xl md:text-5xl font-black mb-4 md:mb-8 leading-tight text-[#222222]">
-              The Journey of <span className="text-primary">MADUR.IN</span>
+              The Journey of <span className="text-secondary">MADUR.IN</span>
             </h2>
             <p className="text-[#222222] text-lg leading-relaxed mb-4 md:mb-8">
               Madur.in is born out of a passion for purity and healthy living. We bridge the gap between rural pure produce and urban healthy living, delivering 100% natural and farm-fresh products directly to your doorstep.
@@ -189,8 +189,8 @@ export default function Home() {
                 <h4 className="font-black text-3xl text-secondary mb-1">100%</h4>
                 <p className="text-xs font-bold text-[#222222] uppercase tracking-wider">Natural Produces</p>
               </div>
-              <div className="bg-accent p-6 rounded-2xl border-l-4 border-primary shadow-sm">
-                <h4 className="font-black text-3xl text-primary mb-1">Farm</h4>
+              <div className="bg-accent p-6 rounded-2xl border-l-4 border-secondary shadow-sm">
+                <h4 className="font-black text-3xl text-secondary mb-1">Farm</h4>
                 <p className="text-xs font-bold text-[#222222] uppercase tracking-wider">To Home Delivery</p>
               </div>
             </div>

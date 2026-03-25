@@ -70,26 +70,17 @@ export default function Navbar() {
     >
       <StreamingTagline />
       <div className="container mt-2 flex items-center justify-between gap-4 relative">
-        {/* Mobile Menu Button - LEFT */}
-        <button
-          className="md:hidden p-2 text-[#222222] z-50"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-xl" />
-        </button>
+        {/* Mobile Left Section (Menu) */}
+        <div className="flex items-center md:hidden z-50">
+          <button
+            className="p-2 text-[#222222]"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-xl" />
+          </button>
+        </div>
 
         <div className="flex items-center flex-1 md:flex-initial justify-center md:justify-start">
-          {/* Back Button (Only on non-home pages) */}
-          {!isHome && (
-            <button
-              onClick={() => router.back()}
-              className="absolute left-4 md:static md:mr-4 p-2 text-gray-800 hover:bg-black/10 rounded-full transition-colors flex items-center justify-center z-20"
-              aria-label="Go back"
-            >
-              <FontAwesomeIcon icon={faChevronLeft} className="text-xl" />
-            </button>
-          )}
-
           {/* Logo - CENTERED ON MOBILE, LEFT ON DESKTOP */}
           <Link 
             href="/" 
