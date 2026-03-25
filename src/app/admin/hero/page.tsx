@@ -159,7 +159,7 @@ export default function AdminHeroPage() {
                  </div>
                  
                  <div className="relative aspect-[16/9] rounded-[1.5rem] overflow-hidden shadow-inner bg-accent/20">
-                    <Image src={img.image_url} alt="Hero Banner" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <Image src={img.image_url} alt="Hero Banner" fill className="object-cover group-hover:scale-105 transition-transform duration-700" unoptimized />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     
                     <button 
@@ -189,7 +189,7 @@ export default function AdminHeroPage() {
                  </div>
                  
                  <div className="relative aspect-[16/9] rounded-[1.5rem] overflow-hidden shadow-inner bg-accent/20">
-                    <Image src={`/hero/hero-${num}.png`} alt="Default Banner" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                    <Image src={`/hero/hero-${num}.png`} alt="Default Banner" fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" unoptimized />
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                        <p className="text-white font-black uppercase tracking-[0.2em] text-xs">Locked Default</p>
                     </div>

@@ -83,6 +83,7 @@ export default function Hero() {
                   fill 
                   className="object-cover object-center sm:object-[center_20%]"
                   priority={index === 0}
+                  unoptimized
                 />
                 {/* Dark Overlay - slightly softened */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent"></div>

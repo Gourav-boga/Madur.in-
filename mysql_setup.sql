@@ -101,3 +101,10 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
+-- 9. Settings Table
+CREATE TABLE IF NOT EXISTS settings (
+    `key` VARCHAR(50) PRIMARY KEY,
+    `value` TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
