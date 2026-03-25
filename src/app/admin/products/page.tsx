@@ -125,9 +125,9 @@ export default function AdminProductsPage() {
       setEditingProduct(null);
       setFormData({ name: "", category_id: "", unit: "", price: 0, image_url: "", description: "", is_out_of_stock: false });
       fetchData();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving product:", error);
-      alert("Error saving product!");
+      alert(error.message || "Error saving product!");
     } finally {
       setIsLoading(false);
     }

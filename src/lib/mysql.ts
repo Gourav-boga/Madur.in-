@@ -18,11 +18,10 @@ const pool = mysql.createPool({
  * @param sql The SQL query string
  * @param params Optional parameters for prepared statements
  */
-export async function query<T = any>(sql: string, params?: any[]): Promise<T[]> {
-  try {
-    const [results] = await pool.execute(sql, params);
-    return results as T[];
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === 'ECONNREFUSED') {
+      throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
+    }
     console.error('MySQL Query Error:', {
       sql,
       params,
