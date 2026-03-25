@@ -69,8 +69,9 @@ export async function POST(request: Request) {
       is_available: !data.is_out_of_stock
     });
     return NextResponse.json(result);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API Products POST Error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to create product' }, { status: 500 });
   }
 }
 
@@ -94,8 +95,9 @@ export async function PATCH(request: Request) {
     }, 'id', id);
 
     return NextResponse.json(result);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API Products PATCH Error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to update product' }, { status: 500 });
   }
 }
 
@@ -108,8 +110,9 @@ export async function DELETE(request: Request) {
   try {
     await mysql.remove('products', 'id', id);
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API Products DELETE Error:', error);
+    return NextResponse.json({ error: error.message || 'Failed to delete product' }, { status: 500 });
   }
 }
 
