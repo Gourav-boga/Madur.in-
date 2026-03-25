@@ -9,28 +9,27 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  // Hostinger often uses standard settings, but SSL might be needed in some cases
-  // ssl: { rejectUnauthorized: false } 
 });
 
 /**
+ * Safely escapes a MySQL identifier (table/column name) with backticks.
+ */
+function escapeId(id: string): string {
+  return '`' + id.replace(/`/g, '``') + '`';
+}
+
+/**
  * Executes a MySQL query and returns the results.
- * @param sql The SQL query string
- * @param params Optional parameters for prepared statements
  */
 export async function query<T = any>(sql: string, params?: any[]): Promise<T[]> {
   try {
-    const [results] = await pool.execute(sql, params);
+    const [results] = await pool.query(sql, params);
     return results as T[];
   } catch (error: any) {
     if (error.code === 'ECONNREFUSED') {
-      throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
+      throw new Error('MySQL Connection Refused: Please ensure your database is running.');
     }
-    console.error('MySQL Query Error:', {
-      sql,
-      params,
-      error: error instanceof Error ? error.message : error
-    });
+    console.error('MySQL Query Error:', { sql, params, error: error.message });
     throw error;
   }
 }
@@ -39,14 +38,14 @@ export async function query<T = any>(sql: string, params?: any[]): Promise<T[]> 
  * Shorthand for simple SELECT * FROM table
  */
 export async function getAll<T = any>(table: string): Promise<T[]> {
-  return query<T>(`SELECT * FROM ?? ORDER BY created_at DESC`, [table]);
+  return query<T>(`SELECT * FROM ${escapeId(table)} ORDER BY created_at DESC`);
 }
 
 /**
  * Shorthand for selecting a single record by field
  */
 export async function getOne<T = any>(table: string, field: string, value: any): Promise<T | null> {
-  const results = await query<T>(`SELECT * FROM ?? WHERE ?? = ? LIMIT 1`, [table, field, value]);
+  const results = await query<T>(`SELECT * FROM ${escapeId(table)} WHERE ${escapeId(field)} = ? LIMIT 1`, [value]);
   return results.length > 0 ? results[0] : null;
 }
 
@@ -56,17 +55,14 @@ export async function getOne<T = any>(table: string, field: string, value: any):
 export async function insert(table: string, data: Record<string, any>) {
   const keys = Object.keys(data);
   const values = Object.values(data);
+  const cols = keys.map(escapeId).join(', ');
   const placeholders = keys.map(() => '?').join(', ');
-  
-  const sql = `INSERT INTO ?? (${keys.map(() => '??').join(', ')}) VALUES (${placeholders})`;
-  const params = [table, ...keys, ...values];
-  
+  const sql = `INSERT INTO ${escapeId(table)} (${cols}) VALUES (${placeholders})`;
   try {
-    return await query(sql, params);
+    const [result] = await pool.query(sql, values);
+    return result;
   } catch (error: any) {
-    if (error.code === 'ECONNREFUSED') {
-      throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
-    }
+    console.error('MySQL Insert Error:', { sql, error: error.message });
     throw error;
   }
 }
@@ -77,17 +73,13 @@ export async function insert(table: string, data: Record<string, any>) {
 export async function update(table: string, data: Record<string, any>, idField: string, idValue: any) {
   const keys = Object.keys(data);
   const values = Object.values(data);
-  const setClause = keys.map(key => `?? = ?`).join(', ');
-  
-  const sql = `UPDATE ?? SET ${setClause} WHERE ?? = ?`;
-  const params = [table, ...keys.flatMap((k, i) => [k, values[i]]), idField, idValue];
-  
+  const setClause = keys.map(k => `${escapeId(k)} = ?`).join(', ');
+  const sql = `UPDATE ${escapeId(table)} SET ${setClause} WHERE ${escapeId(idField)} = ?`;
   try {
-    return await query(sql, params);
+    const [result] = await pool.query(sql, [...values, idValue]);
+    return result;
   } catch (error: any) {
-    if (error.code === 'ECONNREFUSED') {
-      throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
-    }
+    console.error('MySQL Update Error:', { sql, error: error.message });
     throw error;
   }
 }
@@ -96,12 +88,12 @@ export async function update(table: string, data: Record<string, any>, idField: 
  * Deletes a record from a table
  */
 export async function remove(table: string, idField: string, idValue: any) {
+  const sql = `DELETE FROM ${escapeId(table)} WHERE ${escapeId(idField)} = ?`;
   try {
-    return await query(`DELETE FROM ?? WHERE ?? = ?`, [table, idField, idValue]);
+    const [result] = await pool.query(sql, [idValue]);
+    return result;
   } catch (error: any) {
-    if (error.code === 'ECONNREFUSED') {
-      throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
-    }
+    console.error('MySQL Delete Error:', { sql, error: error.message });
     throw error;
   }
 }
@@ -112,5 +104,5 @@ export default {
   getOne,
   insert,
   update,
-  remove
+  remove,
 };
