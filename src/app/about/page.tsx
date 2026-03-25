@@ -143,7 +143,7 @@ export default function AboutPage() {
         </div>
 
         {/* Co-Founders Grid */}
-        <div className="container max-w-4xl mx-auto mt-12 md:mt-16">
+        <div className="container max-w-4xl mx-auto mt-24 md:mt-32">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Co-Founder 1 */}
             <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col items-center text-center group hover:border-secondary transition-all">
