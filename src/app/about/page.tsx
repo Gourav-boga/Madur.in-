@@ -3,9 +3,29 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
+import { faQuoteLeft, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
 export default function AboutPage() {
+  const [members, setMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTeam() {
+      try {
+        const res = await fetch("/api/team");
+        const data = await res.json();
+        setMembers(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch team:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTeam();
+  }, []);
+
+  const founders = members.filter(m => m.is_founder);
+  const coFounders = members.filter(m => !m.is_founder);
 
   return (
     <div>
@@ -31,6 +51,7 @@ export default function AboutPage() {
                 alt="Farm fresh food"
                 fill
                 className="object-contain"
+                unoptimized
               />
             </div>
           </div>
@@ -46,6 +67,7 @@ export default function AboutPage() {
                 alt="Health and purity"
                 fill
                 className="object-contain"
+                unoptimized
               />
            </div>
             <div className="order-1 md:order-2">
@@ -66,123 +88,62 @@ export default function AboutPage() {
            </div>
         </div>
       </section>
-      {/* Why Choose Madur */}
-      <section className="bg-background py-8 md:py-20 relative overflow-hidden">
-        <div className="container relative z-10">
-          <div className="flex items-center justify-center gap-4 mb-8 md:mb-16">
-            <div className="h-[2px] bg-secondary/30 flex-1 hidden md:block"></div>
-            <h2 className="text-3xl md:text-4xl font-black text-center text-secondary-foreground whitespace-nowrap px-4 border-l-4 border-r-4 border-secondary">
-              Why Choose Madur?
-            </h2>
-            <div className="h-[2px] bg-secondary/30 flex-1 hidden md:block"></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12">
-            <div className="flex flex-col items-center text-center">
-              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden shadow-xl">
-                 <Image src="/about/delivery-man.png" alt="Daily Fresh Delivery" fill className="object-cover" />
-              </div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-secondary p-2 rounded-lg text-white">
-                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
-                </div>
-                <h4 className="text-xl font-black text-[#222222]">Daily Fresh Delivery</h4>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden shadow-xl">
-                 <Image src="/about/quality-seal.png" alt="Best Quality Products" fill className="object-cover" />
-              </div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-secondary p-2 rounded-lg text-white">
-                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                </div>
-                <h4 className="text-xl font-black text-[#222222]">Best Quality Products</h4>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="relative w-48 h-48 mb-6 rounded-full overflow-hidden shadow-xl">
-                 <Image src="/about/delivery-van.png" alt="Free Home Delivery" fill className="object-cover" />
-              </div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-secondary p-2 rounded-lg text-white">
-                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                </div>
-                <h4 className="text-xl font-black text-[#222222]">Free Home Delivery</h4>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(166,230,122,0.05),transparent)] pointer-events-none"></div>
-      </section>
 
       {/* Founder Section */}
-      <section className="bg-background pt-8 pb-12 md:pt-24 md:pb-24">
-        <div className="container max-w-4xl mx-auto rounded-[3rem] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row items-stretch">
-           <div className="md:w-1/3 relative min-h-[300px]">
-              <Image 
-                src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400"
-                alt="Sindhusha G - Founder"
-                fill
-                className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
-              />
-           </div>
-           <div className="md:w-2/3 p-12 flex flex-col justify-center">
-              <FontAwesomeIcon icon={faQuoteLeft} className="text-primary text-4xl mb-6 opacity-20" />
-              <h3 className="text-3xl font-black mb-2 text-[#222222]">Sindhusha G</h3>
-              <p className="text-primary font-bold mb-6 uppercase tracking-widest text-xs">Founder of MADUR.IN</p>
-              <p className="text-[#222222] leading-relaxed mb-8">
-                An entrepreneur focused on building local businesses and providing fresh, high-quality food products to communities. Her vision for Madur is to bridge the gap between rural pure produce and urban healthy living.
-              </p>
-              <button className="bg-secondary text-secondary-foreground font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all w-fit uppercase tracking-widest text-xs">
-                Connect with Founder
-              </button>
-           </div>
-        </div>
-      </section>
+      {founders.map((founder) => (
+        <section key={founder.id} className="bg-background pt-8 pb-12 md:pt-24 md:pb-24">
+          <div className="container max-w-4xl mx-auto rounded-[3rem] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row items-stretch border border-gray-100">
+             <div className="md:w-1/3 relative min-h-[300px]">
+                <Image 
+                  src={founder.image_url || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=400"}
+                  alt={founder.name}
+                  fill
+                  className="object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                  unoptimized
+                />
+             </div>
+             <div className="md:w-2/3 p-12 flex flex-col justify-center">
+                <FontAwesomeIcon icon={faQuoteLeft} className="text-primary text-4xl mb-6 opacity-20" />
+                <h3 className="text-3xl font-black mb-2 text-[#222222]">{founder.name}</h3>
+                <p className="text-primary font-bold mb-6 uppercase tracking-widest text-xs">{founder.role}</p>
+                <p className="text-[#222222] leading-relaxed mb-8">
+                  {founder.bio}
+                </p>
+                <button className="bg-secondary text-white font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all w-fit uppercase tracking-widest text-xs">
+                  Connect with Founder
+                </button>
+             </div>
+          </div>
+        </section>
+      ))}
 
       {/* Co-Founders Grid Section */}
-      <section className="bg-background pb-12 md:pb-32">
-        <div className="container max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Co-Founder 1 */}
-            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col items-center text-center group hover:border-secondary transition-all">
-               <div className="w-32 h-32 relative rounded-full overflow-hidden mb-6 border-4 border-accent">
-                 <Image 
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300" 
-                    alt="Co-Founder 1" 
-                    fill 
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                 />
-               </div>
-               <h4 className="text-xl font-black text-[#222222] mb-1">Ravi Sharma</h4>
-               <p className="text-primary font-black uppercase tracking-widest text-[10px] mb-4">Co-Founder & Operations</p>
-               <p className="text-[#222222] text-sm leading-relaxed opacity-80">
-                 Leading our supply chain and farm-to-doorstep logistics to ensure freshness.
-               </p>
-            </div>
-
-            {/* Co-Founder 2 */}
-            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col items-center text-center group hover:border-secondary transition-all">
-               <div className="w-32 h-32 relative rounded-full overflow-hidden mb-6 border-4 border-accent">
-                 <Image 
-                    src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300" 
-                    alt="Co-Founder 2" 
-                    fill 
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                 />
-               </div>
-               <h4 className="text-xl font-black text-[#222222] mb-1">Anil Kumar</h4>
-               <p className="text-primary font-black uppercase tracking-widest text-[10px] mb-4">Co-Founder & Strategy</p>
-               <p className="text-[#222222] text-sm leading-relaxed opacity-80">
-                  Driving brand growth and ensuring the highest quality standards for all products.
-               </p>
+      {coFounders.length > 0 && (
+        <section className="bg-background pb-12 md:pb-32">
+          <div className="container max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {coFounders.map((member) => (
+                <div key={member.id} className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col items-center text-center group hover:border-secondary transition-all">
+                   <div className="w-32 h-32 relative rounded-full overflow-hidden mb-6 border-4 border-accent shadow-inner">
+                     <Image 
+                        src={member.image_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300"} 
+                        alt={member.name} 
+                        fill 
+                        className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                        unoptimized
+                     />
+                   </div>
+                   <h4 className="text-xl font-black text-[#222222] mb-1">{member.name}</h4>
+                   <p className="text-primary font-black uppercase tracking-widest text-[10px] mb-4">{member.role}</p>
+                   <p className="text-[#222222] text-sm leading-relaxed opacity-80">
+                     {member.bio}
+                   </p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

@@ -118,3 +118,15 @@ CREATE TABLE IF NOT EXISTS reviews (
     status VARCHAR(50) DEFAULT 'approved',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 11. Team Members Table
+CREATE TABLE IF NOT EXISTS team_members (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    bio TEXT NOT NULL,
+    image_url TEXT,
+    display_order INT DEFAULT 0,
+    is_founder BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

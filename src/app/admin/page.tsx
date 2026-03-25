@@ -240,6 +240,10 @@ export default function AdminDashboard() {
                 <FontAwesomeIcon icon={faImages} />
                 Hero Banner
               </Link>
+              <Link href="/admin/team" className="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-3">
+                <FontAwesomeIcon icon={faUsers} />
+                Team Manager
+              </Link>
               <Link href="/admin/reviews" className="w-full bg-orange-500 text-white font-black py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-3">
                 <FontAwesomeIcon icon={faQuoteLeft} />
                 Review Board
