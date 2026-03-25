@@ -44,7 +44,12 @@ export default function Home() {
 
         const revRes = await fetch("/api/reviews");
         const revData = await revRes.json();
-        setReviews(Array.isArray(revData) ? revData : []);
+        if (revData && !revData.error) {
+          setReviews(Array.isArray(revData) ? revData : []);
+        } else {
+          console.error("Reviews API Error:", revData?.error);
+          setReviews([]);
+        }
 
       } catch (err) {
         console.error("Failed to fetch data:", err);

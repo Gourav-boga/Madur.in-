@@ -3,7 +3,7 @@ import mysql from '@/lib/mysql';
 
 export async function GET() {
   try {
-    const reviews = await mysql.query('SELECT * FROM reviews WHERE status = "approved" ORDER BY created_at DESC');
+    const reviews = await mysql.query('SELECT * FROM reviews WHERE LOWER(TRIM(status)) = "approved" ORDER BY created_at DESC');
     return NextResponse.json(reviews);
   } catch (error) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
