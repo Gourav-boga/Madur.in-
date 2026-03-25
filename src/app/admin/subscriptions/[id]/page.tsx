@@ -148,7 +148,7 @@ export default function SubscriberDetailsPage() {
               </Link>
               <div>
                 <h1 className="text-3xl font-black text-black">Subscriber Account</h1>
-                <p className="text-gray-500 font-bold text-sm uppercase tracking-widest">Customer Folder: {subscriber?.id.slice(0, 8)}</p>
+                <p className="text-gray-500 font-bold text-sm uppercase tracking-widest">Customer Folder: {String(subscriber?.id || '').slice(0, 8)}</p>
               </div>
            </div>
             <div className="flex gap-3">
@@ -364,7 +364,7 @@ export default function SubscriberDetailsPage() {
                           </div>
                                               {(Array.isArray(deliveries) ? deliveries : []).map((del, index) => (
                             <div key={del.id} className="group grid grid-cols-12 gap-2 items-center p-4 rounded-2xl bg-accent/20 hover:bg-accent/40 transition-all border border-transparent hover:border-primary/10">
-                               <span className="col-span-1 text-[10px] font-black text-gray-300">#{ (Array.isArray(deliveries) ? deliveries.length : 0) - index}</span>
+                               <span className="col-span-1 text-[10px] font-black text-gray-300">#{del.id}</span>
                                <div className="col-span-5">
                                   <span className="font-black text-gray-800 text-sm block">{new Date(del.delivery_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                                   <span className="text-[9px] font-bold text-gray-400">{new Date(del.delivery_date).toLocaleDateString('en-IN', { weekday: 'long' })}</span>
