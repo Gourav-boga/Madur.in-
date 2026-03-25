@@ -289,7 +289,8 @@ export default function SubscriberDetailsPage() {
                  <div className="flex items-end gap-2 mb-2">
                     <span className="text-5xl font-black">{Array.isArray(deliveries) ? deliveries.length : 0}</span>
                     <span className="font-black text-sm mb-2 text-black/60">Days Delivered</span>
-                 </div                 <div className="flex items-end gap-2 mb-4">
+                  </div>
+                  <div className="flex items-end gap-2 mb-4">
                     <span className="text-2xl font-black">{Number(Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (Number(del.quantity) || 0), 0) : 0).toFixed(1)}</span>
                     <span className="font-black text-[10px] mb-1 text-black/60 uppercase tracking-widest">Total {subscriber?.products?.unit || 'L'} Received</span>
                  </div>
@@ -329,7 +330,6 @@ export default function SubscriberDetailsPage() {
                        </div>
                     </div>
                  </div>
-iv>
 
                  {/* Add Log Form — Always Visible */}
                  <div className="p-6 border-b bg-primary/5">
