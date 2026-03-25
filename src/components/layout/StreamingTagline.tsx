@@ -15,17 +15,17 @@ export default function StreamingTagline() {
     >
       <div className="flex items-center">
         <div className="animate-marquee inline-block">
-          <span className="px-4 text-xs font-bold uppercase tracking-wider">
-            Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
+          <span className="px-4 text-xs font-black uppercase tracking-widest text-white shadow-sm">
+            100 % natural and form fresh | Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
           </span>
-          <span className="px-4 text-xs font-bold uppercase tracking-wider">
-            Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
+          <span className="px-4 text-xs font-black uppercase tracking-widest text-white shadow-sm">
+            100 % natural and form fresh | Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
           </span>
-          <span className="px-4 text-xs font-bold uppercase tracking-wider">
-            Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
+          <span className="px-4 text-xs font-black uppercase tracking-widest text-white shadow-sm">
+            100 % natural and form fresh | Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
           </span>
-          <span className="px-4 text-xs font-bold uppercase tracking-wider">
-            Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
+          <span className="px-4 text-xs font-black uppercase tracking-widest text-white shadow-sm">
+            100 % natural and form fresh | Click Here to Register Now and Get Milk to Your Doorstep Every Day! 🥛
           </span>
         </div>
       </div>

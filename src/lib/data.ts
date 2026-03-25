@@ -8,6 +8,7 @@ export const categories = [
   { name: "Traditional Snacks", icon: "🥨", id: "snacks", image: "/categories/snacks.png" },
   { name: "Eggs", icon: "🥚", id: "eggs", image: "/categories/eggs.png" },
   { name: "Honey & Natural Products", icon: "🍯", id: "honey-natural", image: "/categories/honey-natural.png" },
+  { name: "Dry Fruits", icon: "🥜", id: "dry-fruits", image: "/categories/dry-fruits.png" },
 ];
 
 export const products = [
@@ -92,9 +93,11 @@ export const products = [
   // Honey & Natural Products
   { id: "63", category: "Honey & Natural Products", name: "Natural Honey", unit: "500 g", price: 350, image: "/products/natural-honey-v1.png", description: "Raw natural honey." },
   { id: "64", category: "Honey & Natural Products", name: "Palm Jaggery", unit: "500 g", price: 120, image: "/products/palm-jaggery-v1.png", description: "Healthy palm jaggery." },
-  { id: "65", category: "Honey & Natural Products", name: "Dry Fruits Mix", unit: "500 g", price: 450, image: "/products/dry-fruits-mix-v1.png", description: "Energy-rich dry fruits mix." },
-  { id: "66", category: "Honey & Natural Products", name: "Almonds", unit: "500 g", price: 450, image: "/products/almonds-v1.png", description: "California almonds." },
-  { id: "67", category: "Honey & Natural Products", name: "Cashews", unit: "500 g", price: 420, image: "/products/cashews-v1.png", description: "Crunchy cashews." },
-  { id: "68", category: "Honey & Natural Products", name: "Black Raisins", unit: "500 g", price: 220, image: "/products/black-raisins-v1.png", description: "Premium black raisins." },
-  { id: "69", category: "Honey & Natural Products", name: "Golden Raisins", unit: "500 g", price: 180, image: "/products/golden-raisins-v1.png", description: "Sweet golden raisins." },
+
+  // Dry Fruits
+  { id: "65", category: "Dry Fruits", name: "Dry Fruits Mix", unit: "500 g", price: 450, image: "/products/dry-fruits-mix-v1.png", description: "Energy-rich dry fruits mix." },
+  { id: "66", category: "Dry Fruits", name: "Almonds", unit: "500 g", price: 450, image: "/products/almonds-v1.png", description: "California almonds." },
+  { id: "67", category: "Dry Fruits", name: "Cashews", unit: "500 g", price: 420, image: "/products/cashews-v1.png", description: "Crunchy cashews." },
+  { id: "68", category: "Dry Fruits", name: "Black Raisins", unit: "500 g", price: 220, image: "/products/black-raisins-v1.png", description: "Premium black raisins." },
+  { id: "69", category: "Dry Fruits", name: "Golden Raisins", unit: "500 g", price: 180, image: "/products/golden-raisins-v1.png", description: "Sweet golden raisins." },
 ];

@@ -154,6 +154,13 @@ export default function CartPage() {
                 <span className="text-3xl font-black text-secondary">₹{cartTotal}</span>
               </div>
 
+              <div className="flex items-center gap-2 mb-6 justify-center bg-gray-50 py-3 rounded-xl border border-dashed border-gray-200">
+                <div className="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+                <p className="text-[10px] font-black text-secondary uppercase tracking-[0.2em]">
+                  Guaranteed 24 Hours Delivery
+                </p>
+              </div>
+
               <button 
                 onClick={handleCheckoutClick}
                 className="w-full bg-secondary text-white font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 mb-4"

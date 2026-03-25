@@ -99,7 +99,7 @@ export default function SplashScreen({ onComplete }: { onComplete?: () => void }
                 className="relative w-64 h-64 md:w-96 md:h-96 drop-shadow-2xl -mt-4"
               >
                 <Image 
-                  src="/logo.png" 
+                  src="/madur-logo-2026.png" 
                   alt="MADUR.IN Logo" 
                   fill 
                   className="object-contain"

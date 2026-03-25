@@ -148,6 +148,14 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
                   </div>
                 </div>
 
+                {/* Delivery Tagline */}
+                <div className="flex items-center gap-2 mb-4 justify-center bg-gray-50 py-3 rounded-xl border border-dashed border-gray-100">
+                  <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></div>
+                  <p className="text-[9px] font-black text-secondary uppercase tracking-[0.15em]">
+                    Guaranteed 24 Hours Delivery
+                  </p>
+                </div>
+
                 {/* Action Button */}
                 <button
                   onClick={handleConfirm}

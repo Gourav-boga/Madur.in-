@@ -12,14 +12,14 @@ export default function Footer() {
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
-          <div>
-            <Link href="/" className="flex items-center gap-2 mb-6">
+          <div className="flex flex-col items-start">
+            <Link href="/" className="inline-block mb-6">
               <Image 
-                src="/madur-logo-official.png" 
+                src="/madur-logo-2026.png" 
                 alt="MADUR.IN Logo" 
-                width={350} 
-                height={120} 
-                className="h-40 w-auto object-contain mix-blend-multiply"
+                width={250} 
+                height={80} 
+                className="h-24 md:h-32 w-auto object-contain mix-blend-multiply"
               />
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed mb-6">

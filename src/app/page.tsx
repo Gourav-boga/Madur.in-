@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faArrowRight, faPaperPlane, faBox } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faArrowRight, faPaperPlane, faBox, faQuoteLeft, faStar } from "@fortawesome/free-solid-svg-icons";
 import ProductCard from "@/components/common/ProductCard";
 import HomeBanners from "@/components/home/HomeBanners";
 import Link from "next/link";
@@ -271,6 +271,70 @@ export default function Home() {
               </form>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Customer Reviews Section */}
+      <section className="container py-4 md:py-8">
+        <div className="flex items-center justify-between mb-6 md:mb-10">
+          <h2 className="text-2xl font-black flex items-center gap-3 text-[#222222]">
+            <span className="w-2 h-8 bg-secondary rounded-full"></span>
+            Customer Reviews
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          {/* Review 1 */}
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-500">
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+              <FontAwesomeIcon icon={faQuoteLeft} className="text-6xl text-secondary" />
+            </div>
+            <div className="flex gap-1 mb-4">
+              {[...Array(5)].map((_, i) => (
+                <FontAwesomeIcon key={i} icon={faStar} className="text-yellow-400 text-sm" />
+              ))}
+            </div>
+            <p className="text-[#222222] text-lg font-bold italic leading-relaxed mb-6">
+              "Farm Fresh & So Tasty. Local Trust at our doorstep. Reliable, convenient service & delivery."
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-black">
+                AS
+              </div>
+              <p className="font-black text-[#222222]">— Anjali Sharma</p>
+            </div>
+          </div>
+
+          {/* Review 2 */}
+          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-500">
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+              <FontAwesomeIcon icon={faQuoteLeft} className="text-6xl text-secondary" />
+            </div>
+            <div className="flex gap-1 mb-4">
+              {[...Array(5)].map((_, i) => (
+                <FontAwesomeIcon key={i} icon={faStar} className="text-yellow-400 text-sm" />
+              ))}
+            </div>
+            <p className="text-[#222222] text-lg font-bold italic leading-relaxed mb-6">
+              "Amazing quality products. The milk is so pure and the vegetables are always fresh. Highly recommended!"
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-black">
+                RK
+              </div>
+              <p className="font-black text-[#222222]">— Rajesh Kumar</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <Link 
+            href="/reviews" 
+            className="bg-secondary text-secondary-foreground font-black px-6 py-3 md:px-10 md:py-4 text-xs md:text-sm rounded-xl md:rounded-2xl shadow-lg hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+          >
+            VIEW MORE REVIEWS
+            <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
+          </Link>
         </div>
       </section>
     </div>

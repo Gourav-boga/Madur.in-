@@ -87,7 +87,7 @@ export default function Navbar() {
             className="flex items-center p-0 m-0 leading-none z-10 transition-transform active:scale-95 -my-8 md:-my-8"
           >
             <Image 
-              src="/madur-logo-official.png" 
+              src="/madur-logo-2026.png" 
               alt="MADUR.IN Logo" 
               width={350}
               height={120}

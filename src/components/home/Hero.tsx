@@ -96,21 +96,20 @@ export default function Hero() {
       <div className="container relative z-10 h-full flex flex-col justify-center items-start px-4 md:px-12">
         <div className="max-w-2xl space-y-1.5 md:space-y-4">
           <h1 className="text-[1.2rem] leading-[1.1] sm:text-2xl md:text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter">
-            empowering every <br />
-            <span className="text-primary inline-block underline decoration-primary decoration-2 md:decoration-4 underline-offset-[2px] md:underline-offset-[6px]">freshness</span> <br />
-            from farm to <br />
-            <span className="underline decoration-white decoration-2 md:decoration-4 underline-offset-[2px] md:underline-offset-[6px]">your door</span>
+            Pure <span className="text-primary inline-block underline decoration-primary decoration-2 md:decoration-4 underline-offset-[2px] md:underline-offset-[6px]">Natural Products</span> <br />
+            delivered to <br />
+            <span className="underline decoration-white decoration-2 md:decoration-4 underline-offset-[2px] md:underline-offset-[6px]">your home</span>
           </h1>
           
           <div className="pt-3 md:pt-10">
             <Link 
-              href="/services" 
+              href="/products" 
               className="group bg-secondary text-white font-black px-3 py-1.5 md:px-8 md:py-4 rounded-lg shadow-xl hover:opacity-90 transition-all flex items-center gap-2 md:gap-4 w-fit active:scale-95"
             >
               <div className="w-5 h-5 md:w-10 md:h-10 bg-white/10 rounded-full flex items-center justify-center text-white group-hover:bg-black transition-colors">
                 <FontAwesomeIcon icon={faArrowRight} className="text-[10px] md:text-lg" />
               </div>
-              <span className="text-[10px] md:text-lg uppercase tracking-wider md:tracking-widest">Explore Services</span>
+              <span className="text-[10px] md:text-lg uppercase tracking-wider md:tracking-widest">Shop Now</span>
             </Link>
           </div>
         </div>

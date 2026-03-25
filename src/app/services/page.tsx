@@ -47,7 +47,7 @@ export default function ServicesPage() {
             <div 
               key={service.id} 
               id={service.id}
-              className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:border-secondary transition-all group"
+              className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 hover:border-secondary transition-all group flex flex-col h-full"
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative mb-6 rounded-2xl overflow-hidden bg-gray-50">
                 {service.image_url || service.image ? (
@@ -75,7 +75,7 @@ export default function ServicesPage() {
               </ul>
               <Link 
                 href={`/products?category=${encodeURIComponent(service.name)}`}
-                className="w-full bg-accent text-foreground font-bold py-3 rounded-xl hover:bg-secondary hover:text-secondary-foreground transition-all flex items-center justify-center"
+                className="w-full bg-secondary text-white font-black py-4 rounded-2xl flex items-center justify-center shadow-lg text-sm uppercase tracking-widest mt-auto"
               >
                 View Products
               </Link>

@@ -152,9 +152,17 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           </div>
 
           <div className="mt-10 pt-8 border-t border-gray-100">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-4">
               <span className="text-gray-400 font-black uppercase tracking-widest text-[10px]">Total Order Value</span>
               <span className="text-3xl font-black text-primary font-mono tracking-tighter">₹{cartTotal}</span>
+            </div>
+
+            {/* Delivery Tagline */}
+            <div className="flex items-center gap-2 mb-6 justify-center bg-gray-50 py-3 rounded-xl border border-dashed border-gray-100">
+              <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></div>
+              <p className="text-[9px] font-black text-secondary uppercase tracking-[0.15em]">
+                Guaranteed 24 Hours Delivery
+              </p>
             </div>
             <button 
               type="submit"
