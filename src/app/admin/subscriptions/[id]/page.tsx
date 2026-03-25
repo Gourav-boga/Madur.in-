@@ -289,14 +289,15 @@ export default function SubscriberDetailsPage() {
                  <div className="flex items-end gap-2 mb-2">
                     <span className="text-5xl font-black">{Array.isArray(deliveries) ? deliveries.length : 0}</span>
                     <span className="font-black text-sm mb-2 text-black/60">Days Delivered</span>
-                 </div>
-                 <div className="flex items-end gap-2 mb-4">
-                    <span className="text-2xl font-black">{(Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (del.quantity || 0), 0) : 0).toFixed(1)}</span>
+                 </div                 <div className="flex items-end gap-2 mb-4">
+                    <span className="text-2xl font-black">{Number(Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (Number(del.quantity) || 0), 0) : 0).toFixed(1)}</span>
                     <span className="font-black text-[10px] mb-1 text-black/60 uppercase tracking-widest">Total {subscriber?.products?.unit || 'L'} Received</span>
                  </div>
                  <p className="text-xs font-bold text-black/60 leading-relaxed uppercase tracking-widest">Since {subscriber?.created_at ? new Date(subscriber.created_at).toDateString() : 'Unknown Date'}</p>
               </div>
-           </div>           {/* Right Column: Register Book */}
+           </div>
+
+           {/* Right Column: Register Book */}
            <div className="lg:col-span-2">
               <div className="bg-white rounded-[3rem] shadow-xl border border-gray-100 overflow-hidden flex flex-col">
                  
@@ -319,15 +320,16 @@ export default function SubscriberDetailsPage() {
                     </div>
                     <div className="mt-4 grid grid-cols-2 gap-4">
                        <div className="bg-white p-4 rounded-2xl border border-gray-100 text-center">
-                          <p className="text-2xl font-black text-primary">{(Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (del.quantity || subscriber?.quantity || 1), 0) : 0).toFixed(1)}</p>
+                          <p className="text-2xl font-black text-primary">{Number(Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (Number(del.quantity) || Number(subscriber?.quantity) || 1), 0) : 0).toFixed(1)}</p>
                           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Total {subscriber?.products?.unit || 'L'} Delivered</p>
                        </div>
                        <div className="bg-white p-4 rounded-2xl border border-gray-100 text-center">
-                          <p className="text-2xl font-black text-secondary">₹{((Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (del.quantity || subscriber?.quantity || 1), 0) : 0) * (subscriber?.products?.price || 0)).toFixed(0)}</p>
+                          <p className="text-2xl font-black text-secondary">₹{Number((Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (Number(del.quantity) || Number(subscriber?.quantity) || 1), 0) : 0) * (Number(subscriber?.products?.price) || 0)).toFixed(0)}</p>
                           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Est. Total Value</p>
                        </div>
                     </div>
                  </div>
+iv>
 
                  {/* Add Log Form — Always Visible */}
                  <div className="p-6 border-b bg-primary/5">
