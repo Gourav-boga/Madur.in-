@@ -69,6 +69,10 @@ export default function SubscriberDetailsPage() {
         return;
       }
       const subData = await subRes.json();
+      if (!subData || subData.error) {
+        router.push("/admin/subscriptions");
+        return;
+      }
       setSubscriber(subData);
       setPastQuantity(subData.quantity || 1);
 
