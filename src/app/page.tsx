@@ -25,6 +25,7 @@ export default function Home() {
     phone: "",
     message: ""
   });
+  const [reviews, setReviews] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,6 +41,10 @@ export default function Home() {
         
         setCategories(Array.isArray(catData) ? catData : []);
         setProducts(Array.isArray(prodData) ? prodData : []);
+
+        const revRes = await fetch("/api/reviews");
+        const revData = await revRes.json();
+        setReviews(Array.isArray(revData) ? revData : []);
 
       } catch (err) {
         console.error("Failed to fetch data:", err);
@@ -284,47 +289,31 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          {/* Review 1 */}
-          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-500">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <FontAwesomeIcon icon={faQuoteLeft} className="text-6xl text-secondary" />
+          {reviews.length === 0 ? (
+            <div className="col-span-full text-center py-10 opacity-30 text-[#222222] italic font-bold">
+               No reviews shared yet.
             </div>
-            <div className="flex gap-1 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <FontAwesomeIcon key={i} icon={faStar} className="text-yellow-400 text-sm" />
-              ))}
-            </div>
-            <p className="text-[#222222] text-lg font-bold italic leading-relaxed mb-6">
-              "Farm Fresh & So Tasty. Local Trust at our doorstep. Reliable, convenient service & delivery."
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-black">
-                AS
+          ) : reviews.slice(0, 2).map((review) => (
+            <div key={review.id} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-500">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <FontAwesomeIcon icon={faQuoteLeft} className="text-6xl text-secondary" />
               </div>
-              <p className="font-black text-[#222222]">— Anjali Sharma</p>
-            </div>
-          </div>
-
-          {/* Review 2 */}
-          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-xl transition-all duration-500">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <FontAwesomeIcon icon={faQuoteLeft} className="text-6xl text-secondary" />
-            </div>
-            <div className="flex gap-1 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <FontAwesomeIcon key={i} icon={faStar} className="text-yellow-400 text-sm" />
-              ))}
-            </div>
-            <p className="text-[#222222] text-lg font-bold italic leading-relaxed mb-6">
-              "Amazing quality products. The milk is so pure and the vegetables are always fresh. Highly recommended!"
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-black">
-                RK
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <FontAwesomeIcon key={i} icon={faStar} className={i < review.rating ? "text-yellow-400 text-sm" : "text-gray-100 text-sm"} />
+                ))}
               </div>
-              <p className="font-black text-[#222222]">— Rajesh Kumar</p>
+              <p className="text-[#222222] text-lg font-bold italic leading-relaxed mb-6">
+                "{review.comment}"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-black">
+                  {review.customer_name.charAt(0)}
+                </div>
+                <p className="font-black text-[#222222]">— {review.customer_name}</p>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
 
         <div className="flex justify-center">

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBox, faShoppingBag, faPlus, faSignOutAlt, faCog, faChartLine, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faBox, faShoppingBag, faPlus, faSignOutAlt, faCog, faChartLine, faUsers, faImages, faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
 
 
 export default function AdminDashboard() {
@@ -237,8 +237,12 @@ export default function AdminDashboard() {
                 Categories
               </Link>
               <Link href="/admin/hero" className="w-full bg-purple-600 text-white font-black py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-3">
-                <FontAwesomeIcon icon={faPlus} />
-                Hero Section
+                <FontAwesomeIcon icon={faImages} />
+                Hero Banner
+              </Link>
+              <Link href="/admin/reviews" className="w-full bg-orange-500 text-white font-black py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-3">
+                <FontAwesomeIcon icon={faQuoteLeft} />
+                Review Board
               </Link>
               <Link href="/admin/settings" className="w-full bg-gray-800 text-white font-black py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-3">
                 <FontAwesomeIcon icon={faCog} />

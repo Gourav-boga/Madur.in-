@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
@@ -11,52 +10,25 @@ import {
   faCheckCircle 
 } from "@fortawesome/free-solid-svg-icons";
 
-const reviews = [
-  {
-    name: "Anjali Sharma",
-    date: "March 15, 2026",
-    rating: 5,
-    text: "Farm Fresh & So Tasty. Local Trust at our doorstep. Reliable, convenient service & delivery. The milk quality is exceptional, just like what we used to get in our childhood.",
-    initials: "AS"
-  },
-  {
-    name: "Rajesh Kumar",
-    date: "March 12, 2026",
-    rating: 5,
-    text: "Amazing quality products. The milk is so pure and the vegetables are always fresh. Highly recommended! Madur.in has become our primary source for all dairy needs.",
-    initials: "RK"
-  },
-  {
-    name: "Priya Varma",
-    date: "March 10, 2026",
-    rating: 4,
-    text: "Very reliable delivery. The subscription model is very convenient for daily milk. The eggs are also very fresh and good quality.",
-    initials: "PV"
-  },
-  {
-    name: "Sandeep Rao",
-    date: "March 5, 2026",
-    rating: 5,
-    text: "Excellent service. The products are consistently high quality. I appreciate the punctuality of the delivery team every morning.",
-    initials: "SR"
-  },
-  {
-    name: "Meera Nair",
-    date: "February 28, 2026",
-    rating: 5,
-    text: "The best A2 milk available in Hyderabad. We can really see the difference in our kids' health. Thank you Madur.in!",
-    initials: "MN"
-  },
-  {
-    name: "Vikram Reddy",
-    date: "February 25, 2026",
-    rating: 5,
-    text: "Great variety of organic products. The ghee is especially aromatic and pure. A must-try for everyone looking for authentic farm products.",
-    initials: "VR"
-  }
-];
-
 export default function ReviewsPage() {
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const res = await fetch("/api/reviews");
+        const data = await res.json();
+        setReviews(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch reviews:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchReviews();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50/50 pt-24 pb-16">
       <div className="container max-w-6xl">
@@ -101,9 +73,17 @@ export default function ReviewsPage() {
 
         {/* Reviews Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {reviews.map((review, index) => (
+          {loading ? (
+            [...Array(6)].map((_, i) => (
+              <div key={i} className="h-64 bg-white animate-pulse rounded-[2rem] border border-gray-100"></div>
+            ))
+          ) : reviews.length === 0 ? (
+            <div className="col-span-full text-center py-20 opacity-30 italic font-bold text-[#222222]">
+              No reviews shared yet.
+            </div>
+          ) : reviews.map((review) => (
             <div 
-              key={index} 
+              key={review.id} 
               className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-2xl hover:-translate-y-1 transition-all duration-500"
             >
               <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
@@ -121,19 +101,19 @@ export default function ReviewsPage() {
               </div>
               
               <p className="text-[#222222] text-lg font-bold italic leading-relaxed mb-8">
-                "{review.text}"
+                "{review.comment}"
               </p>
               
               <div className="flex items-center gap-4 mt-auto">
                 <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary font-black text-lg">
-                  {review.initials}
+                  {review.customer_name.charAt(0)}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-black text-[#222222] tracking-tight">{review.name}</p>
+                    <p className="font-black text-[#222222] tracking-tight">{review.customer_name}</p>
                     <FontAwesomeIcon icon={faCheckCircle} className="text-secondary text-[10px]" />
                   </div>
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{review.date}</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Verified Customer</p>
                 </div>
               </div>
             </div>

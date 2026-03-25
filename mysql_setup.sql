@@ -108,3 +108,13 @@ CREATE TABLE IF NOT EXISTS settings (
     `value` TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 10. Reviews Table
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(255) NOT NULL,
+    rating INT DEFAULT 5,
+    comment TEXT NOT NULL,
+    status VARCHAR(50) DEFAULT 'approved',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

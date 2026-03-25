@@ -51,7 +51,7 @@ export default function ServicesPage() {
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative mb-6 rounded-2xl overflow-hidden bg-gray-50">
                 {service.image_url || service.image ? (
-                  <Image src={service.image_url || service.image} alt={service.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <Image src={service.image_url || service.image} alt={service.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
                     <FontAwesomeIcon icon={faBox} className="text-4xl" />
