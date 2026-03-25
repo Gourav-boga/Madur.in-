@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faArrowLeft, faSearch, faImages, faBox } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 interface Product {
   id: string;
@@ -52,20 +52,29 @@ export default function AdminProductsPage() {
 
   async function fetchData() {
     setIsLoading(true);
-    const { data: catData } = await supabase.from("categories").select("id, name");
-    setCategories(catData || []);
+    try {
+      const [catRes, prodRes] = await Promise.all([
+        fetch("/api/categories"),
+        fetch("/api/products")
+      ]);
+      
+      const catData = await catRes.json();
+      const prodData = await prodRes.json();
+      
+      setCategories(Array.isArray(catData) ? catData : []);
+      // Map MySQL 'category_name' to the expected 'categories.name' structure if needed
+      const mappedProducts = (Array.isArray(prodData) ? prodData : []).map((p: any) => ({
+        ...p,
+        categories: { name: p.category_name },
+        is_out_of_stock: !p.is_available
+      }));
+      setProducts(mappedProducts);
 
-    const { data: prodData, error } = await supabase
-      .from("products")
-      .select("*, categories(name)")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching products:", error);
-    } else {
-      setProducts(prodData || []);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,21 +83,18 @@ export default function AdminProductsPage() {
       if (!e.target.files || e.target.files.length === 0) return;
 
       const file = e.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `products/${fileName}`;
+      const formData = new FormData();
+      formData.append("file", file);
 
-      const { error: uploadError } = await supabase.storage
-        .from("madur")
-        .upload(filePath, file);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      });
 
-      if (uploadError) throw uploadError;
+      if (!response.ok) throw new Error("Upload failed");
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("madur")
-        .getPublicUrl(filePath);
-
-      setFormData({ ...formData, image_url: publicUrl });
+      const { publicUrl } = await response.json();
+      setFormData({ ...formData as any, image_url: publicUrl });
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Error uploading image!");
@@ -102,19 +108,18 @@ export default function AdminProductsPage() {
     setIsLoading(true);
 
     try {
-      const payload = { ...formData };
-      if (editingProduct) {
-        const { error } = await supabase
-          .from("products")
-          .update(payload)
-          .eq("id", editingProduct.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("products")
-          .insert([payload]);
-        if (error) throw error;
-      }
+      const payload = { 
+        ...formData,
+        id: editingProduct?.id 
+      };
+      
+      const response = await fetch("/api/products", {
+        method: editingProduct ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) throw new Error("Failed to save product");
 
       setIsModalOpen(false);
       setEditingProduct(null);
@@ -130,11 +135,14 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      const { error } = await supabase.from("products").delete().eq("id", id);
-      if (error) {
-        alert("Error deleting product!");
-      } else {
+      try {
+        const response = await fetch(`/api/products?id=${id}`, {
+          method: "DELETE"
+        });
+        if (!response.ok) throw new Error("Failed to delete");
         fetchData();
+      } catch (err) {
+        alert("Error deleting product!");
       }
     }
   };
@@ -166,10 +174,11 @@ export default function AdminProductsPage() {
     );
   }
 
-  const filteredProducts = products.filter(p => 
+  const filteredProducts = (Array.isArray(products) ? products : []).filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     p.categories?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   return (
     <div className="min-h-screen bg-accent/30 p-4 md:p-8">
@@ -221,7 +230,7 @@ export default function AdminProductsPage() {
                    <tr><td colSpan={5} className="py-20 text-center text-gray-400">Loading products...</td></tr>
                 ) : filteredProducts.length === 0 ? (
                    <tr><td colSpan={5} className="py-20 text-center text-gray-400">No products found.</td></tr>
-                ) : filteredProducts.map((product) => (
+                ) : (Array.isArray(filteredProducts) ? filteredProducts : []).map((product) => (
                   <tr key={product.id} className="border-b last:border-none hover:bg-gray-50 transition-colors">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
@@ -271,6 +280,7 @@ export default function AdminProductsPage() {
                     </td>
                   </tr>
                 ))}
+
               </tbody>
             </table>
           </div>
@@ -301,8 +311,9 @@ export default function AdminProductsPage() {
                     value={formData.category_id}
                     onChange={(e) => setFormData({...formData, category_id: e.target.value})}
                   >
-                    {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                    {(Array.isArray(categories) ? categories : []).map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                   </select>
+
                 </div>
               </div>
 

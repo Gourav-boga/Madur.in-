@@ -13,7 +13,7 @@ import "swiper/css/effect-fade";
 import "swiper/css/pagination";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+
 
 export default function Hero() {
   const [images, setImages] = useState<string[]>([]);
@@ -21,14 +21,25 @@ export default function Hero() {
 
   useEffect(() => {
     async function fetchHeroImages() {
-      const { data, error } = await supabase
-        .from("hero_images")
-        .select("image_url")
-        .order("display_order", { ascending: true });
-
-      if (error) {
-        console.error("Error fetching hero images:", error);
-        // Fallback to defaults or empty
+      try {
+        const res = await fetch("/api/hero");
+        if (!res.ok) throw new Error("API Failed");
+        const data = await res.json();
+        
+        if (data && Array.isArray(data) && data.length > 0) {
+          setImages(data.map((img: any) => img.image_url));
+        } else {
+          // Use defaults if empty
+          setImages([
+            "/hero/hero-1.png",
+            "/hero/hero-2.png",
+            "/hero/hero-3.png",
+            "/hero/hero-4.png",
+            "/hero/hero-5.png",
+          ]);
+        }
+      } catch (error) {
+        console.warn("Could not fetch hero images, using defaults.");
         setImages([
           "/hero/hero-1.png",
           "/hero/hero-2.png",
@@ -36,31 +47,23 @@ export default function Hero() {
           "/hero/hero-4.png",
           "/hero/hero-5.png",
         ]);
-      } else if (data && data.length > 0) {
-        setImages(data.map(img => img.image_url));
-      } else {
-        setImages([
-          "/hero/hero-1.png",
-          "/hero/hero-2.png",
-          "/hero/hero-3.png",
-          "/hero/hero-4.png",
-          "/hero/hero-5.png",
-        ]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
+
 
     fetchHeroImages();
   }, []);
 
   if (loading) {
-    return <div className="w-full h-[250px] md:h-[800px] bg-black animate-pulse flex items-center justify-center text-primary font-black uppercase tracking-[0.5em]">Madur Freshness Loading...</div>
+    return <div className="w-full h-[200px] md:h-[400px] bg-white p-2 md:p-4 flex items-center justify-center text-primary font-black uppercase tracking-[0.5em]">Madur Freshness Loading...</div>
   }
 
   return (
-    <section className="relative w-full h-[250px] md:h-[800px] overflow-hidden">
-      {/* Background Swiper */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative w-full max-w-7xl mx-auto h-[210px] md:h-[450px] bg-white p-1.5 md:p-4 shadow-sm mt-0 md:mt-6">
+      {/* Background Swiper with Border effect */}
+      <div className="absolute inset-1.5 md:inset-4 z-0 overflow-hidden rounded-xl md:rounded-3xl border-2 md:border-4 border-white shadow-inner">
         <Swiper
           modules={[Autoplay, EffectFade]}
           effect="fade"
@@ -78,38 +81,36 @@ export default function Hero() {
                   src={src} 
                   alt={`Hero Background ${index + 1}`} 
                   fill 
-                  className="object-cover object-center sm:object-[center_30%]"
+                  className="object-cover object-center sm:object-[center_20%]"
                   priority={index === 0}
                 />
-                {/* Dark Overlay - matches the reference aesthetic */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+                {/* Dark Overlay - slightly softened */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent"></div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
       
-      {/* Content Overlay */}
-      <div className="container relative z-10 h-full flex flex-col justify-center items-start px-6 md:px-12">
-        <div className="max-w-4xl space-y-3 md:space-y-4">
-          <h1 className="text-[1.5rem] leading-[1.1] sm:text-3xl md:text-4xl lg:text-5xl font-black text-white italic uppercase tracking-tighter">
+      {/* Content Overlay - Adjusted for shorter height */}
+      <div className="container relative z-10 h-full flex flex-col justify-center items-start px-4 md:px-12">
+        <div className="max-w-2xl space-y-1.5 md:space-y-4">
+          <h1 className="text-[1.2rem] leading-[1.1] sm:text-2xl md:text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter">
             empowering every <br />
-            <span className="text-primary inline-block underline decoration-primary decoration-2 md:decoration-4 underline-offset-[4px] md:underline-offset-[10px]">freshness</span> <br />
+            <span className="text-primary inline-block underline decoration-primary decoration-2 md:decoration-4 underline-offset-[2px] md:underline-offset-[6px]">freshness</span> <br />
             from farm to <br />
-            <span className="underline decoration-white decoration-2 md:decoration-4 underline-offset-[4px] md:underline-offset-[10px]">your door</span>
+            <span className="underline decoration-white decoration-2 md:decoration-4 underline-offset-[2px] md:underline-offset-[6px]">your door</span>
           </h1>
           
-
-          
-          <div className="pt-12 md:pt-20">
+          <div className="pt-3 md:pt-10">
             <Link 
               href="/services" 
-              className="group bg-black text-white font-black px-6 py-4 md:px-10 md:py-6 rounded-xl shadow-2xl hover:bg-gray-800 transition-all flex items-center gap-4 w-fit active:scale-95"
+              className="group bg-secondary text-white font-black px-3 py-1.5 md:px-8 md:py-4 rounded-lg shadow-xl hover:opacity-90 transition-all flex items-center gap-2 md:gap-4 w-fit active:scale-95"
             >
-              <div className="w-8 h-8 md:w-12 md:h-12 bg-white/10 rounded-full flex items-center justify-center text-white group-hover:bg-black transition-colors">
-                <FontAwesomeIcon icon={faArrowRight} className="text-lg md:text-xl" />
+              <div className="w-5 h-5 md:w-10 md:h-10 bg-white/10 rounded-full flex items-center justify-center text-white group-hover:bg-black transition-colors">
+                <FontAwesomeIcon icon={faArrowRight} className="text-[10px] md:text-lg" />
               </div>
-              <span className="text-base md:text-xl uppercase tracking-widest">Explore Services</span>
+              <span className="text-[10px] md:text-lg uppercase tracking-wider md:tracking-widest">Explore Services</span>
             </Link>
           </div>
         </div>

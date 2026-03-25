@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faCheckCircle, faMapMarkerAlt, faUser, faEnvelope, faRoad, faCreditCard, faUpload, faCheck, faPhone } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 interface SubscriptionModalProps {
   isOpen: boolean;
@@ -32,26 +32,24 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
   const [isSuccess, setIsSuccess] = useState(false);
   const [dairyProducts, setDairyProducts] = useState<any[]>([]);
 
-  // Fetch subscription fee from settings
+  // Fetch details from local APIs
   React.useEffect(() => {
     async function fetchDetails() {
-      // Fetch fee
-      const { data: feeData } = await supabase.from("settings").select("value").eq("key", "subscription_fee").maybeSingle();
-      if (feeData) setSubscriptionAmount(parseInt(feeData.value));
-
-      // Fetch Milk Products
-      const { data: catData } = await supabase.from("categories").select("id").ilike("name", "%Milk%").limit(1).maybeSingle();
-      let prods: any[] = [];
-      if (catData) {
-        const { data: milkProds } = await supabase.from("products").select("*").eq("category_id", catData.id);
-        prods = milkProds || [];
+      try {
+        // 1. Fetch fee
+        const settingsRes = await fetch("/api/settings");
+        const settings = await settingsRes.json();
+        if (settings.subscription_fee) setSubscriptionAmount(parseInt(settings.subscription_fee));
+  
+        // 2. Fetch Milk Products (via API)
+        const productsRes = await fetch("/api/products?category=Milk%20&%20Dairy");
+        const prods = await productsRes.json();
+        
+        setDairyProducts(prods || []);
+        if (prods && prods.length > 0) setFormData(prev => ({ ...prev, product_id: prods[0].id }));
+      } catch (err) {
+        console.error("Error fetching subscription details:", err);
       }
-      if (prods.length === 0) {
-        const { data: allProds } = await supabase.from("products").select("*").limit(10);
-        prods = allProds || [];
-      }
-      setDairyProducts(prods);
-      if (prods.length > 0) setFormData(prev => ({ ...prev, product_id: prods[0].id }));
     }
 
     if (isOpen) {
@@ -102,20 +100,17 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
       setIsUploading(true);
       
       const file = e.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `payments/${fileName}`;
+      const uploadData = new FormData();
+      uploadData.append("file", file);
 
-      const { error: uploadError } = await supabase.storage
-        .from("madur")
-        .upload(filePath, file);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData
+      });
 
-      if (uploadError) throw uploadError;
+      if (!response.ok) throw new Error("Upload failed");
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("madur")
-        .getPublicUrl(filePath);
-
+      const { publicUrl } = await response.json();
       setFormData(prev => ({ ...prev, payment_screenshot_url: publicUrl }));
     } catch (error) {
       console.error("Upload error:", error);
@@ -144,22 +139,22 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("subscriptions").insert([{
-        customer_name: formData.name,
-        customer_email: formData.email,
-        customer_phone: formData.phone,
-        address: formData.address,
-        location_link: formData.location,
-        street: formData.street,
-        payment_screenshot_url: formData.payment_screenshot_url,
-        amount_paid: subscriptionAmount,
-        status: 'active',
-        product_id: formData.product_id,
-        quantity: formData.quantity,
-        plan_details: `Monthly Subscription (₹${subscriptionAmount})`
-      }]);
+      const response = await fetch("/api/subscriptions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: formData.name,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          address: formData.address,
+          payment_screenshot_url: formData.payment_screenshot_url,
+          product_id: formData.product_id,
+          quantity: formData.quantity
+        })
+      });
 
-      if (error) throw error;
+      if (!response.ok) throw new Error("Failed to save subscription");
+      
       setIsSuccess(true);
       setTimeout(() => {
         onClose();
@@ -215,11 +210,11 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                   <>
                     <div className="mb-8">
                        <div className="flex items-center gap-3 mb-2">
-                          <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${currentStep === 1 ? 'bg-primary text-black' : 'bg-green-500 text-white'}`}>
+                          <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${currentStep === 1 ? 'bg-secondary text-black' : 'bg-green-500 text-white'}`}>
                              {currentStep > 1 ? <FontAwesomeIcon icon={faCheck} /> : "1"}
                           </span>
                           <div className={`h-1 flex-1 rounded-full ${currentStep > 1 ? 'bg-green-500' : 'bg-gray-100'}`}></div>
-                          <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${currentStep === 2 ? 'bg-primary text-black' : 'bg-gray-100 text-gray-400'}`}>
+                          <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${currentStep === 2 ? 'bg-secondary text-black' : 'bg-gray-100 text-gray-400'}`}>
                              2
                           </span>
                        </div>
@@ -338,7 +333,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
 
                         <button
                           type="submit"
-                          className="w-full bg-brown hover:bg-brown/90 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-brown/20 text-sm uppercase tracking-widest"
+                          className="w-full bg-secondary hover:opacity-90 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-brown/20 text-sm uppercase tracking-widest"
                         >
                           Continue to Payment
                         </button>
@@ -386,7 +381,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
                                <button
                                  type="submit"
                                  disabled={isSubmitting || isUploading}
-                                 className="flex-[2] bg-brown hover:bg-brown/90 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-brown/20 text-sm uppercase tracking-widest disabled:opacity-50"
+                                 className="flex-[2] bg-secondary hover:opacity-90 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-xl shadow-brown/20 text-sm uppercase tracking-widest disabled:opacity-50"
                                >
                                  {isSubmitting ? "Submitting..." : (
                                    <>

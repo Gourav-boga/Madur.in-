@@ -76,7 +76,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       <div className="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden my-8">
         <div className="flex items-center justify-between px-10 py-8 border-b border-gray-100 bg-gray-50/50">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary shadow-inner">
               <FontAwesomeIcon icon={faShippingFast} />
             </div>
             <div>
@@ -116,10 +116,10 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <button 
                   type="button"
                   onClick={() => setPaymentMethod("Cash on Delivery")}
-                  className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all group ${paymentMethod === "Cash on Delivery" ? 'border-primary bg-primary/5' : 'border-gray-100 bg-white hover:border-accent'}`}
+                  className={`flex items-center justify-between p-5 rounded-2xl border-2 transition-all group ${paymentMethod === "Cash on Delivery" ? 'border-secondary bg-secondary/5' : 'border-gray-100 bg-white hover:border-accent'}`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${paymentMethod === "Cash on Delivery" ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${paymentMethod === "Cash on Delivery" ? 'bg-secondary text-white' : 'bg-gray-100 text-gray-400'}`}>
                       <FontAwesomeIcon icon={faTruck} />
                     </div>
                     <div className="text-left">
@@ -127,8 +127,8 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                       <p className="text-[10px] font-bold text-gray-400 uppercase">Pay when you receive</p>
                     </div>
                   </div>
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${paymentMethod === "Cash on Delivery" ? 'border-primary' : 'border-gray-200'}`}>
-                    {paymentMethod === "Cash on Delivery" && <div className="w-3 h-3 bg-primary rounded-full"></div>}
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${paymentMethod === "Cash on Delivery" ? 'border-secondary' : 'border-gray-200'}`}>
+                    {paymentMethod === "Cash on Delivery" && <div className="w-3 h-3 bg-secondary rounded-full"></div>}
                   </div>
                 </button>
 
@@ -159,7 +159,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             <button 
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary text-primary-foreground font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-3"
+              className="w-full bg-secondary text-white font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-3"
             >
               {isLoading ? (
                 <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>

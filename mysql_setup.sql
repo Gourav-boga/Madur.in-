@@ -1,79 +1,115 @@
--- MADUR.IN MySQL Setup Schema
--- Migrated from Supabase (PostgreSQL)
+-- MADUR.IN MySQL Schema Setup
+-- Run this in Hostinger phpMyAdmin SQL tab
 
+-- 1. Categories Table
 CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    description TEXT,
-    image_url VARCHAR(2048),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    category_id INT,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    price DECIMAL(10, 2) NOT NULL,
-    discount_price DECIMAL(10, 2),
-    unit VARCHAR(50) DEFAULT 'kg',
-    stock INT DEFAULT 0,
-    image_url VARCHAR(2048),
-    is_featured BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
-);
-
-CREATE TABLE IF NOT EXISTS subscriptions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_name VARCHAR(255) NOT NULL,
-    phone VARCHAR(20) NOT NULL,
-    address TEXT NOT NULL,
-    product_id INT,
-    quantity INT NOT NULL DEFAULT 1,
-    start_date DATE NOT NULL,
-    status ENUM('active', 'paused', 'cancelled') DEFAULT 'active',
-    subscription_fee DECIMAL(10, 2) DEFAULT 0.00,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
-);
-
-CREATE TABLE IF NOT EXISTS deliveries (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    subscription_id INT NOT NULL,
-    delivery_date DATE NOT NULL,
-    status ENUM('pending', 'delivered', 'skipped') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS hero_images (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    image_url VARCHAR(2048) NOT NULL,
-    title VARCHAR(255),
-    subtitle VARCHAR(255),
-    is_active BOOLEAN DEFAULT TRUE,
+    icon VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 2. Products Table
+CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    category_id INT,
+    price DECIMAL(10, 2) NOT NULL,
+    image_url TEXT,
+    description TEXT,
+    unit VARCHAR(50),
+    is_available BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+-- 3. Hero Slides Table
+CREATE TABLE IF NOT EXISTS hero_slides (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    image_url TEXT NOT NULL,
+    title VARCHAR(255),
+    subtitle VARCHAR(255),
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Initial Hero Slides
+INSERT INTO hero_slides (image_url, title, subtitle) VALUES 
+('/hero/hero-1.png', 'Fresh Milk', 'From Farm to Your Door'),
+('/hero/hero-2.png', 'Pure Quality', 'No Preservatives'),
+('/hero/hero-3.png', 'Healthy Choice', 'Best for Your Family')
+ON DUPLICATE KEY UPDATE `image_url`=`image_url`;
+
+
+-- 4. Subscriptions Table
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(255),
+    phone VARCHAR(20),
+    email VARCHAR(255),
+    address TEXT,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. Deliveries Table (Milk Subscriptions)
+CREATE TABLE IF NOT EXISTS deliveries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subscription_id INT,
+    delivery_date DATE,
+    quantity DECIMAL(10, 2),
+    status VARCHAR(50) DEFAULT 'delivered',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)
+);
+
+-- 6. Users Table (Auth)
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20),
+    full_name VARCHAR(255),
+    role VARCHAR(50) DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 6b. OTP Codes Table
 CREATE TABLE IF NOT EXISTS otps (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
-    otp VARCHAR(6) NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
+    code VARCHAR(10) NOT NULL,
+    expires_at DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS settings (
+
+-- 7. Orders Table
+CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    `key` VARCHAR(255) UNIQUE NOT NULL,
-    value TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    user_id INT,
+    user_email VARCHAR(255),
+    total_amount DECIMAL(10, 2),
+    shipping_address TEXT,
+    payment_method VARCHAR(50),
+    status VARCHAR(50) DEFAULT 'pending',
+    payment_status VARCHAR(50) DEFAULT 'unpaid',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Seed basic settings
-INSERT INTO settings (`key`, value) VALUES ('subscription_fee', '100');
+-- 8. Order Items Table
+CREATE TABLE IF NOT EXISTS order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    price DECIMAL(10, 2),
+    unit VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+
+-- Initial Data (Optional - you can migrate from Supabase later)
+-- INSERT INTO categories (name, icon) VALUES ('Dairy', 'milk'), ('Vegetables', 'leaf');

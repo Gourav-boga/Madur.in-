@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faUser, faCalendarAlt, faMapMarkerAlt, faPhone, faEnvelope, faTrash, faEdit, faCheckCircle, faClock, faCalendarPlus } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 interface Subscription {
   id: string;
@@ -61,76 +61,71 @@ export default function SubscriberDetailsPage() {
 
   async function fetchData() {
     setIsLoading(true);
-    
-    // Fetch subscriber details
-    const { data: subData, error: subError } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (subData?.product_id) {
-      const { data: prodData } = await supabase
-        .from("products")
-        .select("name, unit, price")
-        .eq("id", subData.product_id)
-        .single();
-      
-      if (prodData) {
-        subData.products = prodData;
+    try {
+      // Fetch subscriber details
+      const subRes = await fetch(`/api/subscriptions?id=${id}`);
+      if (!subRes.ok) {
+        router.push("/admin/subscriptions");
+        return;
       }
+      const subData = await subRes.json();
+      setSubscriber(subData);
+      setPastQuantity(subData.quantity || 1);
+
+      // Fetch delivery history
+      const delRes = await fetch(`/api/deliveries?subscription_id=${id}`);
+      const delData = await delRes.json();
+      setDeliveries(Array.isArray(delData) ? delData : []);
+
+    } catch (err) {
+      console.error("Error fetching subscriber data:", err);
+    } finally {
+      setIsLoading(false);
     }
-
-    if (subError) {
-      console.error("Error fetching subscriber:", subError);
-      router.push("/admin/subscriptions");
-      return;
-    }
-
-    setSubscriber(subData);
-    setPastQuantity(subData.quantity || 1);
-
-    // Fetch delivery history
-    const { data: delData } = await supabase
-      .from("deliveries")
-      .select("*")
-      .eq("subscription_id", id)
-      .order("delivery_date", { ascending: false });
-
-    setDeliveries(delData || []);
-    setIsLoading(false);
   }
 
   const handleDeleteSub = async () => {
     if (confirm("Are you sure you want to delete this subscriber's folder? All history will be lost.")) {
-      const { error } = await supabase.from("subscriptions").delete().eq("id", id);
-      if (error) alert("Error deleting subscriber");
-      else router.push("/admin/subscriptions");
+      try {
+        const response = await fetch(`/api/subscriptions?id=${id}`, { method: "DELETE" });
+        if (!response.ok) throw new Error("Failed");
+        router.push("/admin/subscriptions");
+      } catch (err) {
+        alert("Error deleting subscriber");
+      }
     }
   };
 
   const handleAddDelivery = async () => {
-    const { error } = await supabase.from("deliveries").insert([{
-      subscription_id: id,
-      delivery_date: pastDate,
-      status: 'delivered',
-      quantity: pastQuantity
-    }]);
+    try {
+      const response = await fetch("/api/deliveries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subscription_id: id,
+          delivery_date: pastDate,
+          status: 'delivered',
+          quantity: pastQuantity
+        })
+      });
 
-    if (error) {
-      if (error.code === '23505') alert("Delivery already marked for this date!");
-      else alert("Error adding delivery");
-    } else {
+      if (!response.ok) throw new Error("Failed");
       setIsAddingPast(false);
       fetchData();
+    } catch (err) {
+      alert("Error adding delivery. It may already exist for this date.");
     }
   };
 
   const removeDelivery = async (delId: string) => {
     if (confirm("Remove this delivery log?")) {
-      const { error } = await supabase.from("deliveries").delete().eq("id", delId);
-      if (error) alert("Error removing log");
-      else fetchData();
+      try {
+        const response = await fetch(`/api/deliveries?id=${delId}`, { method: "DELETE" });
+        if (!response.ok) throw new Error("Failed");
+        fetchData();
+      } catch (err) {
+        alert("Error removing log");
+      }
     }
   };
 
@@ -157,24 +152,30 @@ export default function SubscriberDetailsPage() {
               </div>
            </div>
             <div className="flex gap-3">
-               <button 
-                 onClick={async () => {
-                    const { error } = await supabase.from("deliveries").insert([{
-                      subscription_id: id,
-                      delivery_date: new Date().toISOString().split('T')[0],
-                      status: 'delivered',
-                      quantity: subscriber?.quantity || 1
-                    }]);
-                    if (error) {
-                      if (error.code === '23505') alert("Today's delivery already marked!");
-                      else alert("Error logging today's delivery");
-                    } else fetchData();
-                 }}
-                 className="bg-primary text-black font-black px-6 py-3 rounded-xl shadow-lg hover:opacity-90 transition-all flex items-center gap-2"
-               >
-                 <FontAwesomeIcon icon={faCheckCircle} />
-                 Log Today
-               </button>
+                <button 
+                  onClick={async () => {
+                    try {
+                      const response = await fetch("/api/deliveries", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          subscription_id: id,
+                          delivery_date: new Date().toISOString().split('T')[0],
+                          status: 'delivered',
+                          quantity: subscriber?.quantity || 1
+                        })
+                      });
+                      if (!response.ok) throw new Error("Failed");
+                      fetchData();
+                    } catch (err) {
+                      alert("Today's delivery already marked or error occurred!");
+                    }
+                  }}
+                  className="bg-primary text-black font-black px-6 py-3 rounded-xl shadow-lg hover:opacity-90 transition-all flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faCheckCircle} />
+                  Log Today
+                </button>
                <button 
                  onClick={handleDeleteSub}
                  className="bg-red-50 text-red-600 font-bold px-6 py-3 rounded-xl border border-red-100 hover:bg-red-100 transition-all flex items-center gap-2"
@@ -361,17 +362,16 @@ export default function SubscriberDetailsPage() {
                              <span className="col-span-2 text-center">Status</span>
                              <span className="col-span-1"></span>
                           </div>
-                          
-                          {deliveries.map((del, index) => (
+                                              {(Array.isArray(deliveries) ? deliveries : []).map((del, index) => (
                             <div key={del.id} className="group grid grid-cols-12 gap-2 items-center p-4 rounded-2xl bg-accent/20 hover:bg-accent/40 transition-all border border-transparent hover:border-primary/10">
-                               <span className="col-span-1 text-[10px] font-black text-gray-300">#{deliveries.length - index}</span>
+                               <span className="col-span-1 text-[10px] font-black text-gray-300">#{ (Array.isArray(deliveries) ? deliveries.length : 0) - index}</span>
                                <div className="col-span-5">
                                   <span className="font-black text-gray-800 text-sm block">{new Date(del.delivery_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                                   <span className="text-[9px] font-bold text-gray-400">{new Date(del.delivery_date).toLocaleDateString('en-IN', { weekday: 'long' })}</span>
                                </div>
                                <div className="col-span-3 text-center">
                                   <span className="font-black text-primary">{del.quantity || subscriber?.quantity || 1}</span>
-                               </div>
+                                </div>
                                <div className="col-span-2 flex justify-center">
                                   <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[8px] font-black uppercase px-2 py-1 rounded-full">
                                      <FontAwesomeIcon icon={faCheckCircle} size="xs" /> Done
@@ -388,6 +388,7 @@ export default function SubscriberDetailsPage() {
                             </div>
                           ))}
                        </div>
+
                     )}
                  </div>
               </div>

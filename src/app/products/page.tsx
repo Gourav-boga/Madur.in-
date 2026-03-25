@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faSearch, faTimes, faBox } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import Image from "next/image";
-import { supabase } from "@/lib/supabase";
+
 
 function ProductsContent() {
   const searchParams = useSearchParams();
@@ -24,12 +24,23 @@ function ProductsContent() {
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
-      const { data: catData } = await supabase.from("categories").select("*");
-      const { data: prodData } = await supabase.from("products").select("*, categories(name)");
-      
-      setCategories(catData || []);
-      setProducts(prodData || []);
-      setIsLoading(false);
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetch("/api/categories"),
+          fetch("/api/products")
+        ]);
+        
+        const catData = await catRes.json();
+        const prodData = await prodRes.json();
+        
+        setCategories(Array.isArray(catData) ? catData : []);
+        setProducts(Array.isArray(prodData) ? prodData : []);
+
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchData();
   }, []);
@@ -43,15 +54,15 @@ function ProductsContent() {
     const cleanSearch = searchTerm.toLowerCase().replace(/\s/g, "");
     
     return products.filter((product) => {
-      // product.categories.name comes from Supabase join
+      // product labels or associated details from joined query
       const prodCategoryName = product.categories?.name || product.category || "";
       
       const matchesCategory = categoryFilter 
         ? prodCategoryName.toLowerCase() === categoryFilter.toLowerCase() 
         : true;
         
-      const cleanName = product.name.toLowerCase().replace(/\s/g, "");
-      const cleanProductCategory = prodCategoryName.toLowerCase().replace(/\s/g, "");
+      const cleanName = (product.name || "").toLowerCase().replace(/\s/g, "");
+      const cleanProductCategory = (prodCategoryName || "").toLowerCase().replace(/\s/g, "");
       
       const matchesSearch = cleanName.includes(cleanSearch) ||
                            cleanProductCategory.includes(cleanSearch);
@@ -70,12 +81,12 @@ function ProductsContent() {
             {categoryFilter ? (
               <>
                 {(currentCategory?.image_url || currentCategory?.image) ? (
-                  <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-md bg-gray-50 flex-shrink-0">
+                  <div className="relative w-12 h-12 md:w-24 md:h-24 rounded-xl md:rounded-2xl overflow-hidden shadow-md bg-gray-50 flex-shrink-0">
                     <Image src={currentCategory.image_url || currentCategory.image} alt={currentCategory.name} fill className="object-cover" />
                   </div>
                 ) : (
-                  <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300">
-                    <FontAwesomeIcon icon={faBox} size="lg" />
+                  <div className="w-12 h-12 md:w-24 md:h-24 rounded-lg md:rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300">
+                    <FontAwesomeIcon icon={faBox} size="xs" />
                   </div>
                 )}
                 <div className="flex flex-wrap items-center gap-2">
@@ -96,7 +107,7 @@ function ProductsContent() {
             <input 
               type="text" 
               placeholder="Search products..." 
-              className="w-full bg-white border border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:ring-2 ring-primary shadow-sm transition-all font-bold"
+              className="w-full bg-white border border-gray-100 rounded-xl md:rounded-2xl py-3 md:py-4 pl-10 md:pl-12 pr-4 text-xs md:text-sm outline-none focus:ring-2 ring-primary shadow-sm transition-all font-bold"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -121,7 +132,7 @@ function ProductsContent() {
               >
                 All Products
               </Link>
-              {categories.map((cat) => (
+              {(Array.isArray(categories) ? categories : []).map((cat) => (
                 <Link 
                   key={cat.id}
                   href={`/products?category=${encodeURIComponent(cat.name)}`}
@@ -148,6 +159,7 @@ function ProductsContent() {
                   )}
                 </Link>
               ))}
+
             </div>
           </div>
         </div>
@@ -155,25 +167,26 @@ function ProductsContent() {
         {/* Product Grid */}
         <div className="lg:col-span-3">
           {isLoading ? (
-            <div className="grid grid-cols-3 gap-3 md:gap-8">
-               {[...Array(6)].map((_, i) => <div key={i} className="h-80 bg-gray-100 animate-pulse rounded-[2.5rem]"></div>)}
+            <div className="grid grid-cols-2 gap-3 md:gap-8">
+               {[...Array(6)].map((_, i) => <div key={i} className="h-60 md:h-80 bg-gray-100 animate-pulse rounded-2xl md:rounded-[2.5rem]"></div>)}
             </div>
           ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-3 xl:grid-cols-4 gap-3 md:gap-8">
-              {filteredProducts.map((product) => (
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 md:gap-8">
+              {(Array.isArray(filteredProducts) ? filteredProducts : []).map((product) => (
                 <div key={product.id}>
                   <ProductCard product={product} />
                 </div>
               ))}
             </div>
+
           ) : (
-            <div className="py-24 text-center bg-accent/30 rounded-[3rem] border border-dashed border-gray-300">
-              <div className="text-6xl mb-6 opacity-20 text-gray-400">📦</div>
-              <h3 className="text-xl font-black mb-2">No products found</h3>
-              <p className="text-gray-500 mb-8">Try adjusting your filters or search term.</p>
+            <div className="py-12 md:py-24 text-center bg-accent/30 rounded-2xl md:rounded-[3rem] border border-dashed border-gray-300">
+              <div className="text-4xl md:text-6xl mb-4 md:mb-6 opacity-20 text-gray-400">📦</div>
+              <h3 className="text-lg md:text-xl font-black mb-2">No products found</h3>
+              <p className="text-gray-500 mb-6 md:mb-8 text-xs md:text-base">Try adjusting your filters or search term.</p>
               <button 
                 onClick={() => {setSearchTerm(""); window.location.href="/products"}}
-                className="bg-primary text-primary-foreground font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all"
+                className="bg-primary text-primary-foreground font-black px-6 py-3 md:px-8 md:py-4 rounded-lg md:rounded-xl shadow-lg hover:opacity-90 transition-all text-sm md:text-base"
               >
                 Clear All Filters
               </button>

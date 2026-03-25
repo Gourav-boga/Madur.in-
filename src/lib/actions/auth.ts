@@ -1,6 +1,6 @@
 "use server";
 
-import { supabase } from "@/lib/supabase";
+import mysql from "@/lib/mysql";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
@@ -25,18 +25,12 @@ export async function sendOtpAction(email: string) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
 
-    // Save to database (Using service role if needed, or normal client if RLS allows)
-    // Note: We're using the client from @/lib/supabase which might be the anon client.
-    // In a real app, you'd use a service_role client for this to bypass RLS.
-    const { error: dbError } = await supabase
-      .from("otps")
-      .insert({
-        email,
-        code: otp,
-        expires_at: expiresAt.toISOString(),
-      });
-
-    if (dbError) throw new Error(`Database error: ${dbError.message}`);
+    // Save to MySQL
+    await mysql.insert("otps", {
+      email,
+      code: otp,
+      expires_at: expiresAt.toISOString().slice(0, 19).replace('T', ' ')
+    });
 
     // Send email
     await transporter.sendMail({
@@ -65,19 +59,16 @@ export async function sendOtpAction(email: string) {
 export async function verifyOtpAction(email: string, code: string) {
   try {
     // Check code in database
-    const { data, error: dbError } = await supabase
-      .from("otps")
-      .select("*")
-      .eq("email", email)
-      .eq("code", code)
-      .gt("expires_at", new Date().toISOString())
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single();
+    const results = await mysql.query(
+      `SELECT * FROM otps WHERE email = ? AND code = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1`,
+      [email, code]
+    );
 
-    if (dbError || !data) {
+    if (!results || results.length === 0) {
       return { success: false, error: "Invalid or expired code." };
     }
+
+    const data = results[0];
 
     // Code is valid! Create JWT
     const token = jwt.sign(
@@ -97,7 +88,7 @@ export async function verifyOtpAction(email: string, code: string) {
     });
 
     // Cleanup: Remove used OTP
-    await supabase.from("otps").delete().eq("id", data.id);
+    await mysql.remove("otps", "id", data.id);
 
     return { success: true };
   } catch (error: any) {

@@ -1,6 +1,6 @@
 "use server";
 
-import { supabase } from "@/lib/supabase";
+import mysql from "@/lib/mysql";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
@@ -28,38 +28,31 @@ export async function placeOrderAction(orderData: {
     const email = decoded.email.toLowerCase();
 
     // 2. Insert Order
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        user_email: email,
-        total_amount: orderData.total_amount,
-        shipping_address: orderData.shipping_address,
-        payment_method: orderData.payment_method,
-        status: "pending"
-      })
-      .select()
-      .single();
+    const orderResult: any = await mysql.insert('orders', {
+      user_email: email,
+      total_amount: orderData.total_amount,
+      shipping_address: orderData.shipping_address,
+      payment_method: orderData.payment_method,
+      status: "pending"
+    });
 
-    if (orderError) throw new Error(`Order placement error: ${orderError.message}`);
+    const orderId = orderResult.insertId;
 
     // 3. Insert Order Items
-    const orderItems = orderData.items.map(item => ({
-      order_id: order.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      price: item.price,
-      unit: item.unit
-    }));
+    for (const item of orderData.items) {
+      await mysql.insert('order_items', {
+        order_id: orderId,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price,
+        unit: item.unit
+      });
+    }
 
-    const { error: itemsError } = await supabase
-      .from("order_items")
-      .insert(orderItems);
-
-    if (itemsError) throw new Error(`Order items error: ${itemsError.message}`);
-
-    return { success: true, orderId: order.id };
+    return { success: true, orderId: orderId.toString() };
   } catch (error: any) {
     console.error("Place order action error:", error);
     return { success: false, error: error.message || "Failed to place order." };
   }
 }
+

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faSave, faCog } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 export default function AdminSettingsPage() {
   const router = useRouter();
@@ -21,32 +21,36 @@ export default function AdminSettingsPage() {
 
   async function fetchSettings() {
     setIsLoading(true);
-    const { data, error } = await supabase
-      .from("settings")
-      .select("value")
-      .eq("key", "subscription_fee")
-      .single();
-    
-    if (data && !error) {
-      setSubscriptionFee(data.value);
+    try {
+      const res = await fetch("/api/settings");
+      const data = await res.json();
+      if (data.subscription_fee) {
+        setSubscriptionFee(data.subscription_fee);
+      }
+    } catch (err) {
+      console.error("Error fetching settings:", err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setIsSaving(true);
-    const { error } = await supabase
-      .from("settings")
-      .update({ value: subscriptionFee })
-      .eq("key", "subscription_fee");
-    
-    if (error) {
-      alert("Error saving settings!");
-    } else {
+    try {
+      const response = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscription_fee: subscriptionFee })
+      });
+      
+      if (!response.ok) throw new Error("Failed to save");
       alert("Settings saved successfully!");
+    } catch (err) {
+      alert("Error saving settings!");
+    } finally {
+      setIsSaving(false);
     }
-    setIsSaving(false);
   }
 
   if (!isAuthorized || isLoading) {

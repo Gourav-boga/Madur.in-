@@ -40,7 +40,7 @@ export default function CartPage() {
         <p className="text-gray-500 mb-10 max-w-sm">Looks like you haven't added anything to your cart yet. Fresh milk and organic veggies are waiting!</p>
         <Link 
           href="/" 
-          className="bg-primary text-primary-foreground font-black px-10 py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all active:scale-95 flex items-center gap-3"
+          className="bg-secondary text-white font-black px-10 py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all active:scale-95 flex items-center gap-3"
         >
           <FontAwesomeIcon icon={faShoppingBag} />
           Start Shopping
@@ -94,7 +94,7 @@ export default function CartPage() {
                         </span>
                       )}
                     </h3>
-                    <p className="text-primary font-black">₹{item.price}</p>
+                    <p className="text-secondary font-black">₹{item.price}</p>
                   </div>
 
                   <div className="flex items-center justify-between md:justify-end gap-8">
@@ -151,12 +151,12 @@ export default function CartPage() {
 
               <div className="flex justify-between items-center pt-6 border-t mb-10">
                 <span className="text-xl font-black">Total Payable</span>
-                <span className="text-3xl font-black text-primary">₹{cartTotal}</span>
+                <span className="text-3xl font-black text-secondary">₹{cartTotal}</span>
               </div>
 
               <button 
                 onClick={handleCheckoutClick}
-                className="w-full bg-primary text-primary-foreground font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 mb-4"
+                className="w-full bg-secondary text-white font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 mb-4"
               >
                 Proceed to Checkout
               </button>

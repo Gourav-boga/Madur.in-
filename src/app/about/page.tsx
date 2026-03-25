@@ -8,15 +8,15 @@ import { faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
 export default function AboutPage() {
 
   return (
-    <div className="pb-10 md:pb-20">
+    <div>
       {/* Hero Section */}
       <section className="bg-background pt-6 pb-8 md:pt-10 md:pb-20 overflow-hidden">
         <div className="container flex flex-col lg:flex-row items-center gap-6 md:gap-16">
           <div className="flex-1">
-            <h1 className="text-4xl md:text-6xl font-black mb-4 md:mb-8 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-black mb-4 md:mb-8 leading-tight text-[#222222]">
               Bringing the <span className="text-brown">Farm</span> <br /> Closer to You.
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed mb-4 md:mb-8">
+            <p className="text-lg text-[#222222] leading-relaxed mb-4 md:mb-8">
               Madur.in is a local farm-fresh grocery and dairy brand focused on delivering pure, natural, and high-quality products directly to customers' homes. Our mission is to provide fresh milk, vegetables, groceries, traditional sweets, and homemade food products with trusted quality and affordable prices.
             </p>
             <div className="bg-white p-6 rounded-2xl shadow-xl inline-block border-l-8 border-primary">
@@ -49,18 +49,18 @@ export default function AboutPage() {
               />
            </div>
             <div className="order-1 md:order-2">
-              <h2 className="text-3xl font-black mb-6">Our Mission</h2>
-              <p className="text-gray-600 leading-relaxed mb-6">
+              <h2 className="text-3xl font-black mb-6 text-[#222222]">Our Mission</h2>
+              <p className="text-[#222222] leading-relaxed mb-6">
                 Madur emphasizes purity, freshness, and healthy living for families. We believe that the best food doesn't need chemicals, it needs care. Our goal is to revive the traditional ways of food production that our ancestors followed, ensuring that every drop of milk and every spoon of ghee contributes to your well-being.
               </p>
               <div className="grid grid-cols-2 gap-6">
                 <div className="bg-accent p-4 rounded-xl border-b-4 border-secondary">
                   <h4 className="font-black text-2xl text-secondary mb-1">100%</h4>
-                  <p className="text-xs font-bold text-gray-500">Pure Organic</p>
+                  <p className="text-xs font-bold text-[#222222]">Pure Organic</p>
                 </div>
                 <div className="bg-accent p-4 rounded-xl border-b-4 border-primary">
                   <h4 className="font-black text-2xl text-primary mb-1">Daily</h4>
-                  <p className="text-xs font-bold text-gray-500">Fast Delivery</p>
+                  <p className="text-xs font-bold text-[#222222]">Fast Delivery</p>
                 </div>
               </div>
            </div>
@@ -86,7 +86,7 @@ export default function AboutPage() {
                 <div className="bg-secondary p-2 rounded-lg text-white">
                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                 </div>
-                <h4 className="text-xl font-black">Daily Fresh Delivery</h4>
+                <h4 className="text-xl font-black text-[#222222]">Daily Fresh Delivery</h4>
               </div>
             </div>
 
@@ -98,7 +98,7 @@ export default function AboutPage() {
                 <div className="bg-secondary p-2 rounded-lg text-white">
                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                 </div>
-                <h4 className="text-xl font-black">Best Quality Products</h4>
+                <h4 className="text-xl font-black text-[#222222]">Best Quality Products</h4>
               </div>
             </div>
 
@@ -110,7 +110,7 @@ export default function AboutPage() {
                 <div className="bg-secondary p-2 rounded-lg text-white">
                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 </div>
-                <h4 className="text-xl font-black">Free Home Delivery</h4>
+                <h4 className="text-xl font-black text-[#222222]">Free Home Delivery</h4>
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function AboutPage() {
       </section>
 
       {/* Founder Section */}
-      <section className="bg-background py-8 md:py-24">
+      <section className="bg-background pt-8 pb-4 md:py-24">
         <div className="container max-w-4xl mx-auto rounded-[3rem] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row items-stretch">
            <div className="md:w-1/3 relative min-h-[300px]">
               <Image 
@@ -131,9 +131,9 @@ export default function AboutPage() {
            </div>
            <div className="md:w-2/3 p-12 flex flex-col justify-center">
               <FontAwesomeIcon icon={faQuoteLeft} className="text-primary text-4xl mb-6 opacity-20" />
-              <h3 className="text-3xl font-black mb-2">Sindhusha G</h3>
+              <h3 className="text-3xl font-black mb-2 text-[#222222]">Sindhusha G</h3>
               <p className="text-primary font-bold mb-6">Founder of MADUR.IN</p>
-              <p className="text-gray-600 leading-relaxed mb-8">
+              <p className="text-[#222222] leading-relaxed mb-8">
                 An entrepreneur focused on building local businesses and providing fresh, high-quality food products to communities. Her vision for Madur is to bridge the gap between rural pure produce and urban healthy living.
               </p>
               <button className="bg-secondary text-secondary-foreground font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all w-fit">

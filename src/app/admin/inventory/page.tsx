@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faCheck, faClock, faTruck, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 interface Subscription {
   id: string;
@@ -37,67 +37,68 @@ export default function AdminInventoryPage() {
 
   async function fetchData() {
     setIsLoading(true);
-    
-    // Fetch Dairy Products first for in-memory join
-    const { data: catData } = await supabase.from("categories").select("id").eq("name", "Milk & Dairy").single();
-    let productsList: any[] = [];
-    if (catData) {
-      const { data: prodData } = await supabase.from("products").select("*").eq("category_id", catData.id);
-      productsList = prodData || [];
-    }
+    try {
+      // 1. Fetch Products
+      const prodRes = await fetch("/api/products");
+      const productsList = await prodRes.json();
 
-    // Fetch active subscriptions
-    const { data: subData, error: subError } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .eq("status", "active")
-      .order("customer_name", { ascending: true });
-    
-    if (subError) {
-      console.error("Subscription Fetch Error:", subError.message);
+      // 2. Fetch active subscriptions
+      const subRes = await fetch("/api/subscriptions");
+      const subData = await subRes.json();
+      const activeSubs = (subData || []).filter((s: any) => s.status === 'active');
+
+      // 3. Fetch today's deliveries
+      const delRes = await fetch(`/api/deliveries?date=${today}`);
+      const delData = await delRes.json();
+      setDeliveriesToday(Array.isArray(delData) ? delData : []);
+
+
+      // 4. Enrich subscriptions
+      const enrichedSubs = (Array.isArray(activeSubs) ? activeSubs : []).map((sub: any) => {
+        const prod = (Array.isArray(productsList) ? productsList : []).find((p: any) => p.id === sub.product_id);
+        return {
+          ...sub,
+          products: prod ? { name: prod.name, unit: prod.unit } : null
+        };
+      });
+
+
+      setSubscriptions(enrichedSubs);
+    } catch (err) {
+      console.error("Error fetching inventory data:", err);
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // Manually attach products
-    const enrichedSubs = (subData || []).map(sub => {
-      const prod = productsList.find(p => p.id === sub.product_id);
-      return {
-        ...sub,
-        products: prod ? { name: prod.name, unit: prod.unit } : null
-      };
-    });
-
-    setSubscriptions(enrichedSubs);
-
-    // Fetch today's deliveries
-    const { data: delData } = await supabase
-      .from("deliveries")
-      .select("subscription_id, delivery_date, status")
-      .eq("delivery_date", today);
-
-    setDeliveriesToday(delData || []);
-    setIsLoading(false);
   }
 
   const toggleDelivery = async (subId: string) => {
     const existing = deliveriesToday.find(d => d.subscription_id === subId);
-    if (existing) {
-      await supabase.from("deliveries").delete().eq("subscription_id", subId).eq("delivery_date", today);
-    } else {
-      await supabase.from("deliveries").insert([{
-        subscription_id: subId,
-        delivery_date: today,
-        status: 'delivered'
-      }]);
+    try {
+      if (existing) {
+        await fetch(`/api/deliveries?subscription_id=${subId}&date=${today}`, {
+          method: "DELETE"
+        });
+      } else {
+        await fetch("/api/deliveries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subscription_id: subId,
+            delivery_date: today,
+            status: 'delivered'
+          })
+        });
+      }
+      fetchData();
+    } catch (err) {
+      alert("Error toggling delivery!");
     }
-    fetchData();
   };
 
   // Calculate totals
   const inventoryTotals: Record<string, { name: string, unit: string, total: number, delivered: number }> = {};
   
-  subscriptions.forEach(sub => {
+  (Array.isArray(subscriptions) ? subscriptions : []).forEach(sub => {
     const product = Array.isArray(sub.products) ? sub.products[0] : sub.products;
     const prodName = product?.name || "Unknown";
     const prodUnit = product?.unit || "L";
@@ -105,10 +106,11 @@ export default function AdminInventoryPage() {
         inventoryTotals[sub.product_id] = { name: prodName, unit: prodUnit, total: 0, delivered: 0 };
     }
     inventoryTotals[sub.product_id].total += sub.quantity;
-    if (deliveriesToday.some(d => d.subscription_id === sub.id)) {
+    if (Array.isArray(deliveriesToday) && deliveriesToday.some(d => d.subscription_id === sub.id)) {
         inventoryTotals[sub.product_id].delivered += sub.quantity;
     }
   });
+
 
   return (
     <div className="min-h-screen bg-accent/30 p-4 md:p-8 text-black">
@@ -188,10 +190,10 @@ export default function AdminInventoryPage() {
               <tbody className="divide-y divide-gray-100">
                 {isLoading ? (
                   <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-400 font-bold">Loading inventory data...</td></tr>
-                ) : subscriptions.length === 0 ? (
+                ) : (Array.isArray(subscriptions) ? subscriptions : []).length === 0 ? (
                   <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-400 font-bold">No active subscriptions.</td></tr>
-                ) : subscriptions.map(sub => {
-                  const isDelivered = deliveriesToday.some(d => d.subscription_id === sub.id);
+                ) : (Array.isArray(subscriptions) ? subscriptions : []).map(sub => {
+                  const isDelivered = Array.isArray(deliveriesToday) && deliveriesToday.some(d => d.subscription_id === sub.id);
                   return (
                     <tr key={sub.id} className={`hover:bg-gray-50/50 transition-colors ${isDelivered ? 'bg-green-50/30' : ''}`}>
                       <td className="px-8 py-6 text-center">
@@ -224,6 +226,7 @@ export default function AdminInventoryPage() {
                     </tr>
                   )
                 })}
+
               </tbody>
             </table>
           </div>

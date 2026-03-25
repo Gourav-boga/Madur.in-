@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTrash, faArrowLeft, faImages, faCheck, faClock, faUserPlus, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 interface Subscription {
   id: string;
@@ -69,91 +69,72 @@ export default function AdminSubscriptionsPage() {
 
   async function fetchData() {
     setIsLoading(true);
+    try {
+      // 1. Fetch Products
+      const prodRes = await fetch("/api/products");
+      const prodData = await prodRes.json();
+      setDairyProducts(Array.isArray(prodData) ? prodData : []);
+      if (Array.isArray(prodData) && prodData.length > 0 && !formData.product_id) {
+        setFormData(prev => ({ ...prev, product_id: prodData[0].id }));
+      }
 
-    // Fetch Products for selection (Try "Milk & Dairy" first, then fallback to all products)
-    let prodData: any[] = [];
-    const { data: catData } = await supabase.from("categories").select("id").ilike("name", "%Milk%").limit(1).maybeSingle();
+      // 2. Fetch all subscriptions
+      const subRes = await fetch("/api/subscriptions");
+      const fetchedSubData = await subRes.json();
 
-    if (catData) {
-      const { data: milkProds } = await supabase.from("products").select("*").eq("category_id", catData.id);
-      prodData = milkProds || [];
+      // 3. Fetch all deliveries (to calculate counts)
+      const delAllRes = await fetch("/api/deliveries");
+      const allDeliveries = await delAllRes.json();
+
+      // Calculate delivery counts
+      const counts: Record<string, number> = {};
+      (Array.isArray(allDeliveries) ? allDeliveries : []).forEach((d: any) => {
+        counts[d.subscription_id] = (counts[d.subscription_id] || 0) + 1;
+      });
+
+      // 4. Fetch today's deliveries
+      const delTodayRes = await fetch(`/api/deliveries?date=${selectedDate}`);
+      const dateDel = await delTodayRes.json();
+      setDeliveriesToday(Array.isArray(dateDel) ? dateDel : []);
+
+      // Enrich subscriptions with counts and product names
+      const enrichedSubscriptions = (Array.isArray(fetchedSubData) ? fetchedSubData : []).map((sub: any) => {
+        const prod = (Array.isArray(prodData) ? prodData : []).find((p: any) => p.id === sub.product_id);
+        return {
+          ...sub,
+          delivery_count: counts[sub.id] || 0,
+          products: prod ? { name: prod.name, unit: prod.unit } : null
+        };
+      });
+
+      setSubscriptions(enrichedSubscriptions);
+
+    } catch (err) {
+      console.error("Error fetching admin data:", err);
+    } finally {
+      setIsLoading(false);
     }
-
-    if (prodData.length === 0) {
-      const { data: allProds } = await supabase.from("products").select("*").limit(20);
-      prodData = allProds || [];
-    }
-
-    setDairyProducts(prodData);
-    if (prodData.length > 0 && !formData.product_id) {
-      setFormData(prev => ({ ...prev, product_id: prodData[0].id }));
-    }
-
-    // Fetch all subscriptions
-    const { data: subData, error: subError } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    let fetchedSubData: any[] = [];
-
-    if (subError) {
-      console.error("Subscription Fetch Error:", subError.message);
-      fetchedSubData = [];
-    } else {
-      fetchedSubData = subData || [];
-    }
-
-    // Manually attach products to subscriptions if product_id exists
-    const enrichedWithProducts = fetchedSubData.map(sub => {
-      const prod = dairyProducts.find(p => p.id === sub.product_id);
-      return {
-        ...sub,
-        products: prod ? { name: prod.name, unit: prod.unit } : null
-      };
-    });
-
-    setSubscriptions(fetchedSubData);
-
-    // Fetch all deliveries to calculate counts
-    const { data: allDeliveries } = await supabase.from("deliveries").select("subscription_id");
-
-    // Calculate delivery counts
-    const counts: Record<string, number> = {};
-    allDeliveries?.forEach(d => {
-      counts[d.subscription_id] = (counts[d.subscription_id] || 0) + 1;
-    });
-
-    const enrichedSubscriptions = enrichedWithProducts.map((sub: any) => ({
-      ...sub,
-      delivery_count: counts[sub.id] || 0
-    }));
-
-    setSubscriptions(enrichedSubscriptions);
-
-    // Fetch only selected date's deliveries for the toggle buttons
-    const { data: dateDel } = await supabase.from("deliveries").select("*").eq("delivery_date", selectedDate);
-    setDeliveriesToday(dateDel || []);
-
-    setIsLoading(false);
   }
 
   const handleAddSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Auto-generate plan_details if empty
-    const selectedProd = dairyProducts.find(p => p.id === formData.product_id);
-    const finalPlanDetails = formData.plan_details || `Daily ${formData.quantity}${selectedProd?.unit || 'L'} ${selectedProd?.name || 'Milk'}`;
+    try {
+      const selectedProd = dairyProducts.find(p => p.id === formData.product_id);
+      const finalPlanDetails = formData.plan_details || `Daily ${formData.quantity}${selectedProd?.unit || 'L'} ${selectedProd?.name || 'Milk'}`;
 
-    const { error } = await supabase.from("subscriptions").insert([{
-      ...formData,
-      plan_details: finalPlanDetails
-    }]);
+      const response = await fetch("/api/subscriptions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          plan_details: finalPlanDetails
+        })
+      });
 
-    if (error) {
-      alert("Error adding subscription!");
-    } else {
+      if (!response.ok) throw new Error("Failed to add subscription");
+
       setIsModalOpen(false);
       setFormData({
         customer_name: "",
@@ -166,27 +147,44 @@ export default function AdminSubscriptionsPage() {
         quantity: 1
       });
       fetchData();
+    } catch (err) {
+      alert("Error adding subscription!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const deleteSubscriber = async (subId: string, name: string) => {
     if (!confirm(`Delete "${name}"? This will also remove all their delivery history.`)) return;
-    await supabase.from("subscriptions").delete().eq("id", subId);
-    fetchData();
+    try {
+      const response = await fetch(`/api/subscriptions?id=${subId}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete");
+      fetchData();
+    } catch (err) {
+      alert("Error deleting subscriber!");
+    }
   };
 
   const toggleDelivery = async (subId: string) => {
     const existing = deliveriesToday.find(d => d.subscription_id === subId);
-    if (existing) {
-      await supabase.from("deliveries").delete().eq("id", existing.id);
-    } else {
-      await supabase.from("deliveries").insert([{
-        subscription_id: subId,
-        delivery_date: selectedDate,
-        status: 'delivered'
-      }]);
+    try {
+      if (existing) {
+        await fetch(`/api/deliveries?id=${existing.id}`, { method: "DELETE" });
+      } else {
+        await fetch("/api/deliveries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subscription_id: subId,
+            delivery_date: selectedDate,
+            status: 'delivered'
+          })
+        });
+      }
+      fetchData();
+    } catch (err) {
+      alert("Error toggling delivery!");
     }
-    fetchData();
   };
 
   if (!isAuthorized) {
@@ -249,10 +247,10 @@ export default function AdminSubscriptionsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {subscriptions.length === 0 ? (
+                  {(!Array.isArray(subscriptions) || subscriptions.length === 0) ? (
                     <tr><td colSpan={5} className="px-8 py-20 text-center text-gray-400 font-bold">No active subscribers found.</td></tr>
                   ) : subscriptions.map(sub => {
-                    const isDelivered = deliveriesToday.some(d => d.subscription_id === sub.id);
+                    const isDelivered = Array.isArray(deliveriesToday) && deliveriesToday.some(d => d.subscription_id === sub.id);
                     return (
                       <tr
                         key={sub.id}
@@ -318,6 +316,7 @@ export default function AdminSubscriptionsPage() {
                     )
                   })}
                 </tbody>
+
               </table>
             </div>
           </div>
@@ -364,10 +363,11 @@ export default function AdminSubscriptionsPage() {
                     value={formData.product_id}
                     onChange={e => setFormData({ ...formData, product_id: e.target.value })}
                   >
-                    {dairyProducts.map(p => (
+                    {(Array.isArray(dairyProducts) ? dairyProducts : []).map(p => (
                       <option key={p.id} value={p.id}>{p.name} ({p.unit})</option>
                     ))}
                   </select>
+
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantity (Daily)</label>

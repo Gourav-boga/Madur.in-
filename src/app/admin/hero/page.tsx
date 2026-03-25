@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTrash, faArrowLeft, faImages, faUpload, faGripLines } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 interface HeroImage {
   id: string;
@@ -30,17 +30,16 @@ export default function AdminHeroPage() {
 
   async function fetchImages() {
     setIsLoading(true);
-    const { data, error } = await supabase
-      .from("hero_images")
-      .select("*")
-      .order("display_order", { ascending: true });
+    try {
+      const res = await fetch("/api/hero");
+      const data = await res.json();
+      setImages(Array.isArray(data) ? data : []);
 
-    if (error) {
-      console.error("Error fetching hero images:", error);
-    } else {
-      setImages(data || []);
+    } catch (err) {
+      console.error("Error fetching images:", err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,27 +48,26 @@ export default function AdminHeroPage() {
       if (!e.target.files || e.target.files.length === 0) return;
 
       const file = e.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `hero/${fileName}`;
+      const formData = new FormData();
+      formData.append("file", file);
 
-      const { error: uploadError } = await supabase.storage
-        .from("madur")
-        .upload(filePath, file);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData
+      });
 
-      if (uploadError) throw uploadError;
+      if (!response.ok) throw new Error("Upload failed");
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("madur")
-        .getPublicUrl(filePath);
+      const { publicUrl } = await response.json();
 
-      // Add to DB
-      const { error: dbError } = await supabase.from("hero_images").insert([{
-        image_url: publicUrl,
-        display_order: images.length
-      }]);
+      // Add to MySQL
+      const dbRes = await fetch("/api/hero", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_url: publicUrl })
+      });
 
-      if (dbError) throw dbError;
+      if (!dbRes.ok) throw new Error("Failed to save hero slide");
       
       fetchImages();
     } catch (error) {
@@ -91,13 +89,13 @@ export default function AdminHeroPage() {
         "/hero/hero-5.png",
       ];
 
-      const insertData = defaults.map((url, index) => ({
-        image_url: url,
-        display_order: index
-      }));
-
-      const { error } = await supabase.from("hero_images").insert(insertData);
-      if (error) throw error;
+      for (const url of defaults) {
+        await fetch("/api/hero", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image_url: url })
+        });
+      }
       
       fetchImages();
     } catch (error) {
@@ -114,11 +112,14 @@ export default function AdminHeroPage() {
       return;
     }
     if (confirm("Delete this hero banner?")) {
-      const { error } = await supabase.from("hero_images").delete().eq("id", id);
-      if (error) {
-        alert("Error deleting image!");
-      } else {
+      try {
+        const response = await fetch(`/api/hero?id=${id}`, {
+          method: "DELETE"
+        });
+        if (!response.ok) throw new Error("Failed to delete");
         fetchImages();
+      } catch (err) {
+        alert("Error deleting image!");
       }
     }
   };
@@ -151,7 +152,7 @@ export default function AdminHeroPage() {
          </div>
 
          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {images.length > 0 ? images.map((img, index) => (
+            {(Array.isArray(images) && images.length > 0) ? images.map((img, index) => (
               <div key={img.id} className="group relative bg-white p-4 rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden">
                  <div className="absolute top-8 left-8 z-10 bg-black/60 backdrop-blur-md text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-white/20">
                     Slide {index + 1}
@@ -181,6 +182,7 @@ export default function AdminHeroPage() {
                  </div>
               </div>
             )) : [1,2,3,4,5].map((num, index) => (
+
               <div key={num} className="group relative bg-white p-4 rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden opacity-60 hover:opacity-100 transition-opacity">
                  <div className="absolute top-8 left-8 z-10 bg-gray-600 backdrop-blur-md text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-white/20">
                     System Default {num}

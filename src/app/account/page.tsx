@@ -15,7 +15,7 @@ import {
   faSpinner 
 } from "@fortawesome/free-solid-svg-icons";
 import { logoutAction } from "@/lib/actions/auth";
-import { supabase } from "@/lib/supabase";
+
 import InvoiceModal from "@/components/common/InvoiceModal";
 
 interface Order {
@@ -67,41 +67,35 @@ export default function AccountPage() {
         setUser(session.user);
 
         // Fetch user's orders
-        const { data: orderData } = await supabase
-          .from("orders")
-          .select("*")
-          .ilike("user_email", session.user.email)
-          .order("created_at", { ascending: false });
-
-        if (orderData) setOrders(orderData);
+        const orderRes = await fetch(`/api/orders?email=${session.user.email}`);
+        const orderData = await orderRes.json();
+        if (orderData && !orderData.error) setOrders(orderData);
 
         // Fetch user's subscriptions
-        const { data: subData } = await supabase
-          .from("subscriptions")
-          .select("*")
-          .ilike("customer_email", session.user.email)
-          .order("created_at", { ascending: false });
+        const subRes = await fetch(`/api/subscriptions?email=${session.user.email}`);
+        const subData = await subRes.json();
 
-        if (subData && subData.length > 0) {
+        if (subData && !subData.error && Array.isArray(subData) && subData.length > 0) {
           // Fetch deliveries for these subscriptions (last 30 days)
-          const subIds = subData.map(s => s.id);
+          const subIds = subData.map((s: any) => s.id).join(',');
+
           const thirtyDaysAgo = new Date();
           thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+          const dateStr = thirtyDaysAgo.toISOString().split('T')[0];
           
-          const { data: delData } = await supabase
-            .from("deliveries")
-            .select("*")
-            .in("subscription_id", subIds)
-            .gte("delivery_date", thirtyDaysAgo.toISOString().split('T')[0])
-            .order("delivery_date", { ascending: false });
+          const delRes = await fetch(`/api/deliveries?subscription_ids=${subIds}&gte_date=${dateStr}`);
+          const delData = await delRes.json();
 
-          const enrichedSubs = subData.map(sub => ({
+          const enrichedSubs = subData.map((sub: any) => ({
             ...sub,
-            deliveries: delData?.filter(d => d.subscription_id === sub.id) || []
+            deliveries: Array.isArray(delData) ? delData.filter((d: any) => d.subscription_id === sub.id) : []
           }));
           
           setSubscriptions(enrichedSubs);
+        } else {
+          setSubscriptions([]);
         }
+
       } catch (err) {
         console.error("Error fetching session:", err);
       } finally {
@@ -193,7 +187,7 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              {subscriptions.length > 0 ? (
+              {Array.isArray(subscriptions) && subscriptions.length > 0 ? (
                 <div className="space-y-8 mb-16">
                   {subscriptions.map((sub) => (
                     <div key={sub.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
@@ -222,7 +216,7 @@ export default function AccountPage() {
                             const date = new Date();
                             date.setDate(date.getDate() - i);
                             const dateStr = date.toISOString().split('T')[0];
-                            const delivery = sub.deliveries?.find(d => d.delivery_date === dateStr);
+                            const delivery = Array.isArray(sub.deliveries) ? sub.deliveries.find(d => d.delivery_date === dateStr) : null;
                             const isToday = i === 0;
 
                             return (
@@ -240,7 +234,7 @@ export default function AccountPage() {
                           })}
                         </div>
                         
-                        {sub.deliveries && sub.deliveries.length > 7 && (
+                        {Array.isArray(sub.deliveries) && sub.deliveries.length > 7 && (
                           <div className="mt-6 pt-6 border-t border-gray-50">
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Recent History</p>
                             <div className="space-y-3 max-h-48 overflow-y-auto pr-2 scrollbar-hide">
@@ -261,6 +255,7 @@ export default function AccountPage() {
                   ))}
                 </div>
               ) : (
+
                 <div className="bg-accent/10 rounded-3xl p-8 text-center mb-16 border-2 border-dashed border-accent/30">
                   <FontAwesomeIcon icon={faClock} className="text-3xl text-gray-300 mb-4" />
                   <p className="text-sm font-bold text-gray-500 italic">No active milk subscriptions found for your email.</p>
@@ -281,7 +276,7 @@ export default function AccountPage() {
                 </div>
               </div>
 
-              {orders.length > 0 ? (
+              {Array.isArray(orders) && orders.length > 0 ? (
                 <div className="space-y-4">
                   {orders.map((order) => (
                     <div 
@@ -324,6 +319,7 @@ export default function AccountPage() {
                   ))}
                 </div>
               ) : (
+
                 <div className="text-center py-16 px-4">
                   <div className="w-32 h-32 mx-auto bg-accent/50 rounded-full flex items-center justify-center mb-6 text-primary border-8 border-white shadow-xl">
                     <FontAwesomeIcon icon={faBoxOpen} className="text-5xl" />

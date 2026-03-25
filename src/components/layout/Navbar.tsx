@@ -15,7 +15,7 @@ import {
   faChevronLeft
 } from "@fortawesome/free-solid-svg-icons";
 import StreamingTagline from "./StreamingTagline";
-import { supabase } from "@/lib/supabase";
+
 
 
 export default function Navbar() {
@@ -64,39 +64,49 @@ export default function Navbar() {
 
   return (
     <nav
-      style={{ backgroundColor: '#E9CF6A' }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-md border-b border-black ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-md bg-white ${
         isHome && !isScrolled ? "py-3 md:py-5" : "py-1 md:py-2"
       }`}
     >
       <StreamingTagline />
-      <div className="container mt-2 flex items-center justify-between gap-4">
-        <div className="flex items-center -ml-6 md:-ml-12 relative">
+      <div className="container mt-2 flex items-center justify-between gap-4 relative">
+        {/* Mobile Menu Button - LEFT */}
+        <button
+          className="md:hidden p-2 text-[#222222] z-50"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-xl" />
+        </button>
+
+        <div className="flex items-center flex-1 md:flex-initial justify-center md:justify-start">
           {/* Back Button (Only on non-home pages) */}
           {!isHome && (
             <button
               onClick={() => router.back()}
-              className="absolute -left-12 md:-left-16 p-2 text-black hover:bg-black/10 rounded-full transition-colors flex items-center justify-center z-20"
+              className="absolute left-4 md:static md:mr-4 p-2 text-gray-800 hover:bg-black/10 rounded-full transition-colors flex items-center justify-center z-20"
               aria-label="Go back"
             >
               <FontAwesomeIcon icon={faChevronLeft} className="text-xl" />
             </button>
           )}
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center p-0 m-0 leading-none z-10 transition-transform active:scale-95 -my-3 md:-my-8">
+          {/* Logo - CENTERED ON MOBILE, LEFT ON DESKTOP */}
+          <Link 
+            href="/" 
+            className="flex items-center p-0 m-0 leading-none z-10 transition-transform active:scale-95 -my-8 md:-my-8"
+          >
             <Image 
               src="/madur-logo-official.png" 
               alt="MADUR.IN Logo" 
               width={350}
               height={120}
-              className="h-28 md:h-44 w-auto object-contain select-none mix-blend-multiply"
+              className="h-44 md:h-44 w-auto object-contain select-none mix-blend-multiply"
               priority
             />
           </Link>
         </div>
 
-      {/* Desktop Search Bar (Swiggy Style) */}
+        {/* Desktop Search Bar (Swiggy Style) - HIDDEN ON MOBILE */}
         <form 
           onSubmit={handleSearch}
           className="hidden lg:flex flex-1 max-w-md mx-4 items-center bg-white border border-black/10 rounded-lg px-4 py-2 shadow-sm"
@@ -105,40 +115,41 @@ export default function Navbar() {
           <input
             type="text"
             placeholder="Search for milk, vegetables, groceries..."
-            className="bg-transparent border-none outline-none w-full text-sm text-black placeholder:text-gray-400"
+            className="bg-transparent border-none outline-none w-full text-sm text-[#222222] placeholder:text-gray-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </form>
 
-        {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-8 text-black">
+        {/* Desktop Links - HIDDEN ON MOBILE */}
+        <div className="hidden md:flex items-center gap-8 text-[#222222]">
           <Link href="/" className="hover:text-gray-600 font-medium">Home</Link>
           <Link href="/services" className="hover:text-gray-600 font-medium">Services</Link>
           <Link href="/about" className="hover:text-gray-600 font-medium">About</Link>
           <Link href="/contact" className="hover:text-gray-600 font-medium">Contact</Link>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-4 md:gap-6 ml-4">
+        {/* Actions - ACCOUNT ON RIGHT ON MOBILE, CART+ACCOUNT ON DESKTOP */}
+        <div className="flex items-center gap-4 md:gap-6 z-50">
           
           {user ? (
-            <Link href="/account" className="flex items-center gap-2 text-black hover:text-primary transition-colors">
-              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
+            <Link href="/account" className="flex items-center gap-2 text-[#222222] hover:text-primary transition-colors">
+              <div className="w-8 h-8 md:w-8 md:h-8 rounded-full bg-secondary text-white flex items-center justify-center">
                 <FontAwesomeIcon icon={faUser} className="text-sm" />
               </div>
               <span className="hidden md:block text-sm font-black uppercase tracking-widest">Account</span>
             </Link>
           ) : (
-            <Link href="/login" className="flex items-center gap-2 text-black hover:text-primary transition-colors">
-              <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center">
+            <Link href="/login" className="flex items-center gap-2 text-[#222222] hover:text-primary transition-colors">
+              <div className="w-8 h-8 md:w-8 md:h-8 rounded-full bg-secondary text-white flex items-center justify-center">
                 <FontAwesomeIcon icon={faUser} className="text-sm" />
               </div>
               <span className="hidden md:block text-sm font-black uppercase tracking-widest">Sign In</span>
             </Link>
           )}
 
-          <Link href="/cart" className="relative p-2 transition-colors text-black hover:text-gray-600">
+          {/* Cart Icon - HIDDEN ON MOBILE HEADER, MOVED TO MENU */}
+          <Link href="/cart" className="hidden md:block relative p-2 transition-colors text-[#222222] hover:text-gray-600">
             <FontAwesomeIcon icon={faShoppingCart} className="text-xl" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
@@ -146,42 +157,32 @@ export default function Navbar() {
               </span>
             )}
           </Link>
-
-          <button
-            className="md:hidden p-2 text-black"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <FontAwesomeIcon icon={isMobileMenuOpen ? faTimes : faBars} className="text-xl" />
-          </button>
         </div>
       </div>
 
-      {/* Mobile Search Bar (Only on Home Page for mobile/tablet) */}
-      {isHome && (
-        <div className="container md:hidden mt-2 pb-2">
-          <form 
-            onSubmit={handleSearch}
-            className="flex items-center bg-white border border-black/10 rounded-xl px-4 py-2.5 shadow-sm"
-          >
-            <FontAwesomeIcon icon={faSearch} className="text-gray-500 mr-3 text-sm" />
-            <input
-              type="text"
-              placeholder="Search for milk, vegetables..."
-              className="bg-transparent border-none outline-none w-full text-xs text-black placeholder:text-gray-400"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
-        </div>
-      )}
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-background text-black absolute top-full left-0 right-0 shadow-lg border-t border-white/10 py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
+        <div className="md:hidden bg-background text-gray-800 absolute top-full left-0 right-0 shadow-lg border-t border-white/10 py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
           <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Home</Link>
           <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Services</Link>
           <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">About Us</Link>
           <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Contact</Link>
+          <Link 
+            href="/cart" 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="py-2 border-b flex items-center justify-between"
+          >
+            <span className="flex items-center gap-3 text-secondary font-black">
+              <FontAwesomeIcon icon={faShoppingCart} />
+              MY CART
+            </span>
+            {cartCount > 0 && (
+              <span className="bg-secondary text-secondary-foreground text-[10px] font-bold w-6 h-6 flex items-center justify-center rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </Link>
         </div>
       )}
     </nav>

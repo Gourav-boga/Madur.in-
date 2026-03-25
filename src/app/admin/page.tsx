@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBox, faShoppingBag, faPlus, faSignOutAlt, faCog, faChartLine, faUsers } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -30,73 +30,36 @@ export default function AdminDashboard() {
 
   async function fetchDashboardData() {
     setIsLoading(true);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayISO = today.toISOString();
-
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    monthStart.setHours(0, 0, 0, 0);
-    const monthISO = monthStart.toISOString();
-
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayISO = yesterday.toISOString();
-
-    // Fetch counts
-    const { count: prodCount } = await supabase.from("products").select("*", { count: 'exact', head: true });
-    const { count: pendingCount } = await supabase.from("subscriptions").select("*", { count: 'exact', head: true }).eq("status", "active");
-    const { count: deliveryCount } = await supabase.from("deliveries").select("*", { count: 'exact', head: true }).eq("status", "delivered");
-    
-    // Fetch revenue for today
-    const { data: todaySubs } = await supabase
-      .from("subscriptions")
-      .select("amount_paid")
-      .gte("created_at", todayISO);
-    
-    // Fetch revenue for yesterday
-    const { data: yesterdaySubs } = await supabase
-      .from("subscriptions")
-      .select("amount_paid")
-      .gte("created_at", yesterdayISO)
-      .lt("created_at", todayISO);
-
-    // Fetch recent subscriptions
-    const { data: recent } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(5);
-
-    const sumRevenue = (subs: any[] | null) => (subs || []).reduce((acc, curr) => acc + (curr.amount_paid || 0), 0);
-
-    setCounts({
-      products: prodCount || 0,
-      pendingOrders: pendingCount || 0,
-      todayRevenue: sumRevenue(todaySubs),
-      yesterdayRevenue: sumRevenue(yesterdaySubs),
-      completedDeliveries: deliveryCount || 0
-    });
-    setRecentSubs(recent || []);
-    setIsLoading(false);
+    try {
+      const res = await fetch("/api/admin/stats");
+      const data = await res.json();
+      
+      setCounts({
+        products: data.products || 0,
+        pendingOrders: data.activeSubscriptions || 0,
+        todayRevenue: data.todayRevenue || 0,
+        yesterdayRevenue: data.yesterdayRevenue || 0,
+        completedDeliveries: data.completedDeliveries || 0
+      });
+      setRecentSubs(data.recentSubs || []);
+    } catch (err) {
+      console.error("Error fetching dashboard stats:", err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const checkCustomRevenue = async () => {
     setIsCheckingCustom(true);
-    const start = new Date(selectedDate);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(selectedDate);
-    end.setHours(23, 59, 59, 999);
-
-    const { data } = await supabase
-      .from("subscriptions")
-      .select("amount_paid")
-      .gte("created_at", start.toISOString())
-      .lte("created_at", end.toISOString());
-    
-    const sum = (data || []).reduce((acc, curr) => acc + (curr.amount_paid || 0), 0);
-    setCustomRevenue(sum);
-    setIsCheckingCustom(false);
+    try {
+      const res = await fetch(`/api/admin/stats?date=${selectedDate}`);
+      const data = await res.json();
+      setCustomRevenue(data.customRevenue || 0);
+    } catch (err) {
+      console.error("Error checking custom revenue:", err);
+    } finally {
+      setIsCheckingCustom(false);
+    }
   };
 
   // Handle Logout
@@ -150,7 +113,7 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
-        {stats.map((stat, i) => (
+        {(Array.isArray(stats) ? stats : []).map((stat, i) => (
           <div key={i} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col gap-4 hover:shadow-md transition-all">
             <div className={`w-12 h-12 ${stat.color} text-white rounded-xl flex items-center justify-center shadow-lg shrink-0`}>
               <FontAwesomeIcon icon={stat.icon} className="text-xl" />
@@ -162,6 +125,7 @@ export default function AdminDashboard() {
           </div>
         ))}
       </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Subscriptions Preview */}
@@ -181,7 +145,7 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="text-sm font-medium">
-                {recentSubs.length === 0 ? (
+                {(!Array.isArray(recentSubs) || recentSubs.length === 0) ? (
                   <tr><td colSpan={4} className="px-8 py-10 text-center text-gray-400">No subscribers found</td></tr>
                 ) : recentSubs.map((sub, i) => (
                   <tr 
@@ -216,6 +180,7 @@ export default function AdminDashboard() {
                     </td>
                   </tr>
                 ))}
+
               </tbody>
             </table>
           </div>

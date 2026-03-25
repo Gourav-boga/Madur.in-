@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faArrowLeft, faSearch, faImages } from "@fortawesome/free-solid-svg-icons";
-import { supabase } from "@/lib/supabase";
+
 
 interface Category {
   id: string;
@@ -35,17 +35,16 @@ export default function AdminCategoriesPage() {
 
   async function fetchCategories() {
     setIsLoading(true);
-    const { data, error } = await supabase
-      .from("categories")
-      .select("*")
-      .order("created_at", { ascending: false });
+    try {
+      const res = await fetch("/api/categories");
+      const data = await res.json();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (err) {
 
-    if (error) {
-      console.error("Error fetching categories:", error);
-    } else {
-      setCategories(data || []);
+      console.error("Error fetching categories:", err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,20 +53,17 @@ export default function AdminCategoriesPage() {
       if (!e.target.files || e.target.files.length === 0) return;
 
       const file = e.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `categories/${fileName}`;
+      const uploadData = new FormData();
+      uploadData.append("file", file);
 
-      const { error: uploadError } = await supabase.storage
-        .from("madur")
-        .upload(filePath, file);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadData
+      });
 
-      if (uploadError) throw uploadError;
+      if (!response.ok) throw new Error("Upload failed");
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("madur")
-        .getPublicUrl(filePath);
-
+      const { publicUrl } = await response.json();
       setFormData({ ...formData, image_url: publicUrl });
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -82,21 +78,18 @@ export default function AdminCategoriesPage() {
     setIsLoading(true);
 
     try {
-      if (editingCategory) {
-        const { error } = await supabase
-          .from("categories")
-          .update({
-            name: formData.name,
-            image_url: formData.image_url
-          })
-          .eq("id", editingCategory.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("categories")
-          .insert([formData]);
-        if (error) throw error;
-      }
+      const payload = { 
+        ...formData,
+        id: editingCategory?.id 
+      };
+      
+      const response = await fetch("/api/categories", {
+        method: editingCategory ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) throw new Error("Failed to save category");
 
       setIsModalOpen(false);
       setEditingCategory(null);
@@ -112,11 +105,14 @@ export default function AdminCategoriesPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure? This will affect products in this category.")) {
-      const { error } = await supabase.from("categories").delete().eq("id", id);
-      if (error) {
-        alert("Error deleting category!");
-      } else {
+      try {
+        const response = await fetch(`/api/categories?id=${id}`, {
+          method: "DELETE"
+        });
+        if (!response.ok) throw new Error("Failed to delete");
         fetchCategories();
+      } catch (err) {
+        alert("Error deleting category!");
       }
     }
   };
@@ -143,9 +139,10 @@ export default function AdminCategoriesPage() {
     );
   }
 
-  const filteredCategories = categories.filter(c => 
+  const filteredCategories = (Array.isArray(categories) ? categories : []).filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   return (
     <div className="min-h-screen bg-accent/30 p-4 md:p-8">
@@ -194,7 +191,7 @@ export default function AdminCategoriesPage() {
                    <tr>
                      <td colSpan={3} className="py-20 text-gray-400">Loading categories...</td>
                    </tr>
-                ) : filteredCategories.map((category) => (
+                 ) : (Array.isArray(filteredCategories) ? filteredCategories : []).map((category) => (
                   <tr key={category.id} className="border-b last:border-none hover:bg-gray-50 transition-colors">
                     <td className="px-8 py-5">
                       <div className="relative w-16 h-16 mx-auto rounded-2xl overflow-hidden shadow-inner bg-accent/20">
@@ -224,6 +221,7 @@ export default function AdminCategoriesPage() {
                     </td>
                   </tr>
                 ))}
+
               </tbody>
             </table>
           </div>
