@@ -145,11 +145,12 @@ export default function SubscriberDetailsPage() {
   if (!subscriber) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-accent/30 text-primary p-4 text-center">
-        <h2 className="text-2xl font-black mb-4">Subscriber Not Found</h2>
-        <p className="mb-8 font-bold text-gray-500">We couldn't find the customer folder you requested.</p>
-        <Link href="/admin/subscriptions" className="bg-primary text-black font-black px-8 py-4 rounded-2xl shadow-lg">
-          Back to List
-        </Link>
+        <h2 className="text-2xl font-black mb-4">Account Folder Not Ready</h2>
+        <p className="mb-8 font-bold text-gray-500 text-sm max-w-md">We couldn't load the customer details. This might happen if the account was just created. Try refreshing in a few seconds.</p>
+        <div className="flex gap-4">
+           <button onClick={() => fetchData()} className="bg-primary text-black font-black px-6 py-3 rounded-xl shadow-lg">Retry Loading</button>
+           <Link href="/admin/subscriptions" className="bg-white text-gray-600 font-bold px-6 py-3 rounded-xl border border-gray-200">Go Back</Link>
+        </div>
       </div>
     );
   }
@@ -165,7 +166,7 @@ export default function SubscriberDetailsPage() {
               </Link>
               <div>
                 <h1 className="text-3xl font-black text-black">Subscriber Account</h1>
-                <p className="text-gray-500 font-bold text-sm uppercase tracking-widest">Customer Folder: {String(subscriber?.id || '').slice(0, 8)}</p>
+                <p className="text-gray-500 font-bold text-sm uppercase tracking-widest">Customer ID: {String(subscriber?.id || '').slice(0, 8)}</p>
               </div>
            </div>
             <div className="flex gap-3">
@@ -212,8 +213,8 @@ export default function SubscriberDetailsPage() {
                         <FontAwesomeIcon icon={faUser} />
                      </div>
                      <div>
-                        <h2 className="text-xl font-black text-black uppercase tracking-tight leading-tight">{subscriber?.customer_name}</h2>
-                        <span className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">{subscriber?.quantity} {subscriber?.products?.unit || 'L'} {subscriber?.products?.name || 'Milk'}</span>
+                        <h2 className="text-xl font-black text-black uppercase tracking-tight leading-tight">{subscriber?.customer_name || 'Anonymous'}</h2>
+                        <span className="text-[10px] font-black uppercase text-primary tracking-[0.2em]">{subscriber?.quantity || 0} {subscriber?.products?.unit || 'L'} {subscriber?.products?.name || 'Milk'}</span>
                      </div>
                   </div>
                   
@@ -224,7 +225,7 @@ export default function SubscriberDetailsPage() {
                         <div className="grid grid-cols-1 gap-4">
                            <div className="bg-accent/30 p-4 rounded-2xl">
                               <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Phone Number</label>
-                              <span className="text-sm font-black text-black">{subscriber?.customer_phone}</span>
+                              <span className="text-sm font-black text-black">{subscriber?.customer_phone || 'N/A'}</span>
                            </div>
                            <div className="bg-accent/30 p-4 rounded-2xl">
                               <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Email Address</label>
@@ -239,7 +240,7 @@ export default function SubscriberDetailsPage() {
                         <div className="space-y-4">
                            <div className="bg-accent/30 p-4 rounded-2xl">
                               <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider block mb-1">Full Address</label>
-                              <span className="text-sm font-bold text-black leading-relaxed block">{subscriber?.address}</span>
+                              <span className="text-sm font-bold text-black leading-relaxed block">{subscriber?.address || 'No address provided'}</span>
                            </div>
                            <div className="grid grid-cols-2 gap-4">
                               <div className="bg-accent/30 p-4 rounded-2xl">
@@ -263,7 +264,7 @@ export default function SubscriberDetailsPage() {
                         <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 pb-1 border-b border-gray-50">Subscription Plan</h4>
                         <div className="bg-secondary/5 p-4 rounded-2xl border border-secondary/10">
                            <div className="flex justify-between items-center">
-                              <span className="text-[10px] font-black text-secondary uppercase tracking-widest">{subscriber?.plan_details}</span>
+                              <span className="text-[10px] font-black text-secondary uppercase tracking-widest">{subscriber?.plan_details || 'Manual Plan'}</span>
                            </div>
                         </div>
                      </div>
@@ -274,7 +275,7 @@ export default function SubscriberDetailsPage() {
                 <div className="bg-white p-8 rounded-[3rem] shadow-xl border border-gray-100">
                   <h4 className="font-black text-sm mb-4 uppercase tracking-[0.2em] text-gray-400">Payment Proof</h4>
                   <div className="relative aspect-square w-full rounded-2xl overflow-hidden border border-gray-100 bg-accent/20">
-                    <Image src={subscriber.payment_screenshot_url} alt="Payment" fill className="object-cover" />
+                    <Image src={subscriber.payment_screenshot_url} alt="Payment" fill className="object-cover" unoptimized />
                   </div>
                   <div className="mt-4 flex justify-between items-center px-1">
                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Amount Paid</span>
@@ -286,14 +287,14 @@ export default function SubscriberDetailsPage() {
               <div className="bg-primary p-8 rounded-[3rem] shadow-xl text-black">
                  <h4 className="font-black text-lg mb-4 uppercase tracking-tight">Delivery Performance</h4>
                  <div className="flex items-end gap-2 mb-2">
-                    <span className="text-5xl font-black">{deliveries.length}</span>
+                    <span className="text-5xl font-black">{Array.isArray(deliveries) ? deliveries.length : 0}</span>
                     <span className="font-black text-sm mb-2 text-black/60">Days Delivered</span>
                  </div>
                  <div className="flex items-end gap-2 mb-4">
-                    <span className="text-2xl font-black">{(deliveries.reduce((acc, del) => acc + (del.quantity || 0), 0)).toFixed(1)}</span>
+                    <span className="text-2xl font-black">{(Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (del.quantity || 0), 0) : 0).toFixed(1)}</span>
                     <span className="font-black text-[10px] mb-1 text-black/60 uppercase tracking-widest">Total {subscriber?.products?.unit || 'L'} Received</span>
                  </div>
-                 <p className="text-xs font-bold text-black/60 leading-relaxed uppercase tracking-widest">Since {new Date(subscriber?.created_at || '').toDateString()}</p>
+                 <p className="text-xs font-bold text-black/60 leading-relaxed uppercase tracking-widest">Since {subscriber?.created_at ? new Date(subscriber.created_at).toDateString() : 'Unknown Date'}</p>
               </div>
            </div>           {/* Right Column: Register Book */}
            <div className="lg:col-span-2">
@@ -308,21 +309,21 @@ export default function SubscriberDetailsPage() {
                           </div>
                           <div>
                              <h3 className="text-xl font-black text-black">Delivery Register</h3>
-                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Daily milk log for {subscriber?.customer_name}</p>
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Daily milk log for {subscriber?.customer_name || 'Customer'}</p>
                           </div>
                        </div>
                        <div className="text-right">
-                          <p className="text-3xl font-black text-black">{deliveries.length}</p>
+                          <p className="text-3xl font-black text-black">{Array.isArray(deliveries) ? deliveries.length : 0}</p>
                           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Days</p>
                        </div>
                     </div>
                     <div className="mt-4 grid grid-cols-2 gap-4">
                        <div className="bg-white p-4 rounded-2xl border border-gray-100 text-center">
-                          <p className="text-2xl font-black text-primary">{(deliveries.reduce((acc, del) => acc + (del.quantity || subscriber?.quantity || 1), 0)).toFixed(1)}</p>
+                          <p className="text-2xl font-black text-primary">{(Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (del.quantity || subscriber?.quantity || 1), 0) : 0).toFixed(1)}</p>
                           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Total {subscriber?.products?.unit || 'L'} Delivered</p>
                        </div>
                        <div className="bg-white p-4 rounded-2xl border border-gray-100 text-center">
-                          <p className="text-2xl font-black text-secondary">₹{((deliveries.reduce((acc, del) => acc + (del.quantity || subscriber?.quantity || 1), 0)) * (subscriber?.products?.price || 0)).toFixed(0)}</p>
+                          <p className="text-2xl font-black text-secondary">₹{((Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (del.quantity || subscriber?.quantity || 1), 0) : 0) * (subscriber?.products?.price || 0)).toFixed(0)}</p>
                           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Est. Total Value</p>
                        </div>
                     </div>
@@ -363,7 +364,7 @@ export default function SubscriberDetailsPage() {
 
                  {/* Register Entries */}
                  <div className="flex-1 p-6 overflow-y-auto max-h-[600px]">
-                    {deliveries.length === 0 ? (
+                    {!Array.isArray(deliveries) || deliveries.length === 0 ? (
                        <div className="h-full flex flex-col items-center justify-center text-center opacity-30 py-20">
                           <FontAwesomeIcon icon={faCalendarAlt} className="text-5xl mb-4" />
                           <p className="font-black italic">No entries logged yet</p>

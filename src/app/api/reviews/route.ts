@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import mysql from '@/lib/mysql';
 
+export async function GET() {
   try {
     const reviews = await mysql.query('SELECT * FROM reviews ORDER BY created_at DESC');
     console.log(`Fetched ${Array.isArray(reviews) ? (reviews as any[]).length : 0} reviews`);
