@@ -245,7 +245,7 @@ export default function AdminProductsPage() {
                       <div className="flex items-center gap-4">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm shrink-0 bg-accent/20">
                           {product.image_url ? (
-                            <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                            <Image src={product.image_url} alt={product.name} fill className="object-cover" unoptimized />
                           ) : (
                             <FontAwesomeIcon icon={faBox} className="absolute inset-0 m-auto text-gray-300" />
                           )}
@@ -381,7 +381,8 @@ export default function AdminProductsPage() {
                 <div className="flex items-center gap-4">
                    <div className="relative w-32 h-32 rounded-2xl bg-accent/50 flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200">
                       {formData.image_url ? (
-                        <Image src={formData.image_url} alt="Preview" fill className="object-cover" />
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
                       ) : (
                         <FontAwesomeIcon icon={faImages} className="text-gray-300 text-3xl" />
                       )}

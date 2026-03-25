@@ -209,7 +209,7 @@ export default function AdminCategoriesPage() {
                     <td className="px-8 py-5">
                       <div className="relative w-16 h-16 mx-auto rounded-2xl overflow-hidden shadow-inner bg-accent/20">
                         {category.image_url ? (
-                          <Image src={category.image_url} alt={category.name} fill className="object-cover" />
+                          <Image src={category.image_url} alt={category.name} fill className="object-cover" unoptimized />
                         ) : (
                           <FontAwesomeIcon icon={faImages} className="absolute inset-0 m-auto text-gray-300 text-2xl" />
                         )}
@@ -265,7 +265,8 @@ export default function AdminCategoriesPage() {
                 <div className="flex items-center gap-4">
                    <div className="relative w-24 h-24 rounded-2xl bg-accent/50 flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-200">
                       {formData.image_url ? (
-                        <Image src={formData.image_url} alt="Preview" fill className="object-cover" />
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" />
                       ) : (
                         <FontAwesomeIcon icon={faImages} className="text-gray-300 text-2xl" />
                       )}
