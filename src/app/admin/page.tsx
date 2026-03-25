@@ -22,6 +22,7 @@ export default function AdminDashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [customRevenue, setCustomRevenue] = useState<number | null>(null);
   const [isCheckingCustom, setIsCheckingCustom] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     setIsAuthorized(true); // Ensure UI renders
@@ -30,10 +31,16 @@ export default function AdminDashboard() {
 
   async function fetchDashboardData() {
     setIsLoading(true);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/admin/stats");
       const data = await res.json();
       
+      if (data.error) {
+        setErrorMsg(data.details || data.error);
+        return;
+      }
+
       setCounts({
         products: data.products || 0,
         pendingOrders: data.activeSubscriptions || 0,
@@ -42,8 +49,9 @@ export default function AdminDashboard() {
         completedDeliveries: data.completedDeliveries || 0
       });
       setRecentSubs(data.recentSubs || []);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching dashboard stats:", err);
+      setErrorMsg(err.message || "Failed to connect to stats API");
     } finally {
       setIsLoading(false);
     }
@@ -110,6 +118,22 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
+
+      {errorMsg && (
+        <div className="mb-10 p-6 bg-red-50 border-2 border-red-100 rounded-[2rem] flex flex-col items-center text-center gap-2 animate-in slide-in-from-top duration-500">
+           <div className="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-2">
+              <FontAwesomeIcon icon={faSignOutAlt} />
+           </div>
+           <h3 className="font-black text-red-900">Database Connection Issue</h3>
+           <p className="text-red-600 font-bold text-sm max-w-xl">{errorMsg}</p>
+           <button 
+             onClick={fetchDashboardData}
+             className="mt-4 bg-red-600 text-white font-black px-8 py-3 rounded-xl hover:bg-red-700 transition-all text-xs uppercase tracking-widest"
+           >
+             Retry Sync
+           </button>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
