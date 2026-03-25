@@ -48,7 +48,13 @@ export async function GET(request: Request) {
       return NextResponse.json(limit ? filtered.slice(0, parseInt(limit)) : filtered);
     }
 
-    return NextResponse.json(products);
+    // Map is_available (DB) -> is_out_of_stock (frontend)
+    const mapped = (products as any[]).map(p => ({
+      ...p,
+      is_out_of_stock: !p.is_available,
+    }));
+
+    return NextResponse.json(mapped);
   } catch (error) {
     console.error('API Products Error:', error);
     // Fallback on total failure (like connection error)
