@@ -119,7 +119,7 @@ export default function AboutPage() {
       </section>
 
       {/* Founder Section */}
-      <section className="bg-background pt-8 pb-4 md:py-24">
+      <section className="bg-background pt-8 pb-4 md:pt-24 md:pb-12">
         <div className="container max-w-4xl mx-auto rounded-[3rem] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row items-stretch">
            <div className="md:w-1/3 relative min-h-[300px]">
               <Image 
@@ -132,14 +132,53 @@ export default function AboutPage() {
            <div className="md:w-2/3 p-12 flex flex-col justify-center">
               <FontAwesomeIcon icon={faQuoteLeft} className="text-primary text-4xl mb-6 opacity-20" />
               <h3 className="text-3xl font-black mb-2 text-[#222222]">Sindhusha G</h3>
-              <p className="text-primary font-bold mb-6">Founder of MADUR.IN</p>
+              <p className="text-primary font-bold mb-6 uppercase tracking-widest text-xs">Founder of MADUR.IN</p>
               <p className="text-[#222222] leading-relaxed mb-8">
                 An entrepreneur focused on building local businesses and providing fresh, high-quality food products to communities. Her vision for Madur is to bridge the gap between rural pure produce and urban healthy living.
               </p>
-              <button className="bg-secondary text-secondary-foreground font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all w-fit">
+              <button className="bg-secondary text-secondary-foreground font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all w-fit uppercase tracking-widest text-xs">
                 Connect with Founder
               </button>
            </div>
+        </div>
+
+        {/* Co-Founders Grid */}
+        <div className="container max-w-4xl mx-auto mt-12 md:mt-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Co-Founder 1 */}
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col items-center text-center group hover:border-secondary transition-all">
+               <div className="w-32 h-32 relative rounded-full overflow-hidden mb-6 border-4 border-accent">
+                 <Image 
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=300" 
+                    alt="Co-Founder 1" 
+                    fill 
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                 />
+               </div>
+               <h4 className="text-xl font-black text-[#222222] mb-1">Ravi Sharma</h4>
+               <p className="text-primary font-black uppercase tracking-widest text-[10px] mb-4">Co-Founder & Operations</p>
+               <p className="text-[#222222] text-sm leading-relaxed opacity-80">
+                 Leading our supply chain and farm-to-doorstep logistics to ensure freshness.
+               </p>
+            </div>
+
+            {/* Co-Founder 2 */}
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col items-center text-center group hover:border-secondary transition-all">
+               <div className="w-32 h-32 relative rounded-full overflow-hidden mb-6 border-4 border-accent">
+                 <Image 
+                    src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=300" 
+                    alt="Co-Founder 2" 
+                    fill 
+                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                 />
+               </div>
+               <h4 className="text-xl font-black text-[#222222] mb-1">Anil Kumar</h4>
+               <p className="text-primary font-black uppercase tracking-widest text-[10px] mb-4">Co-Founder & Strategy</p>
+               <p className="text-[#222222] text-sm leading-relaxed opacity-80">
+                  Driving brand growth and ensuring the highest quality standards for all products.
+               </p>
+            </div>
+          </div>
         </div>
       </section>
     </div>
