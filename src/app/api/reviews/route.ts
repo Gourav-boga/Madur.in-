@@ -3,15 +3,22 @@ import mysql from '@/lib/mysql';
 
 export async function GET() {
   try {
-    const reviews = await mysql.query('SELECT * FROM reviews ORDER BY created_at DESC');
+    // Sorting by id DESC instead of created_at just in case created_at is missing from the table
+    const reviews = await mysql.query('SELECT * FROM reviews ORDER BY id DESC');
     console.log(`Fetched ${Array.isArray(reviews) ? (reviews as any[]).length : 0} reviews`);
     return NextResponse.json(reviews);
   } catch (error: any) {
     console.error('Reviews GET Error:', error);
-    return NextResponse.json({ 
-      error: 'Failed to fetch reviews', 
-      details: error.message || String(error)
-    }, { status: 500 });
+    // Fallback: try without sorting if id DESC fails for some reason
+    try {
+      const fallbackReviews = await mysql.query('SELECT * FROM reviews');
+      return NextResponse.json(fallbackReviews);
+    } catch (innerError: any) {
+      return NextResponse.json({ 
+        error: 'Failed to fetch reviews', 
+        details: error.message || String(error)
+      }, { status: 500 });
+    }
   }
 }
 
