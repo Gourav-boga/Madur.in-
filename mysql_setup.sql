@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS categories (
     id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    icon VARCHAR(255),
+    image_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -32,14 +32,6 @@ CREATE TABLE IF NOT EXISTS hero_slides (
     active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- Initial Hero Slides
-INSERT INTO hero_slides (image_url, title, subtitle) VALUES 
-('/hero/hero-1.png', 'Fresh Milk', 'From Farm to Your Door'),
-('/hero/hero-2.png', 'Pure Quality', 'No Preservatives'),
-('/hero/hero-3.png', 'Healthy Choice', 'Best for Your Family')
-ON DUPLICATE KEY UPDATE `image_url`=`image_url`;
-
 
 -- 4. Subscriptions Table
 CREATE TABLE IF NOT EXISTS subscriptions (
