@@ -83,6 +83,11 @@ export default function AdminProductsPage() {
       if (!e.target.files || e.target.files.length === 0) return;
 
       const file = e.target.files[0];
+
+      // Show local preview immediately
+      const localPreview = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, image_url: localPreview }));
+
       const uploadFormData = new FormData();
       uploadFormData.append("file", file);
 
@@ -91,13 +96,17 @@ export default function AdminProductsPage() {
         body: uploadFormData
       });
 
-      if (!response.ok) throw new Error("Upload failed");
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Upload failed");
+      }
 
       const { publicUrl } = await response.json();
+      // Replace preview with the actual saved URL
       setFormData(prev => ({ ...prev, image_url: publicUrl }));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading image:", error);
-      alert("Error uploading image!");
+      alert(`Error uploading image: ${error.message}`);
     } finally {
       setUploading(false);
     }
