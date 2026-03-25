@@ -53,6 +53,11 @@ export default function AdminCategoriesPage() {
       if (!e.target.files || e.target.files.length === 0) return;
 
       const file = e.target.files[0];
+
+      // Show local preview immediately
+      const localPreview = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, image_url: localPreview }));
+
       const uploadData = new FormData();
       uploadData.append("file", file);
 
@@ -64,7 +69,7 @@ export default function AdminCategoriesPage() {
       if (!response.ok) throw new Error("Upload failed");
 
       const { publicUrl } = await response.json();
-      setFormData({ ...formData, image_url: publicUrl });
+      setFormData(prev => ({ ...prev, image_url: publicUrl }));
     } catch (error) {
       console.error("Error uploading image:", error);
       alert("Error uploading image!");
@@ -109,10 +114,18 @@ export default function AdminCategoriesPage() {
         const response = await fetch(`/api/categories?id=${id}`, {
           method: "DELETE"
         });
-        if (!response.ok) throw new Error("Failed to delete");
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          if (err.error && err.error.includes('foreign key')) {
+            alert("Cannot delete this category because it still has products. Please reassign or delete the products first.");
+          } else {
+            alert(err.error || "Error deleting category!");
+          }
+          return;
+        }
         fetchCategories();
       } catch (err) {
-        alert("Error deleting category!");
+        alert("Error deleting category! Make sure no products are assigned to it.");
       }
     }
   };
