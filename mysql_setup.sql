@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    category_id INT,
+    category_id VARCHAR(50),
     price DECIMAL(10, 2) NOT NULL,
     image_url TEXT,
     description TEXT,
