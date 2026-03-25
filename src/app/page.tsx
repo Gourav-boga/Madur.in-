@@ -47,7 +47,7 @@ export default function Home() {
         if (revData && !revData.error) {
           setReviews(Array.isArray(revData) ? revData : []);
         } else {
-          console.error("Reviews API Error:", revData?.error);
+          console.error("Reviews API Error:", revData?.error, revData?.details);
           setReviews([]);
         }
 

@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import mysql from '@/lib/mysql';
 
-export async function GET() {
   try {
-    const reviews = await mysql.query('SELECT * FROM reviews WHERE LOWER(TRIM(status)) = "approved" ORDER BY created_at DESC');
+    const reviews = await mysql.query('SELECT * FROM reviews ORDER BY created_at DESC');
+    console.log(`Fetched ${Array.isArray(reviews) ? (reviews as any[]).length : 0} reviews`);
     return NextResponse.json(reviews);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Reviews GET Error:', error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch reviews', 
+      details: error.message || String(error)
+    }, { status: 500 });
   }
 }
 
