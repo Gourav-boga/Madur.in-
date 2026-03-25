@@ -42,8 +42,8 @@ export async function POST(request: Request) {
     const data = await request.json();
     const result = await mysql.insert('subscriptions', {
       customer_name: data.customer_name,
-      email: data.customer_email || data.email,
-      phone: data.customer_phone || data.phone,
+      customer_email: data.customer_email || data.email,
+      customer_phone: data.customer_phone || data.phone,
       address: data.address,
       status: 'active'
     });
