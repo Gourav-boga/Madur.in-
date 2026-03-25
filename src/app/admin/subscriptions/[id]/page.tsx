@@ -383,10 +383,14 @@ export default function SubscriberDetailsPage() {
                                               {(Array.isArray(deliveries) ? deliveries : []).map((del, index) => (
                             <div key={del.id} className="group grid grid-cols-12 gap-2 items-center p-4 rounded-2xl bg-accent/20 hover:bg-accent/40 transition-all border border-transparent hover:border-primary/10">
                                <span className="col-span-1 text-[10px] font-black text-gray-300">#{del.id}</span>
-                               <div className="col-span-5">
-                                  <span className="font-black text-gray-800 text-sm block">{new Date(del.delivery_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                                  <span className="text-[9px] font-bold text-gray-400">{new Date(del.delivery_date).toLocaleDateString('en-IN', { weekday: 'long' })}</span>
-                               </div>
+                                <div className="col-span-5">
+                                   <span className="font-black text-gray-800 text-sm block">
+                                      {del.delivery_date ? new Date(del.delivery_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Invalid Date'}
+                                   </span>
+                                   <span className="text-[9px] font-bold text-gray-400">
+                                      {del.delivery_date ? new Date(del.delivery_date).toLocaleDateString('en-IN', { weekday: 'long' }) : '---'}
+                                   </span>
+                                </div>
                                <div className="col-span-3 text-center">
                                   <span className="font-black text-primary">{del.quantity || subscriber?.quantity || 1}</span>
                                 </div>
