@@ -3,7 +3,7 @@
 
 -- 1. Categories Table
 CREATE TABLE IF NOT EXISTS categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     icon VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -109,7 +109,3 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
-
-
--- Initial Data (Optional - you can migrate from Supabase later)
--- INSERT INTO categories (name, icon) VALUES ('Dairy', 'milk'), ('Vegetables', 'leaf');
