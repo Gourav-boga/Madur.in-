@@ -3,10 +3,10 @@
 
 -- Clear existing data (Optional, handle with care)
 SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE order_items;
-TRUNCATE TABLE orders;
-TRUNCATE TABLE products;
-TRUNCATE TABLE categories;
+DELETE FROM order_items;
+DELETE FROM orders;
+DELETE FROM products;
+DELETE FROM categories;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 1. Insert Categories
