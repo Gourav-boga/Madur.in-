@@ -62,8 +62,9 @@ export default function SubscriberDetailsPage() {
   async function fetchData() {
     setIsLoading(true);
     try {
+      const cleanId = String(id).replace(/\/$/, '');
       // Fetch subscriber details
-      const subRes = await fetch(`/api/subscriptions?id=${id}`);
+      const subRes = await fetch(`/api/subscriptions?id=${cleanId}`);
       if (!subRes.ok) {
         router.push("/admin/subscriptions");
         return;
@@ -137,6 +138,18 @@ export default function SubscriberDetailsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-accent/30 text-primary">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-current"></div>
+      </div>
+    );
+  }
+
+  if (!subscriber) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-accent/30 text-primary p-4 text-center">
+        <h2 className="text-2xl font-black mb-4">Subscriber Not Found</h2>
+        <p className="mb-8 font-bold text-gray-500">We couldn't find the customer folder you requested.</p>
+        <Link href="/admin/subscriptions" className="bg-primary text-black font-black px-8 py-4 rounded-2xl shadow-lg">
+          Back to List
+        </Link>
       </div>
     );
   }
