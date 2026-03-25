@@ -119,7 +119,7 @@ export default function AboutPage() {
       </section>
 
       {/* Founder Section */}
-      <section className="bg-background pt-8 pb-4 md:pt-24 md:pb-12">
+      <section className="bg-background pt-8 pb-12 md:pt-24 md:pb-24">
         <div className="container max-w-4xl mx-auto rounded-[3rem] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row items-stretch">
            <div className="md:w-1/3 relative min-h-[300px]">
               <Image 
@@ -141,9 +141,11 @@ export default function AboutPage() {
               </button>
            </div>
         </div>
+      </section>
 
-        {/* Co-Founders Grid */}
-        <div className="container max-w-4xl mx-auto mt-32 md:mt-56">
+      {/* Co-Founders Grid Section */}
+      <section className="bg-background pb-12 md:pb-32">
+        <div className="container max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Co-Founder 1 */}
             <div className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-gray-100 flex flex-col items-center text-center group hover:border-secondary transition-all">
