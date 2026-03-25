@@ -18,6 +18,10 @@ const pool = mysql.createPool({
  * @param sql The SQL query string
  * @param params Optional parameters for prepared statements
  */
+export async function query<T = any>(sql: string, params?: any[]): Promise<T[]> {
+  try {
+    const [results] = await pool.execute(sql, params);
+    return results as T[];
   } catch (error: any) {
     if (error.code === 'ECONNREFUSED') {
       throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
@@ -57,7 +61,14 @@ export async function insert(table: string, data: Record<string, any>) {
   const sql = `INSERT INTO ?? (${keys.map(() => '??').join(', ')}) VALUES (${placeholders})`;
   const params = [table, ...keys, ...values];
   
-  return query(sql, params);
+  try {
+    return await query(sql, params);
+  } catch (error: any) {
+    if (error.code === 'ECONNREFUSED') {
+      throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
+    }
+    throw error;
+  }
 }
 
 /**
@@ -71,14 +82,28 @@ export async function update(table: string, data: Record<string, any>, idField: 
   const sql = `UPDATE ?? SET ${setClause} WHERE ?? = ?`;
   const params = [table, ...keys.flatMap((k, i) => [k, values[i]]), idField, idValue];
   
-  return query(sql, params);
+  try {
+    return await query(sql, params);
+  } catch (error: any) {
+    if (error.code === 'ECONNREFUSED') {
+      throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
+    }
+    throw error;
+  }
 }
 
 /**
  * Deletes a record from a table
  */
 export async function remove(table: string, idField: string, idValue: any) {
-  return query(`DELETE FROM ?? WHERE ?? = ?`, [table, idField, idValue]);
+  try {
+    return await query(`DELETE FROM ?? WHERE ?? = ?`, [table, idField, idValue]);
+  } catch (error: any) {
+    if (error.code === 'ECONNREFUSED') {
+      throw new Error("MySQL Connection Refused: Please ensure your local database is running or check your Hostinger connection.");
+    }
+    throw error;
+  }
 }
 
 export default {
