@@ -1,11 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faKey, faArrowRight, faTriangleExclamation, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { sendOtpAction, verifyOtpAction } from "@/lib/actions/auth";
+import { googleLoginAction } from "@/lib/actions/google-auth";
+
+declare global {
+  interface Window {
+    google: any;
+  }
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,11 +23,58 @@ export default function LoginPage() {
   const [success, setSuccess] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if already logged in via cookie
-    // Since we're in a client component, we'll check via a simpler way or an API
-    // For now, we'll just let the server-side redirection handle it if they visit /account
+  const handleGoogleCallback = useCallback(async (response: any) => {
+    setIsLoading(true);
+    setError("");
+
+    const res = await googleLoginAction(response.credential);
+
+    if (res.error) {
+      setError(res.error);
+      setIsLoading(false);
+    } else {
+      router.push("/account");
+      router.refresh();
+    }
   }, [router]);
+
+  useEffect(() => {
+    // 1. Google Identity Services Setup
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
+          callback: handleGoogleCallback,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+
+        const googleBtnGroup = document.getElementById("googleBtnGroup");
+        if (googleBtnGroup) {
+          window.google.accounts.id.renderButton(googleBtnGroup, {
+            theme: "outline",
+            size: "large",
+            width: "100%",
+            text: "continue_with",
+            shape: "pill",
+          });
+        }
+      }
+    };
+
+    return () => {
+      // Safe cleanup - check if script parent exists
+      if (script.parentNode) {
+        document.body.removeChild(script);
+      }
+    };
+  }, [handleGoogleCallback]);
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,6 +221,16 @@ export default function LoginPage() {
           )}
 
           <div className="mt-8 text-center relative z-10 border-t border-gray-100 pt-6">
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex-1 h-px bg-gray-100"></div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Or continue with</span>
+                <div className="flex-1 h-px bg-gray-100"></div>
+              </div>
+              
+              <div id="googleBtnGroup" className="w-full h-11"></div>
+            </div>
+
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
               By continuing, you agree to our <Link href="/terms" className="text-gray-800 hover:text-primary hover:underline">Terms of Service</Link>
             </p>

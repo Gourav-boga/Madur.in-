@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import StreamingTagline from "@/components/layout/StreamingTagline";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/common/WhatsAppButton";
+import MobileCartButton from "@/components/common/MobileCartButton";
 import SplashScreen from "@/components/layout/SplashScreen";
 
 import { usePathname } from "next/navigation";
@@ -53,6 +54,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               {children}
             </main>
             <Footer />
+            <MobileCartButton />
             <WhatsAppButton />
           </div>
         )}
