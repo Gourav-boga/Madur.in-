@@ -1,12 +1,9 @@
 import { MetadataRoute } from 'next'
-import { query } from '@/lib/mysql'
-import { categories as staticCategories } from '@/lib/data'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.madur.in';
 
-  // 1. Static Routes
-  const staticRoutes = [
+  const routes = [
     '',
     '/about',
     '/contact',
@@ -15,6 +12,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/reviews',
     '/privacy',
     '/terms',
+    '/products?category=Milk%20%26%20Dairy',
+    '/products?category=Vegetables',
+    '/products?category=Groceries%20%2F%20Staples',
+    '/products?category=Spices%20%26%20Powders',
+    '/products?category=Cold%20Pressed%20Oils',
+    '/products?category=Pickles',
+    '/products?category=Traditional%20Snacks',
+    '/products?category=Eggs',
+    '/products?category=Honey%20%26%20Natural%20Products',
+    '/products?category=Dry%20Fruits',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
@@ -22,28 +29,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === '' ? 1 : 0.8,
   }));
 
-  // 2. Dynamic Categories
-  let categoriesData = [];
-  try {
-    // Try to get from DB first
-    const dbCategories = await query('SELECT name FROM categories');
-    if (Array.isArray(dbCategories) && dbCategories.length > 0) {
-      categoriesData = dbCategories;
-    } else {
-      categoriesData = staticCategories;
-    }
-  } catch (err) {
-    console.error('Sitemap DB Error:', err);
-    categoriesData = staticCategories;
-  }
-
-  // Generate category routes
-  const categoryRoutes = categoriesData.map((cat: any) => ({
-    url: `${baseUrl}/products?category=${encodeURIComponent(cat.name)}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }));
-
-  return [...staticRoutes, ...categoryRoutes];
+  return routes;
 }
