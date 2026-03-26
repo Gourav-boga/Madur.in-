@@ -5,7 +5,7 @@ import { categories as staticCategories } from '@/lib/data'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.madur.in';
 
-  // Static routes
+  // 1. Static Routes
   const staticRoutes = [
     '',
     '/about',
@@ -22,30 +22,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === '' ? 1 : 0.8,
   }));
 
-  // Fetch categories from DB for dynamic routes
-  let categoryRoutes: MetadataRoute.Sitemap = [];
+  // 2. Dynamic Categories
+  let categoriesData = [];
   try {
-    const categories = await query('SELECT name FROM categories');
-    
-    const displayCategories = (Array.isArray(categories) && categories.length > 0) 
-      ? categories 
-      : staticCategories;
-
-    categoryRoutes = displayCategories.map((cat: any) => ({
-      url: `${baseUrl}/products?category=${encodeURIComponent(cat.name)}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    }));
-  } catch (error) {
-    console.error('Sitemap: DB query failed, using static categories', error);
-    categoryRoutes = staticCategories.map((cat: any) => ({
-      url: `${baseUrl}/products?category=${encodeURIComponent(cat.name)}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    }));
+    // Try to get from DB first
+    const dbCategories = await query('SELECT name FROM categories');
+    if (Array.isArray(dbCategories) && dbCategories.length > 0) {
+      categoriesData = dbCategories;
+    } else {
+      categoriesData = staticCategories;
+    }
+  } catch (err) {
+    console.error('Sitemap DB Error:', err);
+    categoriesData = staticCategories;
   }
+
+  // Generate category routes
+  const categoryRoutes = categoriesData.map((cat: any) => ({
+    url: `${baseUrl}/products?category=${encodeURIComponent(cat.name)}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }));
 
   return [...staticRoutes, ...categoryRoutes];
 }
