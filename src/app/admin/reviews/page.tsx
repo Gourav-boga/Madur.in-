@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faTrash, faArrowLeft, faStar, faQuoteLeft, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faTrash, faEdit, faArrowLeft, faStar, faQuoteLeft, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
 interface Review {
@@ -21,6 +21,7 @@ export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     customer_name: "",
     rating: 5,
@@ -50,17 +51,37 @@ export default function AdminReviewsPage() {
     }
   }
 
+  const handleEdit = (review: Review) => {
+    setFormData({
+      customer_name: review.customer_name,
+      rating: review.rating,
+      comment: review.comment
+    });
+    setEditingReviewId(review.id);
+    setIsModalOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setFormData({ customer_name: "", rating: 5, comment: "" });
+    setEditingReviewId(null);
+    setIsModalOpen(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const method = editingReviewId ? "PUT" : "POST";
+      const body = editingReviewId ? { id: editingReviewId, ...formData } : formData;
+
       const res = await fetch("/api/reviews", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(body)
       });
       if (!res.ok) throw new Error("Failed to save");
       setIsModalOpen(false);
       setFormData({ customer_name: "", rating: 5, comment: "" });
+      setEditingReviewId(null);
       fetchReviews();
     } catch (err) {
       alert("Error saving review!");
@@ -94,7 +115,7 @@ export default function AdminReviewsPage() {
             </div>
           </div>
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleAddNew}
             className="bg-primary text-black font-black px-8 py-4 rounded-2xl shadow-xl hover:opacity-90 transition-all flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faPlus} />
@@ -124,20 +145,28 @@ export default function AdminReviewsPage() {
                     />
                   ))}
                 </div>
-                <p className="text-lg font-bold italic mb-6 leading-relaxed">"{review.comment}"</p>
+                <p className="text-base font-bold italic mb-6 leading-relaxed">"{review.comment}"</p>
                 <div className="flex items-center justify-between">
                    <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-black text-xs">
-                         {review.customer_name.charAt(0)}
+                         {review.customer_name?.charAt(0) || "U"}
                       </div>
                       <span className="font-black text-sm">— {review.customer_name}</span>
                    </div>
-                   <button 
-                     onClick={() => handleDelete(review.id)}
-                     className="w-10 h-10 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                   >
-                     <FontAwesomeIcon icon={faTrash} size="sm" />
-                   </button>
+                   <div className="flex gap-2">
+                     <button 
+                       onClick={() => handleEdit(review)}
+                       className="w-10 h-10 rounded-xl bg-accent text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                     >
+                       <FontAwesomeIcon icon={faEdit} size="sm" />
+                     </button>
+                     <button 
+                       onClick={() => handleDelete(review.id)}
+                       className="w-10 h-10 rounded-xl bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                     >
+                       <FontAwesomeIcon icon={faTrash} size="sm" />
+                     </button>
+                   </div>
                 </div>
               </div>
             ))}
@@ -148,7 +177,7 @@ export default function AdminReviewsPage() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl animate-in zoom-in-95">
-            <h2 className="text-2xl font-black mb-6">Add Customer Review</h2>
+            <h2 className="text-2xl font-black mb-6">{editingReviewId ? "Edit Review" : "Add Customer Review"}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Customer Name</label>
@@ -183,7 +212,9 @@ export default function AdminReviewsPage() {
               </div>
               <div className="flex gap-4 pt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-gray-100 font-bold py-4 rounded-xl">Cancel</button>
-                <button type="submit" className="flex-1 bg-primary text-black font-black py-4 rounded-xl shadow-lg">Save Review</button>
+                <button type="submit" className="flex-1 bg-primary text-black font-black py-4 rounded-xl shadow-lg">
+                  {editingReviewId ? "Update Review" : "Save Review"}
+                </button>
               </div>
             </form>
           </div>

@@ -38,6 +38,20 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  try {
+    const data = await request.json();
+    const { id, ...updateData } = data;
+    if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+
+    await mysql.update('reviews', updateData, 'id', id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Review Update Error:', error);
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
