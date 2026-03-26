@@ -128,18 +128,29 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {/* Order items would go here. Since order items are not eagerly fetched in AccountPage, 
-                  we'll display the total summary for now or fetch items if needed. 
-                  In a real app, we'd pass order_items down or fetch them here. */}
-              <tr className="hover:bg-gray-50/50">
-                <td className="px-6 py-5">
-                   <p className="font-black text-gray-800 text-sm">{order.isSubscription ? "Fresh Milk Subscription" : "Farm Fresh Grocery Items"}</p>
-                   <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">{order.isSubscription ? order.plan_details : "Assorted Selection"}</p>
-                </td>
-                <td className="px-6 py-5 text-center font-bold text-gray-600">1</td>
-                <td className="px-6 py-5 text-right font-bold text-gray-600">₹{order.total_amount}</td>
-                <td className="px-6 py-5 text-right font-black text-gray-800 pr-1">₹{order.total_amount}</td>
-              </tr>
+              {order.items && order.items.length > 0 ? (
+                order.items.map((item: any, i: number) => (
+                  <tr key={i} className="hover:bg-gray-50/50">
+                    <td className="px-6 py-5">
+                       <p className="font-black text-gray-800 text-sm uppercase tracking-tight">{item.name}</p>
+                       <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">{item.unit}</p>
+                    </td>
+                    <td className="px-6 py-5 text-center font-bold text-gray-600">{item.quantity}</td>
+                    <td className="px-6 py-5 text-right font-bold text-gray-600">₹{Math.floor(item.price)}</td>
+                    <td className="px-6 py-5 text-right font-black text-gray-800 pr-1">₹{Math.floor(item.price * item.quantity)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr className="hover:bg-gray-50/50">
+                  <td className="px-6 py-5">
+                     <p className="font-black text-gray-800 text-sm">{order.isSubscription ? "Fresh Milk Subscription" : "Farm Fresh Grocery Items"}</p>
+                     <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">{order.isSubscription ? order.plan_details : "Assorted Selection"}</p>
+                  </td>
+                  <td className="px-6 py-5 text-center font-bold text-gray-600">1</td>
+                  <td className="px-6 py-5 text-right font-bold text-gray-600">₹{order.total_amount}</td>
+                  <td className="px-6 py-5 text-right font-black text-gray-800 pr-1">₹{order.total_amount}</td>
+                </tr>
+              )}
             </tbody>
           </table>
 

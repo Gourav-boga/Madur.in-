@@ -214,11 +214,11 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div className="bg-white w-full max-w-md rounded-[2.5rem] p-10 text-center shadow-2xl animate-in zoom-in-95 duration-200">
-          <div className="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+          <div className="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner ring-8 ring-green-50">
             <FontAwesomeIcon icon={faCheckCircle} className="text-5xl" />
           </div>
-          <h2 className="text-3xl font-black text-gray-800 mb-3">Order Placed!</h2>
-          <p className="text-gray-500 font-bold mb-4">Your order details have been sent to WhatsApp.</p>
+          <h2 className="text-3xl font-black text-gray-800 mb-3 tracking-tighter">Order Successfully Placed!</h2>
+          <p className="text-gray-500 font-bold mb-4">Your fresh products are booked and confirmed.</p>
           <div className="flex flex-col gap-2">
             <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest animate-pulse">Redirecting to Dashboard...</p>
           </div>
