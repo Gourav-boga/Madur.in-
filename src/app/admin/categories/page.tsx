@@ -94,15 +94,18 @@ export default function AdminCategoriesPage() {
         body: JSON.stringify(payload)
       });
       
-      if (!response.ok) throw new Error("Failed to save category");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save category");
+      }
 
       setIsModalOpen(false);
       setEditingCategory(null);
       setFormData({ name: "", image_url: "" });
       fetchCategories();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving category:", error);
-      alert("Error saving category!");
+      alert(`Error saving category: ${error.message}`);
     } finally {
       setIsLoading(false);
     }

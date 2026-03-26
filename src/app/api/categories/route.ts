@@ -24,12 +24,14 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     const result = await mysql.insert('categories', {
+      id: `cat_${Date.now()}`,
       name: data.name,
       image_url: data.image_url || ''
     });
     return NextResponse.json(result);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API Categories POST Error:', error);
+    return NextResponse.json({ error: error.message || 'Failed' }, { status: 500 });
   }
 }
 
@@ -43,8 +45,9 @@ export async function PATCH(request: Request) {
       image_url: data.image_url
     }, 'id', data.id);
     return NextResponse.json(result);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  } catch (error: any) {
+    console.error('API Categories PATCH Error:', error);
+    return NextResponse.json({ error: error.message || 'Failed' }, { status: 500 });
   }
 }
 
