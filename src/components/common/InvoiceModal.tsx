@@ -1,7 +1,7 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faPrint, faFileInvoice, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faPrint, faFileInvoice, faCheckCircle, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 
 interface InvoiceModalProps {
@@ -68,9 +68,9 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
             </button>
             <button 
               onClick={onClose}
-              className="px-4 py-3 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-all shadow-sm flex items-center gap-2 font-bold text-xs uppercase"
+              className="px-4 py-3 bg-primary text-black rounded-xl hover:opacity-90 transition-all shadow-sm flex items-center gap-2 font-black text-xs uppercase"
             >
-              <FontAwesomeIcon icon={faTimes} />
+              <FontAwesomeIcon icon={faArrowLeft} />
               Back
             </button>
           </div>
@@ -173,6 +173,17 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
              <p className="text-[8px] text-gray-300 font-bold max-w-sm mx-auto uppercase leading-relaxed tracking-wider">
                This is a computer-generated invoice and doesn't require a physical signature. Madurfoods.in - Pure Organic Farm Fresh Produces.
              </p>
+          </div>
+
+          {/* Back Button at bottom - hidden during print */}
+          <div className="mt-8 flex justify-center print:hidden">
+            <button
+              onClick={onClose}
+              className="flex items-center gap-3 bg-primary text-black font-black px-8 py-4 rounded-2xl shadow-lg hover:opacity-90 hover:-translate-y-0.5 transition-all text-sm uppercase tracking-widest"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+              Back to Account
+            </button>
           </div>
         </div>
       </div>
