@@ -7,6 +7,14 @@ export async function GET(request: Request) {
 
   try {
     console.log('Fetching dashboard stats...');
+    
+    // Self-healing: Ensure payment_status column exists in orders table
+    try {
+      await mysql.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50) DEFAULT 'unpaid'`);
+    } catch (e) {
+      // Ignore if table doesn't exist yet or other DB specific ignore logic
+    }
+
     // 1. Product Count
     const prodResults: any = await mysql.query('SELECT COUNT(*) as count FROM products');
     const prodCount = prodResults[0]?.count || 0;
@@ -19,17 +27,23 @@ export async function GET(request: Request) {
     const delResults: any = await mysql.query("SELECT COUNT(*) as count FROM deliveries WHERE LOWER(TRIM(status)) = 'delivered'");
     const deliveryCount = delResults[0]?.count || 0;
 
-    // 4. Revenue Today
+    // 4. Revenue Today — from paid orders + subscriptions created today
     const revenueTodayResults: any = await mysql.query(
-      "SELECT SUM(amount_paid) as total FROM subscriptions WHERE DATE(created_at) = CURDATE()"
+      "SELECT COALESCE(SUM(total_amount), 0) as total FROM orders WHERE payment_status = 'paid' AND DATE(created_at) = CURDATE()"
     );
-    const todayRevenue = revenueTodayResults[0]?.total || 0;
+    const subRevToday: any = await mysql.query(
+      "SELECT COALESCE(SUM(amount_paid), 0) as total FROM subscriptions WHERE DATE(created_at) = CURDATE() AND amount_paid IS NOT NULL AND amount_paid > 0"
+    );
+    const todayRevenue = (parseFloat(revenueTodayResults[0]?.total) || 0) + (parseFloat(subRevToday[0]?.total) || 0);
 
     // 5. Revenue Yesterday
     const revenueYesterdayResults: any = await mysql.query(
-      "SELECT SUM(amount_paid) as total FROM subscriptions WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)"
+      "SELECT COALESCE(SUM(total_amount), 0) as total FROM orders WHERE payment_status = 'paid' AND DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)"
     );
-    const yesterdayRevenue = revenueYesterdayResults[0]?.total || 0;
+    const subRevYesterday: any = await mysql.query(
+      "SELECT COALESCE(SUM(amount_paid), 0) as total FROM subscriptions WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) AND amount_paid IS NOT NULL AND amount_paid > 0"
+    );
+    const yesterdayRevenue = (parseFloat(revenueYesterdayResults[0]?.total) || 0) + (parseFloat(subRevYesterday[0]?.total) || 0);
 
     // 6. Recent Subscriptions
     const recentSubs = await mysql.query(
@@ -41,12 +55,32 @@ export async function GET(request: Request) {
     // 7. Custom Date Revenue (if provided)
     let customRevenue = null;
     if (customDate) {
-      const customResults: any = await mysql.query(
-        "SELECT SUM(amount_paid) as total FROM subscriptions WHERE DATE(created_at) = ?",
+      const customOrderResults: any = await mysql.query(
+        "SELECT COALESCE(SUM(total_amount), 0) as total FROM orders WHERE payment_status = 'paid' AND DATE(created_at) = ?",
         [customDate]
       );
-      customRevenue = customResults[0]?.total || 0;
+      const customSubResults: any = await mysql.query(
+        "SELECT COALESCE(SUM(amount_paid), 0) as total FROM subscriptions WHERE DATE(created_at) = ? AND amount_paid IS NOT NULL AND amount_paid > 0",
+        [customDate]
+      );
+      customRevenue = (parseFloat(customOrderResults[0]?.total) || 0) + (parseFloat(customSubResults[0]?.total) || 0);
     }
+
+    // 8. One-off Orders
+    const pendingOrdersResult: any = await mysql.query("SELECT COUNT(*) as count FROM orders WHERE status = 'pending'");
+    const completedOrdersResult: any = await mysql.query("SELECT COUNT(*) as count FROM orders WHERE status = 'completed' OR status = 'delivered'");
+    
+    const pendingOrders = pendingOrdersResult[0]?.count || 0;
+    const completedOrdersValue = completedOrdersResult[0]?.count || 0;
+
+    // 9. Recent Orders
+    const recentOrdersRaw = await mysql.query(
+      "SELECT * FROM orders ORDER BY created_at DESC LIMIT 5"
+    );
+    const recentOrders = (recentOrdersRaw as any[]).map(o => ({
+      ...o,
+      items: typeof o.items === 'string' ? JSON.parse(o.items || '[]') : o.items
+    }));
 
     return NextResponse.json({
       products: prodCount,
@@ -55,7 +89,10 @@ export async function GET(request: Request) {
       todayRevenue,
       yesterdayRevenue,
       recentSubs,
-      customRevenue
+      customRevenue,
+      pendingOrders,
+      completedOrders: completedOrdersValue,
+      recentOrders
     });
   } catch (error: any) {
     console.error('Stats Error:', error);

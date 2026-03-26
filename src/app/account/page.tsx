@@ -23,6 +23,12 @@ interface Order {
   total_amount: number;
   status: string;
   created_at: string;
+  items?: any[];
+  user_email?: string;
+  shipping_address?: string;
+  payment_method?: string;
+  isSubscription?: boolean;
+  plan_details?: string;
 }
 
 interface Subscription {
@@ -31,7 +37,10 @@ interface Subscription {
   status: string;
   quantity: number;
   customer_name: string;
+  customer_email?: string;
+  address?: string;
   created_at: string;
+  amount_paid?: number;
   deliveries?: Delivery[];
 }
 
@@ -209,6 +218,32 @@ export default function AccountPage() {
                         </div>
                       </div>
                       
+                      <div className="px-6 py-4 bg-white border-y border-gray-100 flex items-center justify-between sm:justify-end gap-4">
+                        <div className="flex flex-col sm:items-end">
+                          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Paid</span>
+                          <span className="text-xl font-black text-primary">₹{sub.amount_paid || 0}</span>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            setSelectedOrder({
+                              id: sub.id,
+                              user_email: sub.customer_email || user.email,
+                              shipping_address: sub.address || "Subscription Address",
+                              created_at: sub.created_at,
+                              payment_method: 'Online Payment',
+                              status: sub.status,
+                              total_amount: sub.amount_paid || 0,
+                              isSubscription: true,
+                              plan_details: sub.plan_details
+                            });
+                            setIsInvoiceOpen(true);
+                          }}
+                          className="text-[10px] bg-primary/10 border border-primary/20 px-6 py-3 rounded-xl font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-colors"
+                        >
+                          View Invoice
+                        </button>
+                      </div>
+
                       <div className="p-6">
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Last 7 Deliveries</p>
                         <div className="grid grid-cols-7 gap-2">
@@ -216,7 +251,10 @@ export default function AccountPage() {
                             const date = new Date();
                             date.setDate(date.getDate() - i);
                             const dateStr = date.toISOString().split('T')[0];
-                            const delivery = Array.isArray(sub.deliveries) ? sub.deliveries.find(d => d.delivery_date === dateStr) : null;
+                            const delivery = Array.isArray(sub.deliveries) ? sub.deliveries.find(d => {
+                              const dbDate = d.delivery_date ? String(d.delivery_date).split('T')[0] : '';
+                              return dbDate === dateStr;
+                            }) : null;
                             const isToday = i === 0;
 
                             return (
@@ -294,7 +332,7 @@ export default function AccountPage() {
                           Ordered on {new Date(order.created_at).toLocaleDateString()}
                         </p>
                         <p className="text-[10px] font-bold text-gray-300 uppercase mt-1">
-                          ID: {order.id.slice(0, 8)}...
+                          ID: #{String(order.id)}
                         </p>
                       </div>
                       
@@ -309,9 +347,6 @@ export default function AccountPage() {
                               className="text-[10px] bg-primary/10 border border-primary/20 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-colors"
                             >
                               Invoice
-                            </button>
-                            <button className="text-[10px] bg-white border border-gray-100 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-colors">
-                              Details
                             </button>
                           </div>
                         </div>

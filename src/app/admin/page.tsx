@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBox, faShoppingBag, faPlus, faSignOutAlt, faCog, faChartLine, faUsers, faImages, faQuoteLeft } from "@fortawesome/free-solid-svg-icons";
+import { faBox, faShoppingBag, faPlus, faSignOutAlt, faCog, faChartLine, faUsers, faImages, faQuoteLeft, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
 
 export default function AdminDashboard() {
@@ -12,12 +12,15 @@ export default function AdminDashboard() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [counts, setCounts] = useState({
     products: 0,
+    activeSubscriptions: 0,
     pendingOrders: 0,
+    completedOrders: 0,
     todayRevenue: 0,
     yesterdayRevenue: 0,
     completedDeliveries: 0
   });
   const [recentSubs, setRecentSubs] = useState<any[]>([]);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [customRevenue, setCustomRevenue] = useState<number | null>(null);
@@ -43,12 +46,15 @@ export default function AdminDashboard() {
 
       setCounts({
         products: data.products || 0,
-        pendingOrders: data.activeSubscriptions || 0,
+        activeSubscriptions: data.activeSubscriptions || 0,
+        pendingOrders: data.pendingOrders || 0,
+        completedOrders: data.completedOrders || 0,
         todayRevenue: data.todayRevenue || 0,
         yesterdayRevenue: data.yesterdayRevenue || 0,
         completedDeliveries: data.completedDeliveries || 0
       });
       setRecentSubs(data.recentSubs || []);
+      setRecentOrders(data.recentOrders || []);
     } catch (err: any) {
       console.error("Error fetching dashboard stats:", err);
       setErrorMsg(err.message || "Failed to connect to stats API");
@@ -87,8 +93,10 @@ export default function AdminDashboard() {
   const stats = [
     { label: "Today's Revenue", value: `₹${counts.todayRevenue.toLocaleString()}`, icon: faChartLine, color: "bg-green-500" },
     { label: "Yesterday's Revenue", value: `₹${counts.yesterdayRevenue.toLocaleString()}`, icon: faUsers, color: "bg-purple-500" },
-    { label: "Active Subscriptions", value: counts.pendingOrders.toString(), icon: faShoppingBag, color: "bg-orange-500" },
+    { label: "Active Subscriptions", value: counts.activeSubscriptions.toString(), icon: faShoppingBag, color: "bg-orange-500" },
     { label: "Deliveries Done", value: counts.completedDeliveries.toString(), icon: faPlus, color: "bg-indigo-500" },
+    { label: "Pending Orders", value: counts.pendingOrders.toString(), icon: faShoppingBag, color: "bg-amber-500" },
+    { label: "Completed Orders", value: counts.completedOrders.toString(), icon: faCheckCircle, color: "bg-emerald-500" },
     { label: "Total Products", value: counts.products.toString(), icon: faBox, color: "bg-blue-500" },
   ];
 
@@ -208,8 +216,72 @@ export default function AdminDashboard() {
               </tbody>
             </table>
           </div>
-        </div>
 
+          {/* Recent Orders Preview inside the same column */}
+          <div className="mt-8 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-8 border-b flex justify-between items-center text-black">
+              <h3 className="text-xl font-black">Recent Orders</h3>
+              <Link href="/admin/orders" className="text-primary font-bold text-sm hover:underline">View All</Link>
+            </div>
+            <div className="overflow-x-auto text-black">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-accent/50 text-gray-500 text-xs font-black uppercase tracking-widest">
+                    <th className="px-8 py-4">Customer</th>
+                    <th className="px-8 py-4">Items</th>
+                    <th className="px-8 py-4">Amount</th>
+                    <th className="px-8 py-4">Status</th>
+                    <th className="px-8 py-4">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm font-medium">
+                  {(!Array.isArray(recentOrders) || recentOrders.length === 0) ? (
+                    <tr><td colSpan={5} className="px-8 py-10 text-center text-gray-400">No orders found</td></tr>
+                  ) : recentOrders.map((order, i) => (
+                    <tr 
+                      key={order.id || i} 
+                      className="border-b last:border-none hover:bg-gray-50 transition-colors group cursor-pointer"
+                      onClick={() => router.push(`/admin/orders`)}
+                    >
+                      <td className="px-8 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-primary/60 group-hover:bg-primary group-hover:text-white transition-all">
+                            <FontAwesomeIcon icon={faBox} size="xs" />
+                          </div>
+                          <span className="text-gray-800 font-bold group-hover:text-primary transition-colors">{order.user_email?.split('@')[0] || "Unknown"}</span>
+                        </div>
+                      </td>
+                      <td className="px-8 py-4 text-xs font-bold text-gray-500">
+                        {order.items && order.items.length > 0 ? (
+                          <div className="flex flex-col gap-1">
+                            {order.items.slice(0, 2).map((item: any, idx: number) => (
+                              <span key={idx} className="block truncate max-w-[200px]">{item.cartQuantity || 1}x {item.name}</span>
+                            ))}
+                            {order.items.length > 2 && <span className="text-[10px] text-primary">+{order.items.length - 2} more items</span>}
+                          </div>
+                        ) : (
+                          "Farm Fresh items"
+                        )}
+                      </td>
+                      <td className="px-8 py-4 text-xs font-black text-gray-800">₹{order.total_amount}</td>
+                      <td className="px-8 py-4">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${['completed', 'delivered', 'processing'].includes(order.status) ? 'text-green-500 bg-green-50' : 'text-amber-500 bg-amber-50'}`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className="px-8 py-4 text-xs font-bold text-gray-400">
+                        {new Date(order.created_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        {/* Sidebar: Revenue + Management */}
+        <div className="flex flex-col gap-8">
           <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
             <h3 className="text-xl font-black mb-6 text-black">Revenue Lookup</h3>
             <div className="flex flex-col gap-4">
@@ -272,6 +344,10 @@ export default function AdminDashboard() {
                 <FontAwesomeIcon icon={faQuoteLeft} />
                 Review Board
               </Link>
+              <Link href="/admin/orders" className="w-full bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-3">
+                <FontAwesomeIcon icon={faShoppingBag} />
+                Orders (One-off)
+              </Link>
               <Link href="/admin/settings" className="w-full bg-gray-800 text-white font-black py-4 rounded-2xl shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-3">
                 <FontAwesomeIcon icon={faCog} />
                 Global Settings
@@ -286,5 +362,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+    </div>
   );
 }

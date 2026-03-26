@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "tfpondyiyfjwtbwexedp.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "madur.in",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      }
     ],
   },
 };

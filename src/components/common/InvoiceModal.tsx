@@ -17,6 +17,28 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
     window.print();
   };
 
+  const handleDownloadPDF = async () => {
+    try {
+      const element = document.getElementById("invoice-content");
+      if (!element) return;
+      
+      const html2pdf = (await import("html2pdf.js")).default;
+      
+      const opt = {
+        margin: 10,
+        filename: `madur_invoice_${order.id || "download"}.pdf`,
+        image: { type: 'jpeg' as 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm' as 'mm', format: 'a4' as 'a4', orientation: 'portrait' as 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      alert("Could not generate PDF. You can use the Print button to save as PDF.");
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
       <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden my-8 print:m-0 print:shadow-none print:w-full print:max-w-none">
@@ -31,7 +53,14 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
           </div>
           <div className="flex items-center gap-3">
             <button 
+              onClick={handleDownloadPDF}
+              className="p-3 bg-secondary text-white rounded-xl hover:bg-secondary/90 transition-all shadow-sm flex items-center gap-2 font-bold text-xs uppercase"
+            >
+              Download PDF
+            </button>
+            <button 
               onClick={handlePrint}
+              // ... existing print button logic
               className="p-3 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-primary transition-all shadow-sm flex items-center gap-2 font-bold text-xs uppercase"
             >
               <FontAwesomeIcon icon={faPrint} />
@@ -39,25 +68,26 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
             </button>
             <button 
               onClick={onClose}
-              className="p-3 bg-white border border-gray-200 text-gray-400 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm"
+              className="px-4 py-3 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-all shadow-sm flex items-center gap-2 font-bold text-xs uppercase"
             >
               <FontAwesomeIcon icon={faTimes} />
+              Back
             </button>
           </div>
         </div>
 
         {/* Invoice Content */}
-        <div className="p-10 print:p-0">
+        <div id="invoice-content" className="p-10 print:p-0 bg-white">
           <div className="flex justify-between items-start mb-12">
             <div>
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-3 mb-4">
                 <Image src="/logo.png" alt="Madurfoods.in" width={180} height={50} className="h-10 w-auto object-contain" />
               </div>
               <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Purity. Freshness. Healthy Living.</p>
             </div>
             <div className="text-right">
               <h1 className="text-3xl font-black text-gray-800 mb-1 uppercase">Invoice</h1>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">#{order.id.slice(0, 8).toUpperCase()}</p>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">#{String(order.id)}</p>
             </div>
           </div>
 
@@ -103,8 +133,8 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
                   In a real app, we'd pass order_items down or fetch them here. */}
               <tr className="hover:bg-gray-50/50">
                 <td className="px-6 py-5">
-                   <p className="font-black text-gray-800 text-sm">Farm Fresh Grocery Items</p>
-                   <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">Assorted Selection</p>
+                   <p className="font-black text-gray-800 text-sm">{order.isSubscription ? "Fresh Milk Subscription" : "Farm Fresh Grocery Items"}</p>
+                   <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">{order.isSubscription ? order.plan_details : "Assorted Selection"}</p>
                 </td>
                 <td className="px-6 py-5 text-center font-bold text-gray-600">1</td>
                 <td className="px-6 py-5 text-right font-bold text-gray-600">₹{order.total_amount}</td>

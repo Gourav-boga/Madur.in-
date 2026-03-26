@@ -21,6 +21,12 @@ function ProductsContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState(urlSearchTerm);
 
+  const normalizeImageUrl = (url: string) => {
+    if (!url) return "/logo.png";
+    if (url.startsWith("http") || url.startsWith("data:") || url.startsWith("/")) return url;
+    return `/api/admin/proxy-image?url=${encodeURIComponent(url)}`; // Or just return url if relative
+  };
+
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
@@ -55,7 +61,7 @@ function ProductsContent() {
     
     return products.filter((product) => {
       // product labels or associated details from joined query
-      const prodCategoryName = product.categories?.name || product.category || "";
+      const prodCategoryName = product.category_name || product.categories?.name || product.category || "";
       
       const matchesCategory = categoryFilter 
         ? prodCategoryName.toLowerCase() === categoryFilter.toLowerCase() 
@@ -82,7 +88,7 @@ function ProductsContent() {
               <>
                 {(currentCategory?.image_url || currentCategory?.image) ? (
                   <div className="relative w-12 h-12 md:w-24 md:h-24 rounded-xl md:rounded-2xl overflow-hidden shadow-md bg-gray-50 flex-shrink-0">
-                    <Image src={currentCategory.image_url || currentCategory.image} alt={currentCategory.name} fill className="object-cover" />
+                    <Image src={normalizeImageUrl(currentCategory.image_url || currentCategory.image)} alt={currentCategory.name} fill className="object-cover" />
                   </div>
                 ) : (
                   <div className="w-12 h-12 md:w-24 md:h-24 rounded-lg md:rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300">
@@ -145,7 +151,7 @@ function ProductsContent() {
                   {(cat.image_url || cat.image) ? (
                     <div className="flex items-center gap-3 text-left">
                       <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50">
-                        <Image src={cat.image_url || cat.image} alt={cat.name} fill className="object-cover" />
+                        <Image src={normalizeImageUrl(cat.image_url || cat.image)} alt={cat.name} fill className="object-cover" />
                       </div>
                       <span className="text-xs font-black uppercase tracking-tight">{cat.name}</span>
                     </div>

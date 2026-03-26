@@ -76,6 +76,14 @@ export default function AdminProductsPage() {
       setIsLoading(false);
     }
   }
+  
+  const normalizeImageUrl = (url: string) => {
+    if (!url) return "/logo.png";
+    if (url.startsWith("http") || url.startsWith("data:")) return url;
+    if (url.startsWith("/uploads/")) return url;
+    const prodUrl = "https://madur.in";
+    return url.startsWith("/") ? `${prodUrl}${url}` : `${prodUrl}/${url}`;
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -245,7 +253,7 @@ export default function AdminProductsPage() {
                       <div className="flex items-center gap-4">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm shrink-0 bg-accent/20">
                           {product.image_url ? (
-                            <Image src={product.image_url} alt={product.name} fill className="object-cover" unoptimized />
+                            <Image src={normalizeImageUrl(product.image_url)} alt={product.name} fill className="object-cover" unoptimized />
                           ) : (
                             <FontAwesomeIcon icon={faBox} className="absolute inset-0 m-auto text-gray-300" />
                           )}
@@ -332,8 +340,11 @@ export default function AdminProductsPage() {
                   <input 
                     type="number" required
                     className="w-full bg-accent/50 border-none rounded-2xl py-4 px-6 font-bold outline-none focus:ring-4 ring-primary/20"
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value)})}
+                    value={isNaN(formData.price) ? "" : formData.price}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      setFormData({...formData, price: isNaN(val) ? 0 : val});
+                    }}
                   />
                 </div>
                 <div className="space-y-2">

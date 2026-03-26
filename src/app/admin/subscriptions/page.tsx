@@ -52,7 +52,9 @@ export default function AdminSubscriptionsPage() {
     plan_details: "",
     status: "active",
     product_id: "",
-    quantity: 1
+    quantity: 1,
+    street: "",
+    location_link: ""
   });
   const [dairyProducts, setDairyProducts] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -144,7 +146,9 @@ export default function AdminSubscriptionsPage() {
         plan_details: "",
         status: "active",
         product_id: dairyProducts[0]?.id || "",
-        quantity: 1
+        quantity: 1,
+        street: "",
+        location_link: ""
       });
       fetchData();
     } catch (err) {
@@ -272,9 +276,11 @@ export default function AdminSubscriptionsPage() {
                           <Link href={`/admin/subscriptions/${sub.id}`} className="group/name flex flex-col">
                             <span className="font-black text-gray-800 text-sm uppercase tracking-tight group-hover/name:text-primary transition-colors">{sub.customer_name}</span>
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-primary font-black uppercase">{sub.quantity} {Array.isArray(sub.products) ? sub.products[0]?.unit : sub.products?.unit || 'L'}</span>
+                              <span className="text-[10px] text-primary font-black uppercase">
+                                {(sub.quantity ?? 1) >= 1 ? `${sub.quantity ?? 1} L` : `${Math.round((sub.quantity ?? 1) * 1000)} ml`}
+                              </span>
                               <span className="text-[10px] text-gray-400 font-bold uppercase">•</span>
-                              <span className="text-[10px] text-secondary font-black uppercase">{Array.isArray(sub.products) ? sub.products[0]?.name : sub.products?.name || sub.plan_details}</span>
+                              <span className="text-[10px] text-secondary font-black uppercase">Fresh Milk</span>
                             </div>
                             <span className="text-[10px] text-gray-400 font-bold uppercase">{sub.customer_phone}</span>
                           </Link>
@@ -356,30 +362,18 @@ export default function AdminSubscriptionsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Product</label>
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantity (Daily)</label>
                   <select
                     required
                     className="w-full bg-accent/50 rounded-2xl py-4 px-6 font-bold outline-none border-none focus:ring-4 ring-primary/20 appearance-none text-black"
-                    value={formData.product_id}
-                    onChange={e => setFormData({ ...formData, product_id: e.target.value })}
-                  >
-                    {(Array.isArray(dairyProducts) ? dairyProducts : []).map(p => (
-                      <option key={p.id} value={p.id}>{p.name} ({p.unit})</option>
-                    ))}
-                  </select>
-
-                </div>
-                <div>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Quantity (Daily)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    min="0.1"
-                    required
-                    className="w-full bg-accent/50 rounded-2xl py-4 px-6 font-bold outline-none border-none focus:ring-4 ring-primary/20 text-black"
                     value={formData.quantity}
                     onChange={e => setFormData({ ...formData, quantity: parseFloat(e.target.value) })}
-                  />
+                  >
+                    <option value="1">1 Litre</option>
+                    <option value="0.5">500 ml</option>
+                    <option value="1.5">1.5 Litres</option>
+                    <option value="2">2 Litres</option>
+                  </select>
                 </div>
               </div>
               <div>
@@ -389,6 +383,25 @@ export default function AdminSubscriptionsPage() {
                   className="w-full bg-accent/50 rounded-2xl py-4 px-6 font-bold outline-none border-none focus:ring-4 ring-primary/20 text-black"
                   value={formData.plan_details}
                   onChange={e => setFormData({ ...formData, plan_details: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Street / Landmark / House No.</label>
+                <input
+                  className="w-full bg-accent/50 rounded-2xl py-4 px-6 font-bold outline-none border-none focus:ring-4 ring-primary/20 text-black"
+                  placeholder="e.g. Near Hanuman Temple, Road No 1"
+                  value={formData.street}
+                  onChange={e => setFormData({ ...formData, street: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Location Link (Google Maps)</label>
+                <input
+                  type="url"
+                  className="w-full bg-accent/50 rounded-2xl py-4 px-6 font-bold outline-none border-none focus:ring-4 ring-primary/20 text-black"
+                  placeholder="https://maps.google.com/..."
+                  value={formData.location_link}
+                  onChange={e => setFormData({ ...formData, location_link: e.target.value })}
                 />
               </div>
               <div>

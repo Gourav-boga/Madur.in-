@@ -13,30 +13,78 @@ interface Product {
   image: string;
   unit: string;
   category: string;
+  image_url?: string;
 }
 
 interface QuantityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (quantity: number, selectedUnit: string) => void;
+  onConfirm: (quantity: number, selectedUnit: string, price: number) => void;
   product: Product;
 }
 
 export default function QuantityModal({ isOpen, onClose, onConfirm, product }: QuantityModalProps) {
+  const normalizeImageUrl = (url: string) => {
+    if (!url) return "/logo.png";
+    if (url.startsWith("http") || url.startsWith("data:")) return url;
+    if (url.startsWith("/uploads/")) return url;
+    const prodUrl = "https://madur.in";
+    return url.startsWith("/") ? `${prodUrl}${url}` : `${prodUrl}/${url}`;
+  };
+
   const [quantity, setQuantity] = useState(1);
-  const currentUnit = product.unit || "unit";
+  const currentUnit = product.unit || "1 unit";
+  
+  // Helper to parse unit string (e.g. "1kg" -> { value: 1000, unit: "g" })
+  const parseUnit = (unitStr: string) => {
+    const match = unitStr.toLowerCase().match(/(\d+)\s*(g|kg|ml|l|unit|grms)/);
+    if (!match) return { value: 1, unit: "unit" };
+    let value = parseInt(match[1]);
+    let unit = match[2];
+    
+    if (unit === "kg") {
+      value *= 1000;
+      unit = "g";
+    } else if (unit === "l") {
+      value *= 1000;
+      unit = "ml";
+    } else if (unit === "grms") {
+      unit = "g";
+    }
+    
+    return { value, unit };
+  };
+
+  const baseUnitInfo = parseUnit(currentUnit);
   const [selectedUnit, setSelectedUnit] = useState(currentUnit);
 
-  // Derive some common units based on category or default unit
-  const units = [currentUnit];
-  if (currentUnit.includes("kg") && !units.includes("500 g")) units.unshift("500 g");
-  if (currentUnit.includes("L") && !units.includes("500 ml")) units.unshift("500 ml");
+  // Derive available units based on type
+  const getAvailableUnits = () => {
+    if (baseUnitInfo.unit === "g") {
+      return ["250 g", "500 g", "1000 g"];
+    } else if (baseUnitInfo.unit === "ml") {
+      return ["500 ml", "1 L"];
+    }
+    return [currentUnit];
+  };
+
+  const units = getAvailableUnits();
+  
+  // Calculate price for selected unit
+  const calculatePrice = (unitStr: string) => {
+    const selectedInfo = parseUnit(unitStr);
+    if (baseUnitInfo.value === 0) return product.price;
+    const pricePerBase = product.price / baseUnitInfo.value;
+    return Math.round(pricePerBase * selectedInfo.value);
+  };
+
+  const currentTotalPrice = calculatePrice(selectedUnit);
   
   const handleIncrement = () => setQuantity((prev) => prev + 1);
   const handleDecrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
   const handleConfirm = () => {
-    onConfirm(quantity, selectedUnit);
+    onConfirm(quantity, selectedUnit, currentTotalPrice);
     onClose();
   };
 
@@ -75,10 +123,11 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
                   <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl md:rounded-2xl overflow-hidden bg-accent/20 border border-gray-100">
                     {product.image ? (
                       <Image
-                        src={product.image}
+                        src={normalizeImageUrl(product.image_url || product.image)}
                         alt={product.name || "Product"}
                         fill
                         className="object-cover"
+                        unoptimized
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
@@ -93,7 +142,7 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
                     <h3 className="text-xl font-black text-gray-800 leading-tight">
                       {product.name}
                     </h3>
-                    <p className="text-2xl font-black text-gray-900 mt-1">₹{product.price}</p>
+                    <p className="text-2xl font-black text-gray-900 mt-1">₹{Math.floor(currentTotalPrice)}</p>
                   </div>
                 </div>
 
@@ -101,7 +150,7 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
               </div>
 
               {/* Selection Content */}
-              <div className="p-8 pt-0 space-y-8">
+              <div className="p-8 pt-0 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
                 {/* Unit Selection */}
                 <div>
                   <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 block">

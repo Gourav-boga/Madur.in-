@@ -15,8 +15,15 @@ export async function GET(request: Request) {
     }
 
     query += ' ORDER BY created_at DESC';
-    const orders = await mysql.query(query, params);
-    return NextResponse.json(orders);
+    const orders = (await mysql.query(query, params)) as any[];
+    
+    // Parse the JSON string back to an array
+    const parsedOrders = orders.map(o => ({
+      ...o,
+      items: typeof o.items === 'string' ? JSON.parse(o.items || '[]') : o.items
+    }));
+
+    return NextResponse.json(parsedOrders);
   } catch (error) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }

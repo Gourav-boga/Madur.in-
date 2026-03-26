@@ -19,6 +19,13 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+
+  const normalizeImageUrl = (url: string) => {
+    if (!url) return "/logo.png";
+    if (url.startsWith("http")) return url;
+    const prodUrl = "https://madur.in";
+    return url.startsWith("/") ? `${prodUrl}${url}` : `${prodUrl}/${url}`;
+  };
   
   const [formData, setFormData] = useState({
     name: "",
@@ -151,7 +158,7 @@ export default function Home() {
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative overflow-hidden bg-gray-50">
                 {cat.image_url || cat.image ? (
-                  <Image src={cat.image_url || cat.image} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
+                  <Image src={normalizeImageUrl(cat.image_url || cat.image)} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100">
                     <FontAwesomeIcon icon={faBox} className="text-gray-200 text-4xl" />

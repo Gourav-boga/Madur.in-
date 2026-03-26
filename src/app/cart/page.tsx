@@ -94,7 +94,7 @@ export default function CartPage() {
                         </span>
                       )}
                     </h3>
-                    <p className="text-secondary font-black">₹{item.price}</p>
+                    <p className="text-secondary font-black">₹{Math.floor(item.price)}</p>
                   </div>
 
                   <div className="flex items-center justify-between md:justify-end gap-8">
@@ -115,7 +115,7 @@ export default function CartPage() {
                       </button>
                     </div>
 
-                    <p className="font-black text-lg hidden md:block">₹{item.price * item.quantity}</p>
+                    <p className="font-black text-lg hidden md:block">₹{Math.floor(item.price * item.quantity)}</p>
 
                     <button 
                       onClick={() => removeFromCart(item.id, item.selectedUnit)}
@@ -137,7 +137,7 @@ export default function CartPage() {
               <div className="flex flex-col gap-4 mb-8">
                 <div className="flex justify-between text-gray-500">
                   <span>Subtotal</span>
-                  <span className="font-bold text-gray-800">₹{cartTotal}</span>
+                  <span className="font-bold text-gray-800">₹{Math.floor(cartTotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Delivery Charge</span>
@@ -151,7 +151,7 @@ export default function CartPage() {
 
               <div className="flex justify-between items-center pt-6 border-t mb-10">
                 <span className="text-xl font-black">Total Payable</span>
-                <span className="text-3xl font-black text-secondary">₹{cartTotal}</span>
+                <span className="text-3xl font-black text-secondary">₹{Math.floor(cartTotal)}</span>
               </div>
 
               <div className="flex items-center gap-2 mb-6 justify-center bg-gray-50 py-3 rounded-xl border border-dashed border-gray-200">

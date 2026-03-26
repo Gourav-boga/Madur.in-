@@ -27,7 +27,18 @@ export default function ProductCard({ product }: { product: Product }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
   
-  const displayImage = product.image_url || product.image || "/logo.png";
+  const normalizeImageUrl = (url: string) => {
+    if (!url) return "/logo.png";
+    if (url.startsWith("http") || url.startsWith("data:")) return url;
+    
+    // If it's a local upload, use it directly
+    if (url.startsWith("/uploads/")) return url;
+    
+    const prodUrl = "https://madur.in";
+    return url.startsWith("/") ? `${prodUrl}${url}` : `${prodUrl}/${url}`;
+  };
+
+  const displayImage = normalizeImageUrl(product.image_url || product.image);
   const displayCategory = product.categories?.name || product.category || "General";
   const isOutOfStock = product.is_out_of_stock;
 
@@ -50,12 +61,13 @@ export default function ProductCard({ product }: { product: Product }) {
     setIsModalOpen(true);
   };
 
-  const handleAddToCart = (quantity: number, selectedUnit: string) => {
+  const handleAddToCart = (quantity: number, selectedUnit: string, price: number) => {
     if (isOutOfStock) return;
     addToCart({ 
       ...product, 
       quantity, 
       selectedUnit,
+      price, // Use the dynamically calculated price
       image: displayImage,
       category: displayCategory
     });
@@ -116,17 +128,17 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="pt-1.5 md:pt-3 px-0.5 border-t border-gray-50 flex items-center justify-between mt-auto">
           <div className="flex flex-col">
             <span className="hidden md:block text-[8px] font-bold text-gray-400 uppercase tracking-widest">Price</span>
-            <span className={`text-[12px] md:text-lg font-black leading-none ${isOutOfStock ? "text-gray-400" : "text-[#222222]"}`}>₹{product.price}</span>
+            <span className={`text-[12px] md:text-lg font-black leading-none ${isOutOfStock ? "text-gray-400" : "text-[#222222]"}`}>₹{Math.floor(product.price)}</span>
           </div>
           
           <button 
             onClick={handleOpenModal}
             disabled={isOutOfStock}
-            className={`font-black px-2 py-1.5 md:px-4 md:py-2.5 rounded-lg md:rounded-xl flex items-center gap-1 transition-all text-[8px] md:text-[10px] uppercase tracking-widest ${isOutOfStock ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-secondary hover:opacity-90 text-white active:scale-95"}`}
+            className={`font-black px-2 py-1.5 md:px-3 md:py-1.5 rounded-lg md:rounded-xl flex items-center gap-1 transition-all text-[8px] md:text-[9px] uppercase tracking-widest ${isOutOfStock ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-secondary hover:opacity-90 text-white active:scale-95"}`}
           >
             {isOutOfStock ? "SOLD" : (
               <>
-                Add <span className="text-[10px] md:text-sm">＋</span>
+                Add <span className="text-[10px] md:text-xs">＋</span>
               </>
             )}
           </button>
