@@ -87,12 +87,8 @@ export default function AccountPage() {
         if (subData && !subData.error && Array.isArray(subData) && subData.length > 0) {
           // Fetch deliveries for these subscriptions (last 30 days)
           const subIds = subData.map((s: any) => s.id).join(',');
-
-          const thirtyDaysAgo = new Date();
-          thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-          const dateStr = thirtyDaysAgo.toISOString().split('T')[0];
           
-          const delRes = await fetch(`/api/deliveries?subscription_ids=${subIds}&gte_date=${dateStr}`);
+          const delRes = await fetch(`/api/deliveries?subscription_ids=${subIds}`);
           const delData = await delRes.json();
 
           const enrichedSubs = subData.map((sub: any) => ({
@@ -272,11 +268,11 @@ export default function AccountPage() {
                           })}
                         </div>
                         
-                        {Array.isArray(sub.deliveries) && sub.deliveries.length > 7 && (
+                        {Array.isArray(sub.deliveries) && sub.deliveries.length > 0 && (
                           <div className="mt-6 pt-6 border-t border-gray-50">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Recent History</p>
-                            <div className="space-y-3 max-h-48 overflow-y-auto pr-2 scrollbar-hide">
-                              {sub.deliveries.slice(0, 30).map((del) => (
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Full Delivery History</p>
+                            <div className="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-hide">
+                              {sub.deliveries.map((del) => (
                                 <div key={del.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                                   <div className="flex items-center gap-3">
                                     <div className="w-2 h-2 rounded-full bg-secondary"></div>
