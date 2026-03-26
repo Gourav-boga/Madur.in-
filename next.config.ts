@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
         hostname: "madur.in",
       },
       {
+        protocol: "https",
+        hostname: "www.madur.in",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
       }
