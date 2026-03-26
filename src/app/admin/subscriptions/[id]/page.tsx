@@ -319,14 +319,10 @@ export default function SubscriberDetailsPage() {
                           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Days</p>
                        </div>
                     </div>
-                    <div className="mt-4 grid grid-cols-2 gap-4">
+                    <div className="mt-4 grid grid-cols-1">
                        <div className="bg-white p-4 rounded-2xl border border-gray-100 text-center">
                           <p className="text-2xl font-black text-primary">{Number(Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (Number(del.quantity) || Number(subscriber?.quantity) || 1), 0) : 0).toFixed(1)}</p>
                           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Total {subscriber?.products?.unit || 'L'} Delivered</p>
-                       </div>
-                       <div className="bg-white p-4 rounded-2xl border border-gray-100 text-center">
-                          <p className="text-2xl font-black text-secondary">₹{Number((Array.isArray(deliveries) ? deliveries.reduce((acc, del) => acc + (Number(del.quantity) || Number(subscriber?.quantity) || 1), 0) : 0) * (Number(subscriber?.products?.price) || 0)).toFixed(0)}</p>
-                          <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Est. Total Value</p>
                        </div>
                     </div>
                  </div>
