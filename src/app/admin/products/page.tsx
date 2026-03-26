@@ -339,8 +339,12 @@ export default function AdminProductsPage() {
                   <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Price (₹)</label>
                   <input 
                     type="number" required
+                    min="0"
+                    step="0.01"
                     className="w-full bg-accent/50 border-none rounded-2xl py-4 px-6 font-bold outline-none focus:ring-4 ring-primary/20"
-                    value={isNaN(formData.price) ? "" : formData.price}
+                    value={formData.price === 0 ? "" : formData.price}
+                    placeholder="0"
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => {
                       const val = parseFloat(e.target.value);
                       setFormData({...formData, price: isNaN(val) ? 0 : val});
