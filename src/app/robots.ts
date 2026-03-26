@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin', '/account', '/api'],
     },
-    sitemap: 'https://madur.in/sitemap.xml',
+    sitemap: 'https://www.madur.in/sitemap.xml',
   }
 }

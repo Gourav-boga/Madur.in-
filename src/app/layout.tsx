@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 import ClientLayout from "@/components/layout/ClientLayout";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://madur.in"),
+  metadataBase: new URL("https://www.madur.in"),
   title: {
     default: "MADUR.IN | Farm Fresh Grocery & Dairy Delivery",
     template: "%s | MADUR.IN",

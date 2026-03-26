@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "MADUR.IN | Farm Fresh Grocery & Dairy Delivery in Hyderabad",
   description: "Get 100% natural, farm-fresh milk, vegetables, and groceries delivered to your doorstep in Hyderabad. Quality dairy and organic produce from Madur.in.",
   alternates: {
-    canonical: "https://madur.in",
+    canonical: "https://www.madur.in",
   },
 };
 
