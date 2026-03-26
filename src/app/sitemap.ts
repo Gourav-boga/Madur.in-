@@ -1,4 +1,6 @@
 import { MetadataRoute } from 'next'
+import { query } from '@/lib/mysql'
+import { categories as staticCategories } from '@/lib/data'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.madur.in';
@@ -20,22 +22,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === '' ? 1 : 0.8,
   }));
 
-  // Fetch categories for dynamic routes
+  // Fetch categories from DB for dynamic routes
   let categoryRoutes: MetadataRoute.Sitemap = [];
   try {
-    const response = await fetch(`${baseUrl}/api/categories`);
-    const categories = await response.json();
+    const categories = await query('SELECT name FROM categories');
     
-    if (Array.isArray(categories)) {
-      categoryRoutes = categories.map((cat) => ({
-        url: `${baseUrl}/products?category=${encodeURIComponent(cat.name)}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.6,
-      }));
-    }
+    const displayCategories = (Array.isArray(categories) && categories.length > 0) 
+      ? categories 
+      : staticCategories;
+
+    categoryRoutes = displayCategories.map((cat: any) => ({
+      url: `${baseUrl}/products?category=${encodeURIComponent(cat.name)}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }));
   } catch (error) {
-    console.error('Sitemap: Failed to fetch categories', error);
+    console.error('Sitemap: DB query failed, using static categories', error);
+    categoryRoutes = staticCategories.map((cat: any) => ({
+      url: `${baseUrl}/products?category=${encodeURIComponent(cat.name)}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    }));
   }
 
   return [...staticRoutes, ...categoryRoutes];
