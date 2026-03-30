@@ -24,10 +24,10 @@ export default function HomeBanners() {
           <div className="w-56 h-56 md:w-72 md:h-72 relative flex-shrink-0 animate-bounce-slow">
              <Image 
               src="/home/subscription-milk-eggs.png"
-              alt="Subscription Plans"
+              alt="Subscription packages"
               fill
-              className="object-contain"
-              priority
+              className="object-cover group-hover:scale-105 transition-transform duration-700"
+              sizes="(max-width: 768px) 100vw, 800px"
             />
           </div>
         </div>

@@ -63,12 +63,15 @@ export default function AccountPage() {
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
+    
     async function fetchUserData() {
       try {
-        const sessionRes = await fetch("/api/auth/session");
+        const sessionRes = await fetch("/api/auth/session", { signal: controller.signal });
+        if (!sessionRes.ok) throw new Error("Session check failed");
         const session = await sessionRes.json();
         
-        if (!session) {
+        if (!session || !session.user) {
           router.push("/login");
           return;
         }
@@ -76,39 +79,49 @@ export default function AccountPage() {
         setUser(session.user);
 
         // Fetch user's orders
-        const orderRes = await fetch(`/api/orders?email=${session.user.email}`);
-        const orderData = await orderRes.json();
-        if (orderData && !orderData.error) setOrders(orderData);
-
-        // Fetch user's subscriptions
-        const subRes = await fetch(`/api/subscriptions?email=${session.user.email}`);
-        const subData = await subRes.json();
-
-        if (subData && !subData.error && Array.isArray(subData) && subData.length > 0) {
-          // Fetch deliveries for these subscriptions (last 30 days)
-          const subIds = subData.map((s: any) => s.id).join(',');
-          
-          const delRes = await fetch(`/api/deliveries?subscription_ids=${subIds}`);
-          const delData = await delRes.json();
-
-          const enrichedSubs = subData.map((sub: any) => ({
-            ...sub,
-            deliveries: Array.isArray(delData) ? delData.filter((d: any) => d.subscription_id === sub.id) : []
-          }));
-          
-          setSubscriptions(enrichedSubs);
-        } else {
-          setSubscriptions([]);
+        const orderRes = await fetch(`/api/orders?email=${encodeURIComponent(session.user.email)}`, { signal: controller.signal });
+        if (orderRes.ok) {
+          const orderData = await orderRes.json();
+          if (Array.isArray(orderData)) setOrders(orderData);
         }
 
-      } catch (err) {
-        console.error("Error fetching session:", err);
+        // Fetch user's subscriptions
+        const subRes = await fetch(`/api/subscriptions?email=${encodeURIComponent(session.user.email)}`, { signal: controller.signal });
+        if (subRes.ok) {
+          const subData = await subRes.json();
+
+          if (Array.isArray(subData) && subData.length > 0) {
+            // Fetch deliveries for these subscriptions
+            const subIds = subData.map((s: any) => s.id).join(',');
+            
+            const delRes = await fetch(`/api/deliveries?subscription_ids=${subIds}`, { signal: controller.signal });
+            if (delRes.ok) {
+              const delData = await delRes.json();
+              const enrichedSubs = subData.map((sub: any) => ({
+                ...sub,
+                deliveries: Array.isArray(delData) ? delData.filter((d: any) => d.subscription_id === sub.id) : []
+              }));
+              setSubscriptions(enrichedSubs);
+            } else {
+              setSubscriptions(subData.map(s => ({ ...s, deliveries: [] })));
+            }
+          } else {
+            setSubscriptions([]);
+          }
+        }
+
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          console.error("Account Dashboard Error:", err);
+        }
       } finally {
         setIsLoading(false);
       }
     }
 
     fetchUserData();
+    
+    return () => controller.abort();
   }, [router]);
 
   const handleSignOut = async () => {

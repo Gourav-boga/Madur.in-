@@ -11,6 +11,7 @@ import { googleLoginAction } from "@/lib/actions/google-auth";
 declare global {
   interface Window {
     google: any;
+    google_initialized?: boolean;
   }
 }
 
@@ -47,20 +48,27 @@ export default function LoginPage() {
     document.body.appendChild(script);
 
     script.onload = () => {
-      if (window.google) {
+      if (window.google && !window.google_initialized) {
+        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+        if (!clientId) console.warn("Google Client ID is missing in .env!");
+        
         window.google.accounts.id.initialize({
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
+          client_id: clientId,
           callback: handleGoogleCallback,
           auto_select: false,
           cancel_on_tap_outside: true,
         });
+        window.google_initialized = true;
 
         const googleBtnGroup = document.getElementById("googleBtnGroup");
         if (googleBtnGroup) {
+          // Detect actual width of the container or use a safe mobile default
+          const containerWidth = googleBtnGroup.offsetWidth || 300;
+          
           window.google.accounts.id.renderButton(googleBtnGroup, {
             theme: "outline",
             size: "large",
-            width: "100%",
+            width: Math.min(containerWidth, 400), 
             text: "continue_with",
             shape: "pill",
           });
@@ -69,12 +77,12 @@ export default function LoginPage() {
     };
 
     return () => {
-      // Safe cleanup - check if script parent exists
       if (script.parentNode) {
         document.body.removeChild(script);
       }
+      // Keep initialized flag true globally to avoid re-init error if script re-injects
     };
-  }, [handleGoogleCallback]);
+  }, [handleGoogleCallback, step]); // Re-run if step changes to ensure button container exists
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -228,7 +236,9 @@ export default function LoginPage() {
                 <div className="flex-1 h-px bg-gray-100"></div>
               </div>
               
-              <div id="googleBtnGroup" className="w-full h-11"></div>
+              <div className="flex items-center justify-center min-h-[44px]">
+                <div id="googleBtnGroup" className="w-[280px] sm:w-[350px]"></div>
+              </div>
             </div>
 
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">

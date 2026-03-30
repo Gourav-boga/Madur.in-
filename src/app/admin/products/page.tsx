@@ -54,8 +54,8 @@ export default function AdminProductsPage() {
     setIsLoading(true);
     try {
       const [catRes, prodRes] = await Promise.all([
-        fetch("/api/categories"),
-        fetch("/api/products")
+        fetch("/api/categoryList"),
+        fetch("/api/productList")
       ]);
       
       const catData = await catRes.json();
@@ -130,7 +130,7 @@ export default function AdminProductsPage() {
         id: editingProduct?.id 
       };
       
-      const response = await fetch("/api/products", {
+      const response = await fetch("/api/productList", {
         method: editingProduct ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -153,7 +153,7 @@ export default function AdminProductsPage() {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this product?")) {
       try {
-        const response = await fetch(`/api/products?id=${id}`, {
+        const response = await fetch(`/api/productList?id=${id}`, {
           method: "DELETE"
         });
         if (!response.ok) throw new Error("Failed to delete");

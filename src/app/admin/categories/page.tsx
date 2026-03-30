@@ -36,7 +36,7 @@ export default function AdminCategoriesPage() {
   async function fetchCategories() {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/categories");
+      const res = await fetch("/api/categoryList");
       const data = await res.json();
       setCategories(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -88,7 +88,7 @@ export default function AdminCategoriesPage() {
         id: editingCategory?.id 
       };
       
-      const response = await fetch("/api/categories", {
+      const response = await fetch("/api/categoryList", {
         method: editingCategory ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -114,7 +114,7 @@ export default function AdminCategoriesPage() {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure? This will affect products in this category.")) {
       try {
-        const response = await fetch(`/api/categories?id=${id}`, {
+        const response = await fetch(`/api/categoryList?id=${id}`, {
           method: "DELETE"
         });
         if (!response.ok) {

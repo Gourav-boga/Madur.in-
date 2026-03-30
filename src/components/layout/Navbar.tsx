@@ -29,21 +29,25 @@ export default function Navbar() {
   const { cartCount } = useCart();
 
   useEffect(() => {
+    const controller = new AbortController();
+    
     // Check active session via our API
     async function checkSession() {
       try {
-        const res = await fetch("/api/auth/session");
+        const res = await fetch("/api/auth/session", { signal: controller.signal });
+        if (!res.ok) throw new Error("Session failed");
         const session = await res.json();
         setUser(session?.user || null);
-      } catch (err) {
-        setUser(null);
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          setUser(null);
+        }
       }
     }
     
     checkSession();
     
-    // We can't easily listen for events with custom cookies without a complex setup,
-    // so we rely on router.refresh() from other components to trigger a re-render if needed.
+    return () => controller.abort();
   }, [pathname]); // Check on every navigation
 
   const handleSearch = (e: React.FormEvent) => {
@@ -91,8 +95,10 @@ export default function Navbar() {
               alt="MADUR.IN Logo" 
               width={350}
               height={120}
+              sizes="(max-width: 768px) 150px, 350px"
               className="h-44 md:h-44 w-auto object-contain select-none mix-blend-multiply"
               priority
+              loading="eager"
             />
           </Link>
         </div>

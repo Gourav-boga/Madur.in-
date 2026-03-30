@@ -18,6 +18,8 @@ export default function Loading() {
             alt="MADUR.IN Logo" 
             fill 
             className="object-contain animate-pulse"
+            priority
+            sizes="150px"
           />
         </div>
         <p className="text-xs font-bold text-gray-400 uppercase tracking-[1em] pl-[1em]">

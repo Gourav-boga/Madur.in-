@@ -46,7 +46,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
         if (settings.subscription_fee) setSubscriptionAmount(parseInt(settings.subscription_fee));
   
         // 2. Fetch Milk Products (via API)
-        const productsRes = await fetch("/api/products?category=Milk%20&%20Dairy");
+        const productsRes = await fetch("/api/productList?category=Milk%20&%20Dairy");
         const prods = await productsRes.json();
         
         setDairyProducts(prods || []);

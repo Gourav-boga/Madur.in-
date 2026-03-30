@@ -31,7 +31,7 @@ export default function AdminHeroPage() {
   async function fetchImages() {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/hero");
+      const res = await fetch("/api/heroSlides");
       const data = await res.json();
       setImages(Array.isArray(data) ? data : []);
 
@@ -61,7 +61,7 @@ export default function AdminHeroPage() {
       const { publicUrl } = await response.json();
 
       // Add to MySQL
-      const dbRes = await fetch("/api/hero", {
+      const dbRes = await fetch("/api/heroSlides", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image_url: publicUrl })
@@ -90,7 +90,7 @@ export default function AdminHeroPage() {
       ];
 
       for (const url of defaults) {
-        await fetch("/api/hero", {
+        await fetch("/api/heroSlides", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ image_url: url })
@@ -113,7 +113,7 @@ export default function AdminHeroPage() {
     }
     if (confirm("Delete this hero banner?")) {
       try {
-        const response = await fetch(`/api/hero?id=${id}`, {
+        const response = await fetch(`/api/heroSlides?id=${id}`, {
           method: "DELETE"
         });
         if (!response.ok) throw new Error("Failed to delete");

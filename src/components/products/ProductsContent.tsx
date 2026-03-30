@@ -29,8 +29,8 @@ function Content() {
       setIsLoading(true);
       try {
         const [catRes, prodRes] = await Promise.all([
-          fetch("/api/categories"),
-          fetch("/api/products")
+          fetch("/api/categoryList"),
+          fetch("/api/productList")
         ]);
         
         const catData = await catRes.json();

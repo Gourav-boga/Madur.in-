@@ -13,13 +13,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="flex flex-col items-start">
-            <Link href="/" className="inline-block mb-6">
+            <Link href="/" className="inline-block mb-6 relative w-[250px] h-[80px] md:h-[128px]">
               <Image 
                 src="/madur-logo-2026.png" 
                 alt="MADUR.IN Logo" 
-                width={250} 
-                height={80} 
-                className="h-24 md:h-32 w-auto object-contain mix-blend-multiply"
+                fill 
+                className="object-contain select-none mix-blend-multiply"
+                sizes="(max-width: 768px) 250px, 200px"
               />
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed mb-6">

@@ -22,7 +22,7 @@ export default function Hero() {
   useEffect(() => {
     async function fetchHeroImages() {
       try {
-        const res = await fetch("/api/hero");
+        const res = await fetch("/api/heroSlides");
         if (!res.ok) throw new Error("API Failed");
         const data = await res.json();
         
@@ -83,7 +83,7 @@ export default function Hero() {
                   fill 
                   className="object-cover object-center sm:object-[center_20%]"
                   priority={index === 0}
-                  unoptimized
+                  sizes="(max-width: 768px) 100vw, 1200px"
                 />
                 {/* Dark Overlay - slightly softened */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent"></div>

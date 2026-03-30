@@ -32,12 +32,14 @@ export default function HomeContent() {
   const [reviews, setReviews] = useState<any[]>([]);
 
   useEffect(() => {
+    const controller = new AbortController();
+    
     async function fetchData() {
       setIsLoading(true);
       try {
         const [catRes, prodRes] = await Promise.all([
-          fetch("/api/categories"),
-          fetch("/api/products?limit=8")
+          fetch("/api/categoryList", { signal: controller.signal }),
+          fetch("/api/productList?limit=8", { signal: controller.signal })
         ]);
         
         const catData = await catRes.json();
@@ -46,7 +48,7 @@ export default function HomeContent() {
         setCategories(Array.isArray(catData) ? catData : []);
         setProducts(Array.isArray(prodData) ? prodData : []);
 
-        const revRes = await fetch("/api/reviews");
+        const revRes = await fetch("/api/reviews", { signal: controller.signal });
         const revData = await revRes.json();
         if (revData && !revData.error) {
           setReviews(Array.isArray(revData) ? revData : []);
@@ -55,13 +57,17 @@ export default function HomeContent() {
           setReviews([]);
         }
 
-      } catch (err) {
-        console.error("Failed to fetch data:", err);
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          console.error("Failed to fetch data:", err);
+        }
       } finally {
         setIsLoading(false);
       }
     }
     fetchData();
+    
+    return () => controller.abort();
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -154,7 +160,13 @@ export default function HomeContent() {
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative overflow-hidden bg-gray-50">
                 {cat.image_url || cat.image ? (
-                  <Image src={normalizeImageUrl(cat.image_url || cat.image)} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
+                  <Image 
+                    src={normalizeImageUrl(cat.image_url || cat.image)} 
+                    alt={cat.name} 
+                    fill 
+                    className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100">
                     <FontAwesomeIcon icon={faBox} className="text-gray-200 text-4xl" />
@@ -179,6 +191,7 @@ export default function HomeContent() {
               src="/hero-banner.png"
               alt="Farm fresh journey"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>

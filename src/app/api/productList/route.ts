@@ -30,8 +30,11 @@ export async function GET(request: Request) {
     sql += ` ORDER BY p.created_at DESC`;
 
     if (limit) {
-      sql += ` LIMIT ?`;
-      params.push(parseInt(limit));
+      const parsedLimit = parseInt(limit);
+      if (!isNaN(parsedLimit) && parsedLimit > 0) {
+        sql += ` LIMIT ?`;
+        params.push(parsedLimit);
+      }
     }
 
     const products = await mysql.query(sql, params);

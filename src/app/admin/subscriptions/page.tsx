@@ -73,7 +73,7 @@ export default function AdminSubscriptionsPage() {
     setIsLoading(true);
     try {
       // 1. Fetch Products
-      const prodRes = await fetch("/api/products");
+      const prodRes = await fetch("/api/productList");
       const prodData = await prodRes.json();
       setDairyProducts(Array.isArray(prodData) ? prodData : []);
       if (Array.isArray(prodData) && prodData.length > 0 && !formData.product_id) {

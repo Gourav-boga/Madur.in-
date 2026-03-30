@@ -1,24 +1,30 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  trailingSlash: false,
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'no-referrer-when-downgrade',
+          },
+        ],
+      },
+    ];
+  },
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "tfpondyiyfjwtbwexedp.supabase.co",
-      },
-      {
-        protocol: "https",
-        hostname: "madur.in",
-      },
-      {
-        protocol: "https",
-        hostname: "www.madur.in",
+        hostname: "**",
       },
       {
         protocol: "http",

@@ -104,6 +104,7 @@ export default function SplashScreen({ onComplete }: { onComplete?: () => void }
                   fill 
                   className="object-contain"
                   priority
+                  sizes="150px"
                 />
               </motion.div>
             </motion.div>

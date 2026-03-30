@@ -39,7 +39,7 @@ export default function AdminInventoryPage() {
     setIsLoading(true);
     try {
       // 1. Fetch Products
-      const prodRes = await fetch("/api/products");
+      const prodRes = await fetch("/api/productList");
       const productsList = await prodRes.json();
 
       // 2. Fetch active subscriptions
