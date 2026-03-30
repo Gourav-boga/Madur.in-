@@ -77,12 +77,10 @@ export default function LoginPage() {
     };
 
     return () => {
-      if (script.parentNode) {
-        document.body.removeChild(script);
-      }
-      // Keep initialized flag true globally to avoid re-init error if script re-injects
+      // Keep script and window.google alive for faster re-login
     };
-  }, [handleGoogleCallback, step]); // Re-run if step changes to ensure button container exists
+  }, [handleGoogleCallback, step]); 
+
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();

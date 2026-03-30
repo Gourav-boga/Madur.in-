@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'no-referrer-when-downgrade',
           },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'cross-origin',
+          },
         ],
       },
     ];
