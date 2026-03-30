@@ -39,19 +39,31 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  useEffect(() => {
-    // 1. Google Identity Services Setup
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
+  const renderGoogleButton = useCallback(() => {
+    const googleBtnGroup = document.getElementById("googleBtnGroup");
+    if (!googleBtnGroup || !window.google) return;
+    
+    // Clear any previous button render
+    googleBtnGroup.innerHTML = "";
+    
+    const containerWidth = googleBtnGroup.offsetWidth || 280;
+    window.google.accounts.id.renderButton(googleBtnGroup, {
+      theme: "outline",
+      size: "large",
+      width: Math.min(containerWidth, 400),
+      text: "continue_with",
+      shape: "pill",
+    });
+  }, []);
 
-    script.onload = () => {
-      if (window.google && !window.google_initialized) {
-        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
-        if (!clientId) console.warn("Google Client ID is missing in .env!");
-        
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+    if (!clientId) console.warn("Google Client ID is missing in .env!");
+
+    const initializeGoogle = () => {
+      if (!window.google) return;
+
+      if (!window.google_initialized) {
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleGoogleCallback,
@@ -59,27 +71,35 @@ export default function LoginPage() {
           cancel_on_tap_outside: true,
         });
         window.google_initialized = true;
-
-        const googleBtnGroup = document.getElementById("googleBtnGroup");
-        if (googleBtnGroup) {
-          // Detect actual width of the container or use a safe mobile default
-          const containerWidth = googleBtnGroup.offsetWidth || 300;
-          
-          window.google.accounts.id.renderButton(googleBtnGroup, {
-            theme: "outline",
-            size: "large",
-            width: Math.min(containerWidth, 400), 
-            text: "continue_with",
-            shape: "pill",
-          });
-        }
       }
+
+      // Small delay to ensure DOM element is painted
+      setTimeout(renderGoogleButton, 100);
     };
+
+    // If Google is already loaded (e.g. user came back after logout), use it directly
+    if (window.google) {
+      initializeGoogle();
+    } else {
+      // Otherwise inject the script
+      const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+      if (!existingScript) {
+        const script = document.createElement("script");
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+        script.onload = initializeGoogle;
+        document.body.appendChild(script);
+      } else {
+        // Script tag exists but window.google not ready yet, wait
+        existingScript.addEventListener("load", initializeGoogle);
+      }
+    }
 
     return () => {
-      // Keep script and window.google alive for faster re-login
+      // Keep script alive for fast re-login
     };
-  }, [handleGoogleCallback, step]); 
+  }, [handleGoogleCallback, renderGoogleButton, step]);
 
 
   const handleSendOtp = async (e: React.FormEvent) => {
