@@ -20,8 +20,8 @@ export default function HomeContent() {
   const normalizeImageUrl = (url: string) => {
     if (!url) return "/logo.png";
     if (url.startsWith("http")) return url;
-    const prodUrl = "https://madur.in";
-    return url.startsWith("/") ? `${prodUrl}${url}` : `${prodUrl}/${url}`;
+    // Use relative paths to avoid origin mismatch issues (e.g. www vs non-www)
+    return url.startsWith("/") ? url : `/${url}`;
   };
   
   const [formData, setFormData] = useState({
@@ -38,12 +38,12 @@ export default function HomeContent() {
       setIsLoading(true);
       try {
         const [catRes, prodRes] = await Promise.all([
-          fetch("/api/categoryList", { signal: controller.signal }),
-          fetch("/api/productList?limit=8", { signal: controller.signal })
+          fetch("/api/categoryList", { signal: controller.signal, cache: "no-store", headers: { "Accept": "application/json" } }),
+          fetch("/api/productList?limit=8", { signal: controller.signal, cache: "no-store", headers: { "Accept": "application/json" } })
         ]);
         
-        const catData = await catRes.json();
-        const prodData = await prodRes.json();
+        const catData = catRes.ok ? await catRes.json() : [];
+        const prodData = prodRes.ok ? await prodRes.json() : [];
         
         setCategories(Array.isArray(catData) ? catData : []);
         setProducts(Array.isArray(prodData) ? prodData : []);

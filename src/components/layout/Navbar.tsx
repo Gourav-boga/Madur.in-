@@ -34,7 +34,13 @@ export default function Navbar() {
     // Check active session via our API
     async function checkSession() {
       try {
-        const res = await fetch("/api/auth/session", { signal: controller.signal });
+        const res = await fetch("/api/auth/session", { 
+          signal: controller.signal,
+          cache: "no-store", // Prevent browser from caching redirect loops
+          headers: {
+            "Accept": "application/json"
+          }
+        });
         if (!res.ok) throw new Error("Session failed");
         const session = await res.json();
         setUser(session?.user || null);

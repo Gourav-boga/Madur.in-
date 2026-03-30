@@ -13,7 +13,10 @@ export default function ServicesPage() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch("/api/categoryList");
+        const res = await fetch("/api/categoryList", { 
+          cache: "no-store",
+          headers: { "Accept": "application/json" }
+        });
         const data = await res.json();
         setCategories(Array.isArray(data) ? data : []);
       } catch (err) {

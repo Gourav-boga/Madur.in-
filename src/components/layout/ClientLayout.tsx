@@ -50,7 +50,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         {showContent && (
           <div className="animate-in fade-in duration-700">
             <Navbar />
-            <main className={`min-h-screen ${isHome ? "pt-[180px] md:pt-[190px]" : "pt-[150px] md:pt-[100px]"}`}>
+            <main className={`min-h-screen ${isHome ? "pt-[180px] md:pt-[190px]" : "pt-[180px] md:pt-[190px]"}`}>
               {children}
             </main>
             <Footer />

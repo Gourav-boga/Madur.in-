@@ -67,7 +67,11 @@ export default function AccountPage() {
     
     async function fetchUserData() {
       try {
-        const sessionRes = await fetch("/api/auth/session", { signal: controller.signal });
+        const sessionRes = await fetch("/api/auth/session", { 
+          signal: controller.signal,
+          cache: "no-store",
+          headers: { "Accept": "application/json" }
+        });
         if (!sessionRes.ok) throw new Error("Session check failed");
         const session = await sessionRes.json();
         
@@ -79,7 +83,10 @@ export default function AccountPage() {
         setUser(session.user);
 
         // Fetch user's orders
-        const orderRes = await fetch(`/api/orders?email=${encodeURIComponent(session.user.email)}`, { signal: controller.signal });
+        const orderRes = await fetch(`/api/orders?email=${encodeURIComponent(session.user.email)}`, { 
+          signal: controller.signal,
+          cache: "no-store" 
+        });
         if (orderRes.ok) {
           const orderData = await orderRes.json();
           if (Array.isArray(orderData)) setOrders(orderData);
