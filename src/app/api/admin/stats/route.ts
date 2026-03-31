@@ -8,12 +8,7 @@ export async function GET(request: Request) {
   try {
     console.log('Fetching dashboard stats...');
     
-    // Self-healing: Ensure payment_status column exists in orders table
-    try {
-      await mysql.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50) DEFAULT 'unpaid'`);
-    } catch (e) {
-      // Ignore if table doesn't exist yet or other DB specific ignore logic
-    }
+    // Stats fetched via standard MySQL queries
 
     // 1. Product Count
     const prodResults: any = await mysql.query('SELECT COUNT(*) as count FROM products');
@@ -95,10 +90,11 @@ export async function GET(request: Request) {
       recentOrders
     });
   } catch (error: any) {
-    console.error('Stats Error:', error);
+    console.error('Stats API Error @ [GET /api/admin/stats]:', error);
     return NextResponse.json({ 
       error: 'Failed to fetch stats', 
-      details: error.message || String(error)
+      details: error.message || String(error),
+      errorCode: error.code || 'UNKNOWN'
     }, { status: 500 });
   }
 }

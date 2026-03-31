@@ -36,7 +36,11 @@ export default function AdminDashboard() {
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      const res = await fetch("/api/admin/stats");
+      const res = await fetch(`${window.location.origin}/api/admin/stats`, {
+        cache: "no-store",
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       
       if (data.error) {
@@ -66,7 +70,11 @@ export default function AdminDashboard() {
   const checkCustomRevenue = async () => {
     setIsCheckingCustom(true);
     try {
-      const res = await fetch(`/api/admin/stats?date=${selectedDate}`);
+      const res = await fetch(`${window.location.origin}/api/admin/stats?date=${selectedDate}`, {
+        cache: "no-store",
+        headers: { "Accept": "application/json" }
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
       const data = await res.json();
       setCustomRevenue(data.customRevenue || 0);
     } catch (err) {
