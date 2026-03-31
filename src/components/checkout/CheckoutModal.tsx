@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faCheckCircle, faShippingFast, faCreditCard, faTruck, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import { placeOrderAction } from "@/lib/actions/orders";
+import { formatOrderWhatsAppMessage, sendWhatsAppNotification } from "@/lib/whatsappUtil";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 
@@ -23,6 +24,8 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
   // New user detail fields
   const [customerName, setCustomerName] = useState("");
@@ -82,12 +85,24 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     );
   };
 
-  const sendWhatsAppNotification = (orderId: string) => {
-    const itemDetails = cart.map(item => `- ${item.name} (${item.selectedUnit || (item as any).unit || ""}) x ${item.quantity} = ₹${Math.floor(item.price * item.quantity)}`).join('\n');
-    const message = `*NEW ORDER PLACED!* 🛍️\n\n*Order ID:* #${orderId}\n\n*Customer Details:*\n- Name: ${customerName}\n- Phone: ${customerPhone}\n- Email: ${customerEmail}\n\n*Delivery Address:*\n${address}\n\n*Location:* ${locationLink || 'Not provided'}\n\n*Items:*\n${itemDetails}\n\n*Total Amount:* ₹${Math.floor(cartTotal)}\n*Payment Method:* ${paymentMethod}\n\nThank you for shopping with MADUR.IN!`;
+  const handleSendWhatsAppNotification = (orderId: string) => {
+    const customerData = {
+      name: customerName,
+      phone: customerPhone,
+      email: customerEmail,
+      address: address,
+      location: locationLink
+    };
     
-    const url = `https://wa.me/${businessWhatsApp}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    const items = cart.map(item => ({
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+      selectedUnit: item.selectedUnit || (item as any).unit
+    }));
+
+    const message = formatOrderWhatsAppMessage(orderId, customerData, items, cartTotal, paymentMethod);
+    sendWhatsAppNotification(message);
   };
 
   const handleOnlinePayment = async (internalOrderId: string) => {
@@ -124,14 +139,10 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           
           const verifyData = await verifyRes.json();
           if (verifyData.success) {
-            sendWhatsAppNotification(internalOrderId);
+            setPlacedOrderId(internalOrderId);
             setIsSuccess(true);
             clearCart();
-            setTimeout(() => {
-              onClose();
-              router.push("/account");
-              router.refresh();
-            }, 3000);
+            // We don't auto-redirect anymore to give time to click WhatsApp
           } else {
             setError("Payment verification failed. Please contact support.");
           }
@@ -194,14 +205,9 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       if (paymentMethod === "Online Payment") {
         await handleOnlinePayment(result.orderId!);
       } else {
-        sendWhatsAppNotification(result.orderId!);
+        setPlacedOrderId(result.orderId!);
         setIsSuccess(true);
         clearCart();
-        setTimeout(() => {
-          onClose();
-          router.push("/account");
-          router.refresh();
-        }, 3000);
         setIsLoading(false);
       }
     } else {
@@ -218,9 +224,29 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             <FontAwesomeIcon icon={faCheckCircle} className="text-5xl" />
           </div>
           <h2 className="text-3xl font-black text-gray-800 mb-3 tracking-tighter">Order Successfully Placed!</h2>
-          <p className="text-gray-500 font-bold mb-4">Your fresh products are booked and confirmed.</p>
-          <div className="flex flex-col gap-2">
-            <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest animate-pulse">Redirecting to Dashboard...</p>
+          <p className="text-gray-500 font-bold mb-8">Your fresh products are booked and confirmed.</p>
+          
+          <div className="flex flex-col gap-4">
+            <button 
+              onClick={() => handleSendWhatsAppNotification(placedOrderId || "")}
+              className="w-full bg-[#25D366] text-white font-black py-5 rounded-2xl shadow-xl hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-3 text-sm uppercase tracking-widest"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 448 512"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-5.5-2.8-23.4-8.6-44.5-27.4-16.4-14.6-27.5-32.8-30.7-38.4-3.2-5.5-.3-8.5 2.5-11.2 2.5-2.5 5.5-6.5 8.3-9.7 2.8-3.3 3.8-5.7 5.7-9.4 1.9-3.7 1-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.8 23.5 9.2 31.5 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.5 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
+              Confirm on WhatsApp
+            </button>
+            <button 
+              onClick={() => {
+                setIsRedirecting(true);
+                setTimeout(() => {
+                  onClose();
+                  router.push("/account");
+                  router.refresh();
+                }, 500);
+              }}
+              className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em] hover:text-primary transition-colors"
+            >
+              {isRedirecting ? "Redirecting..." : "Skip to Dashboard"}
+            </button>
           </div>
         </div>
       </div>

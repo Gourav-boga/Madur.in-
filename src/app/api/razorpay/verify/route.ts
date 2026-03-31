@@ -25,21 +25,37 @@ export async function POST(req: NextRequest) {
     if (isAuthentic) {
       try {
         if (type === 'subscription') {
-          try {
-            await mysql.query(`ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS razorpay_payment_id VARCHAR(255)`);
-            await mysql.query(`ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS amount_paid DECIMAL(10, 2)`);
-          } catch(e) {}
+          // Join with existing subscription data to send notification
+          const sub = await mysql.getOne('subscriptions', 'id', order_id);
+          const subData = {
+              ...sub,
+              customer_name: sub?.customer_name,
+              customer_phone: sub?.customer_phone,
+              address: sub?.address,
+              amount: amount || sub?.amount_paid
+          };
 
           await mysql.update('subscriptions', { 
             status: 'active',
             razorpay_payment_id: razorpay_payment_id,
            ...(amount && { amount_paid: amount })
           }, 'id', order_id);
+
+          try {
+             const { sendAdminOrderNotification } = await import("@/lib/emailUtil");
+             await sendAdminOrderNotification(order_id, 'subscription', subData);
+          } catch(e) {}
         } else {
+          const order = await mysql.getOne('orders', 'id', order_id);
           await mysql.update('orders', { 
             payment_status: 'paid',
             status: 'processing'
           }, 'id', order_id);
+
+          try {
+             const { sendAdminOrderNotification } = await import("@/lib/emailUtil");
+             await sendAdminOrderNotification(order_id, 'order', order || {});
+          } catch(e) {}
         }
       } catch (dbError: any) {
         console.error("Database update error after payment verification:", dbError);
