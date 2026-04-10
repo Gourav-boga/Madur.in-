@@ -192,8 +192,8 @@ export default function AdminProductsPage() {
   }
 
   const filteredProducts = (Array.isArray(products) ? products : []).filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.categories?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (p.name || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (p.categories?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
 
