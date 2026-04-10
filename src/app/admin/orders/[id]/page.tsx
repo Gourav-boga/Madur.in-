@@ -22,6 +22,7 @@ interface Order {
   shipping_address: string;
   location_link?: string;
   total_amount: number;
+  delivery_charge: number;
   payment_method: string;
   status: string;
   created_at: string;
@@ -138,8 +139,16 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                  ))}
                </div>
 
-               <div className="mt-8 pt-6 border-t border-dashed border-gray-200">
-                 <div className="flex justify-between items-center">
+               <div className="mt-8 pt-6 border-t border-dashed border-gray-200 space-y-3">
+                 <div className="flex justify-between items-center text-sm">
+                   <span className="text-gray-400 font-bold uppercase tracking-widest">Items Total</span>
+                   <span className="font-bold text-gray-700">₹{Math.floor(order.total_amount - (order.delivery_charge || 0))}</span>
+                 </div>
+                 <div className="flex justify-between items-center text-sm">
+                   <span className="text-gray-400 font-bold uppercase tracking-widest">Delivery Charge</span>
+                   <span className="font-bold text-gray-700">₹{Math.floor(order.delivery_charge || 0)}</span>
+                 </div>
+                 <div className="flex justify-between items-center pt-3 border-t">
                    <span className="text-gray-400 font-black uppercase tracking-widest text-xs">Total Amount</span>
                    <span className="text-3xl font-black text-secondary">₹{Math.floor(order.total_amount)}</span>
                  </div>

@@ -15,6 +15,7 @@ interface Order {
   location_link?: string;
   total_amount: number;
   payment_method: string;
+  delivery_charge: number;
   status: string;
   created_at: string;
   item_count: number;
@@ -144,7 +145,8 @@ export default function AdminOrdersPage() {
                         <button
                           onClick={(e) => { 
                             e.stopPropagation();
-                            const message = `*Order details :* #${order.id.toString()}\n*Client:* ${order.customer_name}\n*Phone:* ${order.customer_phone}\n*Address:* ${order.shipping_address}\n*Total:* ₹${order.total_amount}\n*Items Link:* ${window.location.origin}/admin/orders/${order.id}`;
+                            const subtotal = order.total_amount - (order.delivery_charge || 0);
+                            const message = `*Order details :* #${order.id.toString()}\n*Client:* ${order.customer_name}\n*Phone:* ${order.customer_phone}\n*Address:* ${order.shipping_address}\n*Items Total:* ₹${Math.floor(subtotal)}\n*Delivery:* ₹${Math.floor(order.delivery_charge || 0)}\n*Grand Total:* ₹${Math.floor(order.total_amount)}\n*Order Link:* ${window.location.origin}/admin/orders/${order.id}`;
                             const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
                             window.open(url, '_blank');
                           }}
