@@ -17,7 +17,7 @@ export default function CartPage() {
 
   useEffect(() => {
     async function checkAuth() {
-      const res = await fetch("/api/auth/session");
+      const res = await fetch("/api/auth/session", { cache: "no-store" });
       const session = await res.json();
       setIsLoggedIn(!!session);
     }

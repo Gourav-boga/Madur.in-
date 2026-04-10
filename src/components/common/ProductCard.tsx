@@ -47,10 +47,12 @@ export default function ProductCard({ product }: { product: Product }) {
     
     // Check if user is logged in via our custom session API
     try {
-      const res = await fetch("/api/auth/session");
+      const res = await fetch("/api/auth/session", { cache: "no-store" });
       const session = await res.json();
       if (!session) {
-        router.push("/login");
+        // Redirect to login with current path as redirect param
+        const currentPath = window.location.pathname + window.location.search;
+        router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
         return;
       }
     } catch (err) {

@@ -49,7 +49,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       document.body.appendChild(script);
       
       // Prefill if possible (optional: could fetch from session/profile)
-      fetch("/api/auth/session").then(res => res.json()).then(session => {
+      fetch("/api/auth/session", { cache: "no-store" }).then(res => res.json()).then(session => {
         if (session && session.email) {
           setCustomerEmail(session.email);
         }

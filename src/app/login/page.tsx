@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faKey, faArrowRight, faTriangleExclamation, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
@@ -15,7 +15,9 @@ declare global {
   }
 }
 
-export default function LoginPage() {
+function LoginContent() {
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/account";
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"email" | "otp">("email");
@@ -34,10 +36,10 @@ export default function LoginPage() {
       setError(res.error);
       setIsLoading(false);
     } else {
-      router.push("/account");
+      router.push(redirect);
       router.refresh();
     }
-  }, [router]);
+  }, [router, redirect]);
 
   const renderGoogleButton = useCallback(() => {
     const googleBtnGroup = document.getElementById("googleBtnGroup");
@@ -144,7 +146,7 @@ export default function LoginPage() {
       setIsLoading(false);
     } else {
       // Successfully logged in via cookie
-      router.push("/account");
+      router.push(redirect);
       router.refresh(); // Refresh to update server-side auth state
     }
   };
@@ -266,5 +268,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-accent/20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
