@@ -320,8 +320,9 @@ export default function AdminProductsPage() {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-black/60 backdrop-blur-sm p-2 md:p-4 overflow-y-auto">
-          <div className="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 max-w-2xl w-full shadow-2xl animate-in zoom-in-95 duration-200 my-4 md:my-8 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-hidden">
+          <div className="bg-white rounded-[2rem] md:rounded-[3rem] max-w-2xl w-full shadow-2xl animate-in zoom-in-95 duration-200 relative flex flex-col max-h-[90vh]">
+            <div className="overflow-y-auto p-6 md:p-10 scrollbar-hide">
             <button 
               onClick={() => setIsModalOpen(false)}
               className="absolute top-6 right-6 w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all z-20"
@@ -485,6 +486,7 @@ export default function AdminProductsPage() {
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
