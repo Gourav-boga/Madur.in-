@@ -14,6 +14,7 @@ interface Product {
   category_id: string;
   unit: string;
   price: number;
+  original_price?: number;
   image_url: string;
   description: string;
   is_out_of_stock: boolean;
@@ -39,6 +40,7 @@ export default function AdminProductsPage() {
     category_id: "",
     unit: "",
     price: 0,
+    original_price: 0,
     image_url: "",
     description: "",
     is_out_of_stock: false
@@ -140,7 +142,7 @@ export default function AdminProductsPage() {
 
       setIsModalOpen(false);
       setEditingProduct(null);
-      setFormData({ name: "", category_id: "", unit: "", price: 0, image_url: "", description: "", is_out_of_stock: false });
+      setFormData({ name: "", category_id: "", unit: "", price: 0, original_price: 0, image_url: "", description: "", is_out_of_stock: false });
       fetchData();
     } catch (error: any) {
       console.error("Error saving product:", error);
@@ -172,13 +174,14 @@ export default function AdminProductsPage() {
         category_id: product.category_id,
         unit: product.unit,
         price: product.price,
+        original_price: product.original_price || 0,
         image_url: product.image_url,
         description: product.description,
         is_out_of_stock: product.is_out_of_stock || false
       });
     } else {
       setEditingProduct(null);
-      setFormData({ name: "", category_id: categories[0]?.id || "", unit: "1litre", price: 0, image_url: "", description: "", is_out_of_stock: false });
+      setFormData({ name: "", category_id: categories[0]?.id || "", unit: "1litre", price: 0, original_price: 0, image_url: "", description: "", is_out_of_stock: false });
     }
     setIsModalOpen(true);
   };
@@ -236,7 +239,8 @@ export default function AdminProductsPage() {
                 <tr className="bg-accent/50 text-gray-500 text-xs font-black uppercase tracking-widest">
                   <th className="px-8 py-5">Product</th>
                   <th className="px-8 py-5">Category</th>
-                  <th className="px-8 py-5">Price</th>
+                  <th className="px-8 py-5">DP Price</th>
+                  <th className="px-8 py-5">Original</th>
                   <th className="px-8 py-5">Unit</th>
                   <th className="px-8 py-5">Status</th>
                   <th className="px-8 py-5 text-right">Actions</th>
@@ -267,6 +271,11 @@ export default function AdminProductsPage() {
                       </span>
                     </td>
                     <td className="px-8 py-5 font-black text-primary text-lg">₹{product.price}</td>
+                    <td className="px-8 py-5 font-bold text-gray-400">
+                      {product.original_price ? (
+                        <span className="line-through text-xs">₹{product.original_price}</span>
+                      ) : "-"}
+                    </td>
                     <td className="px-8 py-5 font-bold text-sm">{product.unit}</td>
                     <td className="px-8 py-5">
                       {product.is_out_of_stock ? (
@@ -336,7 +345,7 @@ export default function AdminProductsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Price (₹)</label>
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">DP Price (Selling ₹)</label>
                   <input 
                     type="number" required
                     min="0"
@@ -348,6 +357,22 @@ export default function AdminProductsPage() {
                     onChange={(e) => {
                       const val = parseFloat(e.target.value);
                       setFormData({...formData, price: isNaN(val) ? 0 : val});
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Original Price (MRP ₹)</label>
+                  <input 
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="w-full bg-accent/50 border-none rounded-2xl py-4 px-6 font-bold outline-none focus:ring-4 ring-primary/20"
+                    value={formData.original_price === 0 ? "" : formData.original_price}
+                    placeholder="Leave empty if no discount"
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      setFormData({...formData, original_price: isNaN(val) ? 0 : val});
                     }}
                   />
                 </div>

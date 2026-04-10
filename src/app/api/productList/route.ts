@@ -10,7 +10,7 @@ export async function GET(request: Request) {
 
   try {
     let sql = `
-      SELECT p.*, c.name as category_name 
+      SELECT p.*, p.original_price, c.name as category_name 
       FROM products p 
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE 1=1
@@ -72,6 +72,7 @@ export async function POST(request: Request) {
       name: data.name,
       category_id: data.category_id,
       price: data.price,
+      original_price: data.original_price || null,
       image_url: data.image_url,
       description: data.description,
       unit: data.unit,
@@ -97,6 +98,7 @@ export async function PATCH(request: Request) {
       name: updateData.name,
       category_id: updateData.category_id,
       price: updateData.price,
+      original_price: updateData.original_price || null,
       image_url: updateData.image_url,
       description: updateData.description,
       unit: updateData.unit,

@@ -15,6 +15,7 @@ interface Product {
   category: string;
   unit: string;
   price: number;
+  original_price?: number;
   image: string;
   image_url?: string;
   description: string;
@@ -99,6 +100,14 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           )}
           
+          {product.original_price && product.original_price > product.price && !isOutOfStock && (
+            <div className="absolute top-2 left-2 z-10">
+              <span className="bg-red-500 text-white font-black px-2 py-1 rounded-lg text-[7px] md:text-[9px] uppercase tracking-tighter shadow-lg">
+                {Math.round(((product.original_price - product.price) / product.original_price) * 100)}% OFF
+              </span>
+            </div>
+          )}
+          
           {isOutOfStock && (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
               <span className="bg-red-600 text-white font-black px-2 py-1 rounded-md text-[8px] md:text-xs uppercase tracking-widest shadow-xl">
@@ -129,8 +138,19 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Footer */}
         <div className="pt-1.5 md:pt-3 px-0.5 border-t border-gray-50 flex items-center justify-between mt-auto">
           <div className="flex flex-col">
-            <span className="hidden md:block text-[8px] font-bold text-gray-400 uppercase tracking-widest">Price</span>
-            <span className={`text-[12px] md:text-lg font-black leading-none ${isOutOfStock ? "text-gray-400" : "text-[#222222]"}`}>₹{Math.floor(product.price)}</span>
+            <span className="hidden md:block text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">
+              {product.original_price ? "Special Price" : "Price"}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[12px] md:text-lg font-black leading-none ${isOutOfStock ? "text-gray-400" : "text-[#222222]"}`}>
+                ₹{Math.floor(product.price)}
+              </span>
+              {product.original_price && product.original_price > product.price && (
+                <span className="text-[8px] md:text-xs text-gray-400 line-through font-bold">
+                  ₹{Math.floor(product.original_price)}
+                </span>
+              )}
+            </div>
           </div>
           
           <button 
