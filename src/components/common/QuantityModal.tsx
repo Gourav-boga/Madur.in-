@@ -61,7 +61,7 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
   // Derive available units based on type
   const getAvailableUnits = () => {
     if (baseUnitInfo.unit === "g") {
-      return ["250 g", "500 g", "1000 g"];
+      return ["250 g", "500 g", "1 kg"];
     } else if (baseUnitInfo.unit === "ml") {
       return ["500 ml", "1 L"];
     }

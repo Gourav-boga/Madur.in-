@@ -458,7 +458,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               ) : (
                 <>
                   <FontAwesomeIcon icon={faCheckCircle} />
-                  Proceed to Payment
+                  {paymentMethod === "Cash on Delivery" ? "Confirm Order" : "Proceed to Payment"}
                 </>
               )}
             </button>

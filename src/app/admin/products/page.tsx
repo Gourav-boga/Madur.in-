@@ -386,9 +386,9 @@ export default function AdminProductsPage() {
                     <option value="1litre">1litre</option>
                     <option value="500ml">500ml</option>
                     <option value="250ml">250ml</option>
-                    <option value="100grms">100grms</option>
-                    <option value="250grms">250grms</option>
-                    <option value="500grms">500grms</option>
+                    <option value="100 g">100 g</option>
+                    <option value="250 g">250 g</option>
+                    <option value="500 g">500 g</option>
                     <option value="1 kg">1 kg</option>
                     <option value="1 bunch">1 bunch</option>
                   </select>
