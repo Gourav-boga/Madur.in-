@@ -27,6 +27,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [whatsappSent, setWhatsappSent] = useState(false);
+  const [finalizedItems, setFinalizedItems] = useState<any[]>([]);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   
   // New user detail fields
@@ -114,14 +115,14 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       location: locationLink
     };
     
-    const items = cart.map(item => ({
+    const itemsToUse = finalizedItems.length > 0 ? finalizedItems : cart.map(item => ({
       name: item.name,
       quantity: item.quantity,
       price: item.price,
       selectedUnit: item.selectedUnit || (item as any).unit
     }));
 
-    const message = formatOrderWhatsAppMessage(orderId, customerData, items, cartTotal + deliveryCharge, paymentMethod);
+    const message = formatOrderWhatsAppMessage(orderId, customerData, itemsToUse, cartTotal + deliveryCharge, paymentMethod);
     sendWhatsAppNotification(message);
   };
 
@@ -160,6 +161,13 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           const verifyData = await verifyRes.json();
           if (verifyData.success) {
             setPlacedOrderId(internalOrderId);
+            // Store items before clearing cart
+            setFinalizedItems(cart.map(item => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              selectedUnit: item.selectedUnit || (item as any).unit
+            })));
             setIsSuccess(true);
             clearCart();
             // We don't auto-redirect anymore to give time to click WhatsApp
@@ -239,6 +247,13 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         await handleOnlinePayment(result.orderId!);
       } else {
         setPlacedOrderId(result.orderId!);
+        // Store items before clearing cart
+        setFinalizedItems(cart.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          selectedUnit: item.selectedUnit || (item as any).unit
+        })));
         setIsSuccess(true);
         clearCart();
         setIsLoading(false);
