@@ -16,7 +16,12 @@ export async function GET(request: Request) {
       WHERE 1=1
     `;
     const params: any[] = [];
-
+    
+    // Ensure description column exists
+    try {
+      await mysql.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS description TEXT`);
+    } catch (e) { /* ignore */ }
+    
     const isPopular = searchParams.get('is_popular');
 
     if (category) {

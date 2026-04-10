@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faCartPlus } from "@fortawesome/free-solid-svg-icons";
-import { useCart } from "@/context/CartContext";
-import { motion } from "framer-motion";
 import QuantityModal from "./QuantityModal";
-
+import ProductDetailModal from "./ProductDetailModal";
+import { faPlus, faCartPlus, faEye } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 
 interface Product {
@@ -26,6 +24,7 @@ interface Product {
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const router = useRouter();
   
   const normalizeImageUrl = (url: string) => {
@@ -115,6 +114,18 @@ export default function ProductCard({ product }: { product: Product }) {
               </span>
             </div>
           )}
+
+          {/* Eye Icon Overlay */}
+          {!isOutOfStock && (
+            <div 
+              onClick={(e) => { e.stopPropagation(); setIsDetailOpen(true); }}
+              className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center z-10"
+            >
+              <div className="w-10 h-10 md:w-14 md:h-14 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-secondary scale-50 group-hover:scale-100 transition-transform duration-300 shadow-xl">
+                <FontAwesomeIcon icon={faEye} className="text-sm md:text-xl" />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -130,9 +141,12 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
           
-          <p className="text-[#222222]/80">
-            {product.description}
-          </p>
+          <button 
+            onClick={() => setIsDetailOpen(true)}
+            className="text-[8px] md:text-[10px] font-bold text-secondary hover:underline uppercase tracking-widest mt-1"
+          >
+            View Details
+          </button>
         </div>
 
         {/* Footer */}
@@ -170,16 +184,28 @@ export default function ProductCard({ product }: { product: Product }) {
 
 
       {!isOutOfStock && (
-        <QuantityModal 
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onConfirm={handleAddToCart}
-          product={{
-            ...product,
-            image: displayImage,
-            category: displayCategory
-          }}
-        />
+        <>
+          <QuantityModal 
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={handleAddToCart}
+            product={{
+              ...product,
+              image: displayImage,
+              category: displayCategory
+            }}
+          />
+          <ProductDetailModal
+            isOpen={isDetailOpen}
+            onClose={() => setIsDetailOpen(false)}
+            onAddToCart={handleAddToCart}
+            product={{
+              ...product,
+              image: displayImage,
+              category: displayCategory
+            }}
+          />
+        </>
       )}
     </>
   );
