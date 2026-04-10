@@ -27,6 +27,7 @@ interface Order {
   user_email?: string;
   shipping_address?: string;
   payment_method?: string;
+  delivery_charge?: number;
   isSubscription?: boolean;
   plan_details?: string;
 }

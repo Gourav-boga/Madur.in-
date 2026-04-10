@@ -248,6 +248,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
     const orderData = {
       total_amount: cartTotal + deliveryCharge,
+      delivery_charge: deliveryCharge,
       shipping_address: address,
       payment_method: paymentMethod,
       customer_name: customerName,

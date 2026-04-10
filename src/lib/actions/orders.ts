@@ -14,6 +14,7 @@ export async function placeOrderAction(orderData: {
   customer_phone: string;
   customer_email: string;
   location_link?: string;
+  delivery_charge: number;
   items: {
     product_id: string;
     quantity: number;
@@ -43,6 +44,7 @@ export async function placeOrderAction(orderData: {
         shipping_address TEXT,
         location_link TEXT,
         total_amount DECIMAL(10, 2),
+        delivery_charge DECIMAL(10, 2) DEFAULT 0.00,
         payment_method VARCHAR(50),
         status VARCHAR(20) DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -67,6 +69,7 @@ export async function placeOrderAction(orderData: {
       await mysql.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone VARCHAR(20)`);
       await mysql.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_email VARCHAR(255)`);
       await mysql.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS location_link TEXT`);
+      await mysql.query(`ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_charge DECIMAL(10, 2) DEFAULT 0.00`);
     } catch (e) { /* ignore */ }
 
     // 3. Insert Order
@@ -78,6 +81,7 @@ export async function placeOrderAction(orderData: {
       shipping_address: orderData.shipping_address,
       location_link: orderData.location_link,
       total_amount: orderData.total_amount,
+      delivery_charge: orderData.delivery_charge,
       payment_method: orderData.payment_method,
       status: "pending"
     });

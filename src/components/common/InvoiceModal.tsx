@@ -159,11 +159,13 @@ export default function InvoiceModal({ isOpen, onClose, order }: InvoiceModalPro
             <div className="w-full max-w-xs space-y-4">
               <div className="flex justify-between items-center text-sm">
                 <span className="font-bold text-gray-400 uppercase tracking-widest">Subtotal</span>
-                <span className="font-bold text-gray-800">₹{order.total_amount}</span>
+                <span className="font-bold text-gray-800">₹{Math.floor(order.total_amount - (order.delivery_charge || 0))}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="font-bold text-gray-400 uppercase tracking-widest">Delivery Charge</span>
-                <span className="font-bold text-green-500 uppercase tracking-widest">FREE</span>
+                <span className={!order.delivery_charge || order.delivery_charge === 0 ? "font-bold text-green-500 uppercase tracking-widest" : "font-bold text-gray-800 uppercase tracking-widest"}>
+                  {!order.delivery_charge || order.delivery_charge === 0 ? "FREE" : `₹${Math.floor(order.delivery_charge)}`}
+                </span>
               </div>
               <div className="flex justify-between items-center pt-6 border-t-2 border-primary/20">
                 <span className="text-xl font-black text-gray-800 uppercase tracking-tighter">Total Paid</span>
