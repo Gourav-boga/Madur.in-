@@ -97,9 +97,17 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
                     Product Description
                   </h4>
                   <div className="bg-accent/30 rounded-3xl p-6 border border-gray-50 mb-8 min-h-[120px]">
-                    <p className="text-gray-700 font-bold leading-relaxed whitespace-pre-line">
-                      {product.description || "Fresh from our farm to your kitchen. We ensure the highest quality and purity in every harvest."}
-                    </p>
+                    <ul className="space-y-3">
+                      {(product.description || "Fresh from our farm to your kitchen.\nWe ensure the highest quality and purity in every harvest.")
+                        .split('\n')
+                        .filter(line => line.trim() !== '')
+                        .map((line, index) => (
+                          <li key={index} className="flex gap-3 text-gray-700 font-bold leading-relaxed text-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 shrink-0" />
+                            <span>{line.replace(/^\s*[•.-]\s*/, '').trim()}</span>
+                          </li>
+                        ))}
+                    </ul>
                   </div>
                 </div>
 
