@@ -26,6 +26,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [whatsappSent, setWhatsappSent] = useState(false);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   
   // New user detail fields
@@ -71,6 +72,17 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       };
     }
   }, [isOpen]);
+
+  // Automatic WhatsApp Redirection
+  useEffect(() => {
+    if (isSuccess && placedOrderId && !whatsappSent) {
+      setWhatsappSent(true);
+      // Small delay to ensure the success screen is visible first
+      setTimeout(() => {
+        handleSendWhatsAppNotification(placedOrderId);
+      }, 1000);
+    }
+  }, [isSuccess, placedOrderId, whatsappSent]);
 
   if (!isOpen) return null;
 
@@ -269,6 +281,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             </h2>
             <p className="text-gray-500 font-bold mb-10 text-sm">
               Thank you for shopping with Madur.in. Your fresh items are being prepared for delivery.
+              {whatsappSent && <span className="block mt-2 text-secondary animate-pulse text-[10px] uppercase tracking-widest">Redirecting to WhatsApp...</span>}
             </p>
             
             <div className="flex flex-col gap-4">
