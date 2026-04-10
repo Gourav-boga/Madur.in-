@@ -57,7 +57,7 @@ export default function CartPage() {
     }
   };
 
-  if (cart.length === 0) {
+  if (cart.length === 0 && !isCheckoutOpen) {
     return (
       <div className="container pt-32 pb-24 flex flex-col items-center justify-center text-center">
         <div className="text-8xl mb-8 opacity-20">🛒</div>
