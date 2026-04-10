@@ -27,9 +27,12 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [whatsappSent, setWhatsappSent] = useState(false);
-  const [finalizedItems, setFinalizedItems] = useState<any[]>([]);
-  const [finalizedSubtotal, setFinalizedSubtotal] = useState(0);
-  const [finalizedDelivery, setFinalizedDelivery] = useState(0);
+  const [finalizedOrder, setFinalizedOrder] = useState<{
+    items: any[],
+    subtotal: number,
+    delivery: number,
+    paymentMethod: string
+  } | null>(null);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   
   // New user detail fields
@@ -117,15 +120,17 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       location: locationLink
     };
     
-    const itemsToUse = finalizedItems.length > 0 ? finalizedItems : cart.map(item => ({
+    // Use frozen data if available, otherwise fallback to current state
+    const itemsToUse = finalizedOrder ? finalizedOrder.items : cart.map(item => ({
       name: item.name,
       quantity: item.quantity,
       price: item.price,
       selectedUnit: item.selectedUnit || (item as any).unit
     }));
 
-    const subtotal = finalizedSubtotal > 0 ? finalizedSubtotal : cartTotal;
-    const delivery = finalizedDelivery > 0 ? finalizedDelivery : deliveryCharge;
+    const subtotal = finalizedOrder ? finalizedOrder.subtotal : cartTotal;
+    const delivery = finalizedOrder ? finalizedOrder.delivery : deliveryCharge;
+    const method = finalizedOrder ? finalizedOrder.paymentMethod : paymentMethod;
 
     const message = formatOrderWhatsAppMessage(
       orderId, 
@@ -133,7 +138,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       itemsToUse, 
       subtotal, 
       delivery,
-      paymentMethod === "cod" ? "Cash on Delivery" : "Paid Online"
+      method === "cod" ? "Cash on Delivery" : "Paid Online"
     );
     sendWhatsAppNotification(message);
   };
@@ -173,15 +178,18 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           const verifyData = await verifyRes.json();
           if (verifyData.success) {
             setPlacedOrderId(internalOrderId);
-            // Store values before clearing cart
-            setFinalizedItems(cart.map(item => ({
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price,
-              selectedUnit: item.selectedUnit || (item as any).unit
-            })));
-            setFinalizedSubtotal(cartTotal);
-            setFinalizedDelivery(deliveryCharge);
+            // Freeze all order details before cart clear
+            setFinalizedOrder({
+              items: cart.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                selectedUnit: item.selectedUnit || (item as any).unit
+              })),
+              subtotal: cartTotal,
+              delivery: deliveryCharge,
+              paymentMethod: "online"
+            });
             setIsSuccess(true);
             clearCart();
             // We don't auto-redirect anymore to give time to click WhatsApp
@@ -261,15 +269,18 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         await handleOnlinePayment(result.orderId!);
       } else {
         setPlacedOrderId(result.orderId!);
-        // Store values before clearing cart
-        setFinalizedItems(cart.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-          selectedUnit: item.selectedUnit || (item as any).unit
-        })));
-        setFinalizedSubtotal(cartTotal);
-        setFinalizedDelivery(deliveryCharge);
+        // Freeze all order details before cart clear
+        setFinalizedOrder({
+          items: cart.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            selectedUnit: item.selectedUnit || (item as any).unit
+          })),
+          subtotal: cartTotal,
+          delivery: deliveryCharge,
+          paymentMethod: "cod"
+        });
         setIsSuccess(true);
         clearCart();
         setIsLoading(false);
