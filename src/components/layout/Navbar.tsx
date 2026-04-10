@@ -12,7 +12,9 @@ import {
   faTimes, 
   faUser, 
   faShoppingCart,
-  faChevronLeft
+  faChevronLeft,
+  faLayerGroup,
+  faBox
 } from "@fortawesome/free-solid-svg-icons";
 import StreamingTagline from "./StreamingTagline";
 
@@ -23,6 +25,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [user, setUser] = useState<any>(null);
+  const [categories, setCategories] = useState<any[]>([]);
   const router = useRouter();
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -51,7 +54,18 @@ export default function Navbar() {
       }
     }
     
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/categoryList");
+        const data = await res.json();
+        setCategories(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    }
+
     checkSession();
+    fetchCategories();
     
     return () => controller.abort();
   }, [pathname]); // Check on every navigation
@@ -127,6 +141,7 @@ export default function Navbar() {
         {/* Desktop Links - HIDDEN ON MOBILE */}
         <div className="hidden md:flex items-center gap-8 text-[#222222]">
           <Link href="/" className="hover:text-gray-600 font-medium">Home</Link>
+          <Link href="/products" className="hover:text-gray-600 font-medium text-secondary font-bold">Products</Link>
           <Link href="/services" className="hover:text-gray-600 font-medium">Services</Link>
           <Link href="/about" className="hover:text-gray-600 font-medium">About</Link>
           <Link href="/contact" className="hover:text-gray-600 font-medium">Contact</Link>
@@ -168,6 +183,49 @@ export default function Navbar() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-background text-gray-800 absolute top-full left-0 right-0 shadow-lg border-t border-white/10 py-4 px-6 flex flex-col gap-4 animate-in slide-in-from-top">
           <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Home</Link>
+          <Link href="/products" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b text-secondary font-black">All Products</Link>
+          
+          <div className="py-2">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
+              <FontAwesomeIcon icon={faLayerGroup} className="text-secondary" />
+              Shop By Category
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {categories.slice(0, 6).map((cat) => (
+                <Link 
+                  key={cat.id} 
+                  href={`/products?category=${encodeURIComponent(cat.name)}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex flex-col items-center gap-1 p-2 rounded-xl bg-accent/30 active:scale-95 transition-all text-center"
+                >
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-secondary relative overflow-hidden shadow-sm">
+                    {cat.image_url ? (
+                      <Image 
+                        src={cat.image_url.startsWith('http') ? cat.image_url : `/api/admin/proxy-image?url=${encodeURIComponent(cat.image_url)}`} 
+                        alt={cat.name} 
+                        fill 
+                        className="object-cover" 
+                      />
+                    ) : (
+                      <FontAwesomeIcon icon={faBox} size="xs" />
+                    )}
+                  </div>
+                  <span className="text-[8px] font-black uppercase leading-tight truncate w-full">{cat.name}</span>
+                </Link>
+              ))}
+              <Link 
+                href="/products" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex flex-col items-center gap-1 p-2 rounded-xl bg-secondary/10 active:scale-95 transition-all text-center"
+              >
+                <div className="w-10 h-10 bg-secondary text-white rounded-lg flex items-center justify-center shadow-sm">
+                  <FontAwesomeIcon icon={faArrowRight} size="xs" />
+                </div>
+                <span className="text-[8px] font-black uppercase leading-tight">More</span>
+              </Link>
+            </div>
+          </div>
+
           <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Services</Link>
           <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">About Us</Link>
           <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="py-2 border-b">Contact</Link>
