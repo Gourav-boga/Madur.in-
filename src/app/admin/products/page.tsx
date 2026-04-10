@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faEdit, faTrash, faArrowLeft, faSearch, faImages, faBox } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faEdit, faTrash, faArrowLeft, faSearch, faImages, faBox, faStar } from "@fortawesome/free-solid-svg-icons";
 
 
 interface Product {
@@ -18,6 +18,7 @@ interface Product {
   image_url: string;
   description: string;
   is_out_of_stock: boolean;
+  is_popular?: boolean;
   categories?: { name: string };
 }
 
@@ -43,7 +44,8 @@ export default function AdminProductsPage() {
     original_price: 0,
     image_url: "",
     description: "",
-    is_out_of_stock: false
+    is_out_of_stock: false,
+    is_popular: false
   });
   const [uploading, setUploading] = useState(false);
 
@@ -142,7 +144,7 @@ export default function AdminProductsPage() {
 
       setIsModalOpen(false);
       setEditingProduct(null);
-      setFormData({ name: "", category_id: "", unit: "", price: 0, original_price: 0, image_url: "", description: "", is_out_of_stock: false });
+      setFormData({ name: "", category_id: "", unit: "", price: 0, original_price: 0, image_url: "", description: "", is_out_of_stock: false, is_popular: false });
       fetchData();
     } catch (error: any) {
       console.error("Error saving product:", error);
@@ -177,11 +179,12 @@ export default function AdminProductsPage() {
         original_price: product.original_price || 0,
         image_url: product.image_url,
         description: product.description,
-        is_out_of_stock: product.is_out_of_stock || false
+        is_out_of_stock: product.is_out_of_stock || false,
+        is_popular: product.is_popular || false
       });
     } else {
       setEditingProduct(null);
-      setFormData({ name: "", category_id: categories[0]?.id || "", unit: "1litre", price: 0, original_price: 0, image_url: "", description: "", is_out_of_stock: false });
+      setFormData({ name: "", category_id: categories[0]?.id || "", unit: "1litre", price: 0, original_price: 0, image_url: "", description: "", is_out_of_stock: false, is_popular: false });
     }
     setIsModalOpen(true);
   };
@@ -262,7 +265,10 @@ export default function AdminProductsPage() {
                             <FontAwesomeIcon icon={faBox} className="absolute inset-0 m-auto text-gray-300" />
                           )}
                         </div>
-                        <span className="font-bold text-gray-800">{product.name}</span>
+                        <span className="font-bold text-gray-800 flex items-center gap-2">
+                          {product.name}
+                          {product.is_popular && <FontAwesomeIcon icon={faStar} className="text-yellow-400 text-[10px]" />}
+                        </span>
                       </div>
                     </td>
                     <td className="px-8 py-5">
@@ -395,17 +401,35 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-4 bg-accent/30 rounded-2xl border-2 border-dashed border-gray-100">
-                <input 
-                  type="checkbox"
-                  id="is_out_of_stock"
-                  className="w-5 h-5 accent-primary cursor-pointer"
-                  checked={formData.is_out_of_stock}
-                  onChange={(e) => setFormData({...formData, is_out_of_stock: e.target.checked})}
-                />
-                <label htmlFor="is_out_of_stock" className="text-sm font-black text-gray-700 cursor-pointer uppercase tracking-tight">
-                  Mark as Out of Stock
-                </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-3 p-4 bg-accent/30 rounded-2xl border-2 border-dashed border-gray-100">
+                  <input 
+                    type="checkbox"
+                    id="is_out_of_stock"
+                    className="w-5 h-5 accent-secondary cursor-pointer"
+                    checked={formData.is_out_of_stock}
+                    onChange={(e) => setFormData({...formData, is_out_of_stock: e.target.checked})}
+                  />
+                  <label htmlFor="is_out_of_stock" className="text-xs font-black text-gray-700 cursor-pointer uppercase tracking-tight">
+                    Mark as Out of Stock
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-yellow-50/50 rounded-2xl border-2 border-dashed border-yellow-200">
+                  <input 
+                    type="checkbox"
+                    id="is_popular"
+                    className="w-5 h-5 accent-yellow-400 cursor-pointer"
+                    checked={formData.is_popular}
+                    onChange={(e) => setFormData({...formData, is_popular: e.target.checked})}
+                  />
+                  <div className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faStar} className={formData.is_popular ? "text-yellow-400" : "text-gray-300"} />
+                    <label htmlFor="is_popular" className="text-xs font-black text-gray-700 cursor-pointer uppercase tracking-tight">
+                      Featured on Home Page
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">

@@ -39,7 +39,7 @@ export default function HomeContent() {
       try {
         const [catRes, prodRes] = await Promise.all([
           fetch("/api/categoryList", { signal: controller.signal, cache: "no-store", headers: { "Accept": "application/json" } }),
-          fetch("/api/productList?limit=8", { signal: controller.signal, cache: "no-store", headers: { "Accept": "application/json" } })
+          fetch("/api/productList?is_popular=1&limit=8", { signal: controller.signal, cache: "no-store", headers: { "Accept": "application/json" } })
         ]);
         
         const catData = catRes.ok ? await catRes.json() : [];

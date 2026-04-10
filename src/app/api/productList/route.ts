@@ -17,9 +17,16 @@ export async function GET(request: Request) {
     `;
     const params: any[] = [];
 
+    const isPopular = searchParams.get('is_popular');
+
     if (category) {
       sql += ` AND c.name = ?`;
       params.push(category);
+    }
+
+    if (isPopular) {
+      sql += ` AND p.is_popular = ?`;
+      params.push(isPopular === '1' || isPopular === 'true' ? 1 : 0);
     }
 
     if (search) {
@@ -76,7 +83,8 @@ export async function POST(request: Request) {
       image_url: data.image_url,
       description: data.description,
       unit: data.unit,
-      is_available: !data.is_out_of_stock
+      is_available: !data.is_out_of_stock,
+      is_popular: data.is_popular ? 1 : 0
     });
     return NextResponse.json(result);
   } catch (error: any) {
@@ -102,7 +110,8 @@ export async function PATCH(request: Request) {
       image_url: updateData.image_url,
       description: updateData.description,
       unit: updateData.unit,
-      is_available: !updateData.is_out_of_stock
+      is_available: !updateData.is_out_of_stock,
+      is_popular: updateData.is_popular ? 1 : 0
     }, 'id', id);
 
     return NextResponse.json(result);
