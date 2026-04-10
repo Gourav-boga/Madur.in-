@@ -26,6 +26,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [deliveryCharge, setDeliveryCharge] = useState(0);
   
   // New user detail fields
   const [customerName, setCustomerName] = useState("");
@@ -52,6 +53,13 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       fetch("/api/auth/session", { cache: "no-store" }).then(res => res.json()).then(session => {
         if (session && session.email) {
           setCustomerEmail(session.email);
+        }
+      });
+
+      // Fetch delivery charge from settings
+      fetch("/api/settings").then(res => res.json()).then(data => {
+        if (data.delivery_charge) {
+          setDeliveryCharge(parseFloat(data.delivery_charge));
         }
       });
 
@@ -101,7 +109,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       selectedUnit: item.selectedUnit || (item as any).unit
     }));
 
-    const message = formatOrderWhatsAppMessage(orderId, customerData, items, cartTotal, paymentMethod);
+    const message = formatOrderWhatsAppMessage(orderId, customerData, items, cartTotal + deliveryCharge, paymentMethod);
     sendWhatsAppNotification(message);
   };
 
@@ -111,7 +119,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          amount: cartTotal,
+          amount: cartTotal + deliveryCharge,
           receipt: `order_${internalOrderId}`
         }),
       });
@@ -184,7 +192,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     setError("");
 
     const orderData = {
-      total_amount: cartTotal,
+      total_amount: cartTotal + deliveryCharge,
       shipping_address: address,
       payment_method: paymentMethod,
       customer_name: customerName,
@@ -278,6 +286,17 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
             </div>
           )}
 
+          <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col gap-2">
+            <div className="flex justify-between text-xs font-bold text-gray-500">
+              <span>Items Total</span>
+              <span>₹{Math.floor(cartTotal)}</span>
+            </div>
+            <div className="flex justify-between text-xs font-bold text-gray-500">
+              <span>Delivery Charge</span>
+              <span>{deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}</span>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Full Name</label>
@@ -343,7 +362,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           <div className="pt-6 border-t border-gray-100">
             <div className="flex justify-between items-center mb-6">
               <span className="text-gray-400 font-black uppercase tracking-widest text-[10px]">Payable Amount</span>
-              <span className="text-3xl font-black text-secondary">₹{Math.floor(cartTotal)}</span>
+              <span className="text-3xl font-black text-secondary">₹{Math.floor(cartTotal + deliveryCharge)}</span>
             </div>
 
             <div className="mb-6 p-4 bg-primary/5 rounded-2xl border border-primary/20 flex items-center gap-4">

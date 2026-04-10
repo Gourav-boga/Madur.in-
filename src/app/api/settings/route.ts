@@ -13,7 +13,8 @@ export async function GET() {
     return NextResponse.json({
       subscription_fee: settings.subscription_fee || "599",
       contact_email: settings.contact_email || "support@madur.in",
-      contact_phone: settings.contact_phone || "+91 9345678910"
+      contact_phone: settings.contact_phone || "+91 9345678910",
+      delivery_charge: settings.delivery_charge || "0"
     });
   } catch (error) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });

@@ -11,6 +11,7 @@ export default function AdminSettingsPage() {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [subscriptionFee, setSubscriptionFee] = useState("599");
+  const [deliveryCharge, setDeliveryCharge] = useState("0");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -27,6 +28,9 @@ export default function AdminSettingsPage() {
       if (data.subscription_fee) {
         setSubscriptionFee(data.subscription_fee);
       }
+      if (data.delivery_charge) {
+        setDeliveryCharge(data.delivery_charge);
+      }
     } catch (err) {
       console.error("Error fetching settings:", err);
     } finally {
@@ -41,7 +45,10 @@ export default function AdminSettingsPage() {
       const response = await fetch("/api/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscription_fee: subscriptionFee })
+        body: JSON.stringify({ 
+          subscription_fee: subscriptionFee,
+          delivery_charge: deliveryCharge 
+        })
       });
       
       if (!response.ok) throw new Error("Failed to save");
@@ -96,6 +103,21 @@ export default function AdminSettingsPage() {
                 />
               </div>
               <p className="text-xs text-gray-400 font-bold mt-4 px-2">This value will be displayed to users in the Subscription Modal and used for all new registrations.</p>
+            </div>
+
+            <div className="pt-6 border-t border-gray-50">
+              <label className="text-xs font-black text-gray-500 uppercase tracking-widest block mb-4 ml-1 text-black">Delivery Charge (₹)</label>
+              <div className="relative">
+                <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-gray-300">₹</span>
+                <input 
+                  type="number"
+                  required
+                  className="w-full bg-accent/30 border-none rounded-2xl py-6 pl-12 pr-6 text-2xl font-black text-black outline-none focus:ring-4 ring-primary/20 transition-all"
+                  value={deliveryCharge}
+                  onChange={(e) => setDeliveryCharge(e.target.value)}
+                />
+              </div>
+              <p className="text-xs text-gray-400 font-bold mt-4 px-2">This fixed charge will be added to every order during checkout. Set to 0 for free delivery.</p>
             </div>
 
             <button

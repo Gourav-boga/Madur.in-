@@ -13,6 +13,7 @@ export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, cartTotal } = useCart();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [deliveryCharge, setDeliveryCharge] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -21,7 +22,21 @@ export default function CartPage() {
       const session = await res.json();
       setIsLoggedIn(!!session);
     }
+    
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/settings");
+        const data = await res.json();
+        if (data.delivery_charge) {
+          setDeliveryCharge(parseFloat(data.delivery_charge));
+        }
+      } catch (err) {
+        console.error("Error fetching delivery settings:", err);
+      }
+    }
+
     checkAuth();
+    fetchSettings();
   }, []);
 
   const handleCheckoutClick = () => {
@@ -140,7 +155,9 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Delivery Charge</span>
-                  <span className="text-green-600 font-bold">FREE</span>
+                  <span className={deliveryCharge === 0 ? "text-green-600 font-bold" : "font-bold text-gray-800"}>
+                    {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
+                  </span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>GST (Tax)</span>
@@ -150,7 +167,7 @@ export default function CartPage() {
 
               <div className="flex justify-between items-center pt-6 border-t mb-8 md:mb-10">
                 <span className="text-lg md:text-xl font-black">Total Payable</span>
-                <span className="text-2xl md:text-3xl font-black text-secondary">₹{Math.floor(cartTotal)}</span>
+                <span className="text-2xl md:text-3xl font-black text-secondary">₹{Math.floor(cartTotal + deliveryCharge)}</span>
               </div>
 
               <div className="flex items-center gap-2 mb-6 justify-center bg-gray-50 py-3 rounded-xl border border-dashed border-gray-200">
