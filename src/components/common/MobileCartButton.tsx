@@ -4,12 +4,15 @@ import { useCart } from "@/context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function MobileCartButton() {
   const { cartCount, cartTotal } = useCart();
+  const pathname = usePathname();
+  const isCartPage = pathname === "/cart";
 
-  if (cartCount === 0) return null;
+  if (cartCount === 0 || isCartPage) return null;
 
   return (
     <AnimatePresence>

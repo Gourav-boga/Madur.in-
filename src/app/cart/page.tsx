@@ -50,7 +50,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="pb-24 pt-32">
+    <div className="pb-12 pt-24 md:pt-32">
       <div className="container">
         <div className="flex items-center gap-4 mb-10">
           <Link href="/" className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-accent transition-colors">
@@ -65,7 +65,7 @@ export default function CartPage() {
             {cart.map((item, index) => (
               <div 
                 key={`${item.id}-${item.selectedUnit}-${index}`} 
-                className="bg-white p-4 md:p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-6"
+                className="bg-white p-3 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 flex items-center gap-3 md:gap-6"
               >
                 <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden shadow-md shrink-0 bg-gray-50 flex items-center justify-center">
                   {(item.image || (item as any).image_url) ? (
@@ -99,19 +99,19 @@ export default function CartPage() {
 
                   <div className="flex items-center justify-between md:justify-end gap-8">
                     {/* Quantity Selector */}
-                    <div className="flex items-center gap-4 bg-accent rounded-xl px-2 py-1">
+                    <div className="flex items-center gap-2 md:gap-4 bg-accent rounded-xl px-2 py-1">
                       <button 
                         onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedUnit)}
-                        className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-gray-500"
+                        className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-gray-500"
                       >
-                        <FontAwesomeIcon icon={faMinus} size="sm" />
+                        <FontAwesomeIcon icon={faMinus} size="xs" className="md:text-sm" />
                       </button>
-                      <span className="font-black w-6 text-center">{item.quantity}</span>
+                      <span className="font-black w-5 md:w-6 text-center text-sm md:text-base">{item.quantity}</span>
                       <button 
                          onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedUnit)}
-                        className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-gray-500"
+                        className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-gray-500"
                       >
-                        <FontAwesomeIcon icon={faPlus} size="sm" />
+                        <FontAwesomeIcon icon={faPlus} size="xs" className="md:text-sm" />
                       </button>
                     </div>
 
@@ -129,10 +129,9 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* Sumary Card */}
           <div className="lg:w-1/3">
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl border border-gray-50 sticky top-48">
-              <h3 className="text-xl font-black mb-8 pb-4 border-b">Order Summary</h3>
+            <div className="bg-white p-5 md:p-8 rounded-3xl md:rounded-[2.5rem] shadow-2xl border border-gray-50 sticky top-48">
+              <h3 className="text-xl font-black mb-6 md:mb-8 pb-4 border-b">Order Summary</h3>
               
               <div className="flex flex-col gap-4 mb-8">
                 <div className="flex justify-between text-gray-500">
@@ -149,9 +148,9 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center pt-6 border-t mb-10">
-                <span className="text-xl font-black">Total Payable</span>
-                <span className="text-3xl font-black text-secondary">₹{Math.floor(cartTotal)}</span>
+              <div className="flex justify-between items-center pt-6 border-t mb-8 md:mb-10">
+                <span className="text-lg md:text-xl font-black">Total Payable</span>
+                <span className="text-2xl md:text-3xl font-black text-secondary">₹{Math.floor(cartTotal)}</span>
               </div>
 
               <div className="flex items-center gap-2 mb-6 justify-center bg-gray-50 py-3 rounded-xl border border-dashed border-gray-200">
