@@ -191,6 +191,19 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     setIsLoading(true);
     setError("");
 
+    // Secondary check for session to prevent server action auth errors
+    try {
+      const sessionRes = await fetch("/api/auth/session", { cache: "no-store" });
+      const session = await sessionRes.json();
+      if (!session || !session.user) {
+        setError("Your session has expired. Please refresh the page and sign in again.");
+        setIsLoading(false);
+        return;
+      }
+    } catch (e) {
+      console.warn("Session pre-check failed, continuing to server action...");
+    }
+
     const orderData = {
       total_amount: cartTotal + deliveryCharge,
       shipping_address: address,
@@ -365,14 +378,48 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               <span className="text-3xl font-black text-secondary">₹{Math.floor(cartTotal + deliveryCharge)}</span>
             </div>
 
-            <div className="mb-6 p-4 bg-primary/5 rounded-2xl border border-primary/20 flex items-center gap-4">
-               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                 <FontAwesomeIcon icon={faCreditCard} className="text-xl" />
-               </div>
-               <div>
-                 <p className="text-[10px] font-black text-primary uppercase tracking-widest">Payment Method</p>
-                 <p className="text-sm font-black text-gray-800">Online Payment Required</p>
-               </div>
+            <div className="space-y-3 mb-8">
+              <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Choose Payment Method</label>
+              
+              <div 
+                onClick={() => setPaymentMethod("Online Payment")}
+                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-4 ${
+                  paymentMethod === "Online Payment" 
+                    ? "border-primary bg-primary/5 shadow-md" 
+                    : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  paymentMethod === "Online Payment" ? "bg-primary text-black" : "bg-gray-200 text-gray-400"
+                }`}>
+                  <FontAwesomeIcon icon={faCreditCard} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-black text-gray-800">Online Payment</p>
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pay securely via Razorpay</p>
+                </div>
+                {paymentMethod === "Online Payment" && <FontAwesomeIcon icon={faCheckCircle} className="text-primary" />}
+              </div>
+
+              <div 
+                onClick={() => setPaymentMethod("Cash on Delivery")}
+                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-4 ${
+                  paymentMethod === "Cash on Delivery" 
+                    ? "border-primary bg-primary/5 shadow-md" 
+                    : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  paymentMethod === "Cash on Delivery" ? "bg-primary text-black" : "bg-gray-200 text-gray-400"
+                }`}>
+                  <FontAwesomeIcon icon={faTruck} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-black text-gray-800">Cash on Delivery</p>
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Pay when you receive items</p>
+                </div>
+                {paymentMethod === "Cash on Delivery" && <FontAwesomeIcon icon={faCheckCircle} className="text-primary" />}
+              </div>
             </div>
 
             <button 

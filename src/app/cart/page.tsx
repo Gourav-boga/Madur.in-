@@ -39,12 +39,22 @@ export default function CartPage() {
     fetchSettings();
   }, []);
 
-  const handleCheckoutClick = () => {
-    if (!isLoggedIn) {
+  const handleCheckoutClick = async () => {
+    // Perform a fresh session check before opening the modal
+    try {
+      const res = await fetch("/api/auth/session", { cache: "no-store" });
+      const session = await res.json();
+      if (!session || !session.user) {
+        setIsLoggedIn(false);
+        router.push("/login?redirect=/cart");
+        return;
+      }
+      setIsLoggedIn(true);
+      setIsCheckoutOpen(true);
+    } catch (err) {
+      console.error("Cart checkout auth check failed:", err);
       router.push("/login?redirect=/cart");
-      return;
     }
-    setIsCheckoutOpen(true);
   };
 
   if (cart.length === 0) {
