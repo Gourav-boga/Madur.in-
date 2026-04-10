@@ -28,6 +28,8 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [whatsappSent, setWhatsappSent] = useState(false);
   const [finalizedItems, setFinalizedItems] = useState<any[]>([]);
+  const [finalizedSubtotal, setFinalizedSubtotal] = useState(0);
+  const [finalizedDelivery, setFinalizedDelivery] = useState(0);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   
   // New user detail fields
@@ -122,7 +124,17 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       selectedUnit: item.selectedUnit || (item as any).unit
     }));
 
-    const message = formatOrderWhatsAppMessage(orderId, customerData, itemsToUse, cartTotal + deliveryCharge, paymentMethod);
+    const subtotal = finalizedSubtotal > 0 ? finalizedSubtotal : cartTotal;
+    const delivery = finalizedDelivery > 0 ? finalizedDelivery : deliveryCharge;
+
+    const message = formatOrderWhatsAppMessage(
+      orderId, 
+      customerData, 
+      itemsToUse, 
+      subtotal, 
+      delivery,
+      paymentMethod === "cod" ? "Cash on Delivery" : "Paid Online"
+    );
     sendWhatsAppNotification(message);
   };
 
@@ -161,13 +173,15 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           const verifyData = await verifyRes.json();
           if (verifyData.success) {
             setPlacedOrderId(internalOrderId);
-            // Store items before clearing cart
+            // Store values before clearing cart
             setFinalizedItems(cart.map(item => ({
               name: item.name,
               quantity: item.quantity,
               price: item.price,
               selectedUnit: item.selectedUnit || (item as any).unit
             })));
+            setFinalizedSubtotal(cartTotal);
+            setFinalizedDelivery(deliveryCharge);
             setIsSuccess(true);
             clearCart();
             // We don't auto-redirect anymore to give time to click WhatsApp
@@ -247,13 +261,15 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
         await handleOnlinePayment(result.orderId!);
       } else {
         setPlacedOrderId(result.orderId!);
-        // Store items before clearing cart
+        // Store values before clearing cart
         setFinalizedItems(cart.map(item => ({
           name: item.name,
           quantity: item.quantity,
           price: item.price,
           selectedUnit: item.selectedUnit || (item as any).unit
         })));
+        setFinalizedSubtotal(cartTotal);
+        setFinalizedDelivery(deliveryCharge);
         setIsSuccess(true);
         clearCart();
         setIsLoading(false);
