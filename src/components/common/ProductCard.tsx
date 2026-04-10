@@ -4,8 +4,10 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import QuantityModal from "./QuantityModal";
 import ProductDetailModal from "./ProductDetailModal";
+import { useCart } from "@/context/CartContext";
 import { faPlus, faCartPlus, faEye } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 interface Product {
   id: string;
