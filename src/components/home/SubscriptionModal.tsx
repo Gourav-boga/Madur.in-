@@ -129,7 +129,7 @@ export default function SubscriptionModal({ isOpen, onClose }: SubscriptionModal
       selectedUnit: selectedProduct?.unit || "L"
     }];
 
-    const message = formatOrderWhatsAppMessage(subId, customerData, items, subscriptionAmount, "Online Payment", true);
+    const message = formatOrderWhatsAppMessage(subId, customerData, items, subscriptionAmount, 0, "Online Payment", true);
     sendWhatsAppNotification(message);
   };
 

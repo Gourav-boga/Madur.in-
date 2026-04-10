@@ -14,7 +14,8 @@ import {
   faShoppingCart,
   faChevronLeft,
   faLayerGroup,
-  faBox
+  faBox,
+  faArrowRight
 } from "@fortawesome/free-solid-svg-icons";
 import StreamingTagline from "./StreamingTagline";
 
