@@ -84,7 +84,7 @@ export default function ContactPage() {
                <div className="mt-12 pt-8 border-t">
                  <p className="font-bold text-sm mb-4">Quick Connect</p>
                  <button 
-                  onClick={openWhatsApp}
+                  onClick={() => openWhatsApp()}
                   className="w-full bg-green-500 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-green-600 transition-all shadow-lg active:scale-95"
                  >
                    <FontAwesomeIcon icon={faWhatsapp} className="text-2xl" />
