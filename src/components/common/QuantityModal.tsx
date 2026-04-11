@@ -37,7 +37,7 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
   
   // Helper to parse unit string (e.g. "1kg" -> { value: 1000, unit: "g" })
   const parseUnit = (unitStr: string) => {
-    const match = unitStr.toLowerCase().match(/(\d+)\s*(g|kg|ml|l|unit|grms)/);
+    const match = unitStr.toLowerCase().match(/(\d+)\s*(g|kg|ml|l|unit|grms|litre)/);
     if (!match) return { value: 1, unit: "unit" };
     let value = parseInt(match[1]);
     let unit = match[2];
@@ -45,7 +45,7 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
     if (unit === "kg") {
       value *= 1000;
       unit = "g";
-    } else if (unit === "l") {
+    } else if (unit === "l" || unit === "litre") {
       value *= 1000;
       unit = "ml";
     } else if (unit === "grms") {
@@ -61,9 +61,11 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
   // Derive available units based on type
   const getAvailableUnits = () => {
     if (baseUnitInfo.unit === "g") {
-      return ["250 g", "500 g", "1 kg"];
+      // 100 grms, 250 grms, 500 grms, 1 kg
+      return ["100 grms", "250 grms", "500 grms", "1 kg"];
     } else if (baseUnitInfo.unit === "ml") {
-      return ["500 ml", "1 L"];
+      // 250 ml, 500 ml, 1 litre
+      return ["250 ml", "500 ml", "1 litre"];
     }
     return [currentUnit];
   };
@@ -126,7 +128,7 @@ export default function QuantityModal({ isOpen, onClose, onConfirm, product }: Q
                         src={normalizeImageUrl(product.image_url || product.image)}
                         alt={product.name || "Product"}
                         fill
-                        className="object-cover"
+                        className="object-contain p-2"
                         unoptimized
                       />
                     ) : (

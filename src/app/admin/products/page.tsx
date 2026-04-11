@@ -395,9 +395,9 @@ export default function AdminProductsPage() {
                     value={formData.unit}
                     onChange={(e) => setFormData({...formData, unit: e.target.value})}
                   >
-                    <option value="1litre">1litre</option>
-                    <option value="500ml">500ml</option>
-                    <option value="250ml">250ml</option>
+                    <option value="1 litre">1 litre</option>
+                    <option value="500 ml">500 ml</option>
+                    <option value="250 ml">250 ml</option>
                     <option value="100 g">100 g</option>
                     <option value="250 g">250 g</option>
                     <option value="500 g">500 g</option>
