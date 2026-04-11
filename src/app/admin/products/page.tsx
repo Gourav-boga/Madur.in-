@@ -27,6 +27,16 @@ interface Category {
   name: string;
 }
 
+const AVAILABLE_UNITS = [
+  "1 kg",
+  "500 grms",
+  "250 grms",
+  "1 litre",
+  "500 ml",
+  "250 ml",
+  "1 bunch"
+];
+
 export default function AdminProductsPage() {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -144,7 +154,7 @@ export default function AdminProductsPage() {
 
       setIsModalOpen(false);
       setEditingProduct(null);
-      setFormData({ name: "", category_id: "", unit: "", price: 0, original_price: 0, image_url: "", description: "", is_out_of_stock: false, is_popular: false });
+      setFormData({ name: "", category_id: "", unit: "1 litre", price: 0, original_price: 0, image_url: "", description: "", is_out_of_stock: false, is_popular: false });
       fetchData();
     } catch (error: any) {
       console.error("Error saving product:", error);
@@ -170,11 +180,18 @@ export default function AdminProductsPage() {
 
   const openModal = (product: Product | null = null) => {
     if (product) {
-      setEditingProduct(product);
+      // Sanitize units to only include allowed ones
+      const sanitizedUnit = product.unit 
+        ? product.unit.split(',')
+            .map(u => u.trim())
+            .filter(u => AVAILABLE_UNITS.includes(u))
+            .join(', ')
+        : "";
+
       setFormData({
         name: product.name,
         category_id: product.category_id,
-        unit: product.unit,
+        unit: sanitizedUnit,
         price: product.price,
         original_price: product.original_price || 0,
         image_url: product.image_url,
@@ -388,22 +405,42 @@ export default function AdminProductsPage() {
                     }}
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Unit</label>
-                  <select 
-                    className="w-full bg-accent/50 border-none rounded-2xl py-4 px-6 font-bold outline-none focus:ring-4 ring-primary/20 appearance-none"
-                    value={formData.unit}
-                    onChange={(e) => setFormData({...formData, unit: e.target.value})}
-                  >
-                    <option value="1 litre">1 litre</option>
-                    <option value="500 ml">500 ml</option>
-                    <option value="250 ml">250 ml</option>
-                    <option value="100 g">100 g</option>
-                    <option value="250 g">250 g</option>
-                    <option value="500 g">500 g</option>
-                    <option value="1 kg">1 kg</option>
-                    <option value="1 bunch">1 bunch</option>
-                  </select>
+                <div className="space-y-4 col-span-1 md:col-span-2">
+                  <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Available Quantities / Units (Tick all that apply)</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {AVAILABLE_UNITS.map((unit) => {
+                      const isChecked = formData.unit.split(',').map(u => u.trim()).includes(unit);
+                      return (
+                        <div 
+                          key={unit}
+                          onClick={() => {
+                            const currentUnits = formData.unit ? formData.unit.split(',').map(u => u.trim()) : [];
+                            let newUnits;
+                            if (isChecked) {
+                              newUnits = currentUnits.filter(u => u !== unit);
+                            } else {
+                              newUnits = [...currentUnits, unit];
+                            }
+                            // Sort them according to AVAILABLE_UNITS order for consistency
+                            newUnits.sort((a, b) => AVAILABLE_UNITS.indexOf(a) - AVAILABLE_UNITS.indexOf(b));
+                            setFormData({...formData, unit: newUnits.join(', ')});
+                          }}
+                          className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                            isChecked 
+                              ? "bg-primary/10 border-primary text-black" 
+                              : "bg-accent/30 border-transparent text-gray-500 hover:border-accent"
+                          }`}
+                        >
+                          <div className={`w-5 h-5 rounded flex items-center justify-center border-2 ${
+                            isChecked ? "bg-primary border-primary text-black" : "border-gray-300"
+                          }`}>
+                            {isChecked && <FontAwesomeIcon icon={faBox} className="text-[10px]" />}
+                          </div>
+                          <span className="text-xs font-bold uppercase">{unit}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 

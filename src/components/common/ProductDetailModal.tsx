@@ -76,7 +76,12 @@ export default function ProductDetailModal({ isOpen, onClose, product, onAddToCa
                   <h2 className="text-3xl font-black text-gray-800 leading-tight">
                     {product.name}
                   </h2>
-                  <p className="text-gray-400 font-bold text-sm mt-1">{product.unit}</p>
+                  <p className="text-gray-400 font-bold text-sm mt-1">
+                    {product.unit.split(',')
+                      .map(u => u.trim())
+                      .filter(u => !u.toLowerCase().includes('1000grms'))
+                      .join(', ')}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-3 mb-8">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuoteLeft, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
@@ -105,13 +106,13 @@ export default function AboutPage() {
              <div className="md:w-2/3 p-12 flex flex-col justify-center">
                 <FontAwesomeIcon icon={faQuoteLeft} className="text-primary text-4xl mb-6 opacity-20" />
                 <h3 className="text-3xl font-black mb-2 text-[#222222]">{founder.name}</h3>
-                <p className="text-primary font-bold mb-6 uppercase tracking-widest text-xs">{founder.role}</p>
+                <p className="text-navy font-bold mb-6 uppercase tracking-widest text-xs">{founder.role}</p>
                 <p className="text-[#222222] leading-relaxed mb-8">
                   {founder.bio}
                 </p>
-                <button className="bg-secondary text-white font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all w-fit uppercase tracking-widest text-xs">
+                <Link href="/contact" className="bg-secondary text-white font-black px-8 py-4 rounded-xl shadow-lg hover:opacity-90 transition-all w-fit uppercase tracking-widest text-xs">
                   Connect with Founder
-                </button>
+                </Link>
              </div>
           </div>
         </section>
@@ -134,7 +135,7 @@ export default function AboutPage() {
                      />
                    </div>
                    <h4 className="text-xl font-black text-[#222222] mb-1">{member.name}</h4>
-                   <p className="text-primary font-black uppercase tracking-widest text-[10px] mb-4">{member.role}</p>
+                   <p className="text-navy font-black uppercase tracking-widest text-[10px] mb-4">{member.role}</p>
                    <p className="text-[#222222] text-sm leading-relaxed opacity-80">
                      {member.bio}
                    </p>

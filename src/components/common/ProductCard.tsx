@@ -136,7 +136,12 @@ export default function ProductCard({ product }: { product: Product }) {
             <span className="bg-secondary/10 text-secondary text-[7px] md:text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-full">
               {displayCategory}
             </span>
-            <span className="text-gray-400 font-bold text-[8px] md:text-[10px]">{product.unit}</span>
+            <span className="text-gray-400 font-bold text-[8px] md:text-[10px]">
+              {product.unit.split(',')
+                .map(u => u.trim())
+                .filter(u => !u.toLowerCase().includes('1000grms'))
+                .join(', ')}
+            </span>
           </div>
           
           <h3 className={`text-[10px] md:text-sm font-black leading-tight mb-0.5 md:mb-1.5 transition-colors line-clamp-2 ${isOutOfStock ? "text-[#222222]" : "text-[#222222] group-hover:text-primary"}`}>

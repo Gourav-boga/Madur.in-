@@ -9,6 +9,7 @@
   --secondary-foreground: #000000;
   --accent: #f4f4f4;
   --custom-blue: #f1ddbf;
+  --navy: #1a365d;
   --brown: #795548;
 }
 
@@ -21,6 +22,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
   --color-custom-blue: var(--custom-blue);
+  --color-navy: var(--navy);
   --color-brown: var(--brown);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

@@ -13,17 +13,21 @@ export default function ContactPage() {
     message: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would send to an API
-    alert("Thank you for your message! We will get back to you soon.");
-    setFormData({ name: "", phone: "", email: "", message: "" });
+  const openWhatsApp = (data = formData) => {
+    const phoneNumber = "917416750834";
+    const text = `Hi MADUR.IN, I have an enquiry:
+*Name:* ${data.name}
+*Phone:* ${data.phone}
+*Email:* ${data.email || 'N/A'}
+*Message:* ${data.message}`;
+    
+    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
-  const openWhatsApp = () => {
-    const phoneNumber = "+917416750834";
-    const text = `Hi MADUR.IN, I'm ${formData.name}. I have an inquiry: ${formData.message}`;
-    window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`, "_blank");
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    openWhatsApp();
+    setFormData({ name: "", phone: "", email: "", message: "" });
   };
 
   return (
