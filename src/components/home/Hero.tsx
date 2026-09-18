@@ -61,7 +61,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative w-full h-[240px] sm:h-[360px] md:h-[480px] lg:h-[540px] overflow-hidden bg-gray-100">
+    <section className="relative w-full aspect-[16/9] sm:aspect-auto sm:h-[360px] md:h-[480px] lg:h-[540px] overflow-hidden bg-gray-100">
       {/* Edge-to-Edge Full Width Background Swiper */}
       <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
         <Swiper
@@ -76,32 +76,32 @@ export default function Hero() {
         >
           {images.map((src, index) => (
             <SwiperSlide key={index}>
-              <div className="relative w-full h-full">
+              <Link href="/products" className="block relative w-full h-full cursor-pointer">
                 <Image 
                   src={src} 
                   alt={`Hero Banner ${index + 1}`} 
                   fill 
-                  className="object-cover object-top"
+                  className="object-cover object-center sm:object-top"
                   priority={index === 0}
                   sizes="100vw"
                 />
-              </div>
+              </Link>
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
       
-      {/* Content Overlay: Only Shop Now Button */}
-      <div className="container relative z-10 h-full flex items-end sm:items-center px-6 sm:px-12 md:px-20 pb-5 sm:pb-0 pointer-events-none">
+      {/* Content Overlay: Only Shop Now Button - Compact on mobile */}
+      <div className="container relative z-10 h-full flex items-end sm:items-center px-4 sm:px-12 md:px-20 pb-3 sm:pb-0 pointer-events-none">
         <div className="pointer-events-auto">
           <Link 
             href="/products" 
-            className="group bg-secondary text-white font-black px-4 py-2 sm:px-7 sm:py-3.5 md:px-8 md:py-4 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:bg-[#255732] hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)] transition-all flex items-center gap-2.5 sm:gap-4 w-fit active:scale-95 border border-white/20"
+            className="group bg-secondary text-white font-black px-3 py-1.5 sm:px-7 sm:py-3.5 md:px-8 md:py-4 rounded-lg sm:rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:bg-[#255732] hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)] transition-all flex items-center gap-2 sm:gap-4 w-fit active:scale-95 border border-white/20"
           >
-            <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center text-white group-hover:bg-white group-hover:text-secondary transition-colors">
-              <FontAwesomeIcon icon={faArrowRight} className="text-[10px] sm:text-xs md:text-sm" />
+            <div className="w-5 h-5 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center text-white group-hover:bg-white group-hover:text-secondary transition-colors">
+              <FontAwesomeIcon icon={faArrowRight} className="text-[8px] sm:text-xs md:text-sm" />
             </div>
-            <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-wider md:tracking-widest">
+            <span className="text-[10px] sm:text-sm md:text-base font-black uppercase tracking-wider md:tracking-widest">
               Shop Now
             </span>
           </Link>
