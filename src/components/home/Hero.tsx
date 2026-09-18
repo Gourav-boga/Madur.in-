@@ -22,7 +22,7 @@ export default function Hero() {
   useEffect(() => {
     async function fetchHeroImages() {
       try {
-        const res = await fetch("/api/heroSlides");
+        const res = await fetch("/api/heroSlides", { cache: "no-store" });
         if (!res.ok) throw new Error("API Failed");
         const data = await res.json();
         
@@ -51,7 +51,6 @@ export default function Hero() {
         setLoading(false);
       }
     }
-
 
     fetchHeroImages();
   }, []);
@@ -91,8 +90,8 @@ export default function Hero() {
         </Swiper>
       </div>
       
-      {/* Content Overlay: Only Shop Now Button - Compact on mobile */}
-      <div className="container relative z-10 h-full flex items-end sm:items-center px-4 sm:px-12 md:px-20 pb-3 sm:pb-0 pointer-events-none">
+      {/* Content Overlay: Shop Now Button kept down at the bottom on all screen sizes */}
+      <div className="container relative z-10 h-full flex items-end px-4 sm:px-12 md:px-20 pb-3 sm:pb-6 md:pb-8 lg:pb-10 pointer-events-none">
         <div className="pointer-events-auto">
           <Link 
             href="/products" 
