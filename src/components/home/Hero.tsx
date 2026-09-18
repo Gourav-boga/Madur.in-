@@ -61,7 +61,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative w-full h-[220px] sm:h-[340px] md:h-[460px] lg:h-[520px] overflow-hidden bg-gray-100">
+    <section className="relative w-full h-[240px] sm:h-[360px] md:h-[480px] lg:h-[540px] overflow-hidden bg-gray-100">
       {/* Edge-to-Edge Full Width Background Swiper */}
       <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
         <Swiper
@@ -81,7 +81,7 @@ export default function Hero() {
                   src={src} 
                   alt={`Hero Banner ${index + 1}`} 
                   fill 
-                  className="object-cover object-center"
+                  className="object-cover object-top"
                   priority={index === 0}
                   sizes="100vw"
                 />

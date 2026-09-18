@@ -30,7 +30,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <div className="animate-in fade-in duration-300">
           <Navbar />
           <CartToast />
-          <main className={`min-h-screen pb-16 md:pb-0 ${isHome ? "pt-[85px] sm:pt-[110px] md:pt-[125px]" : "pt-[90px] sm:pt-[115px] md:pt-[130px]"}`}>
+          <main className="min-h-screen pb-16 md:pb-0 pt-[116px] sm:pt-[136px] md:pt-[152px]">
             {children}
           </main>
           <Footer />
