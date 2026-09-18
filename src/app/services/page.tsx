@@ -6,6 +6,21 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faBox } from "@fortawesome/free-solid-svg-icons";
 
+function ServiceCardImage({ src, alt }: { src: string; alt: string }) {
+  const [imgSrc, setImgSrc] = useState(src);
+  useEffect(() => setImgSrc(src), [src]);
+  return (
+    <Image
+      src={imgSrc}
+      alt={alt}
+      fill
+      className="object-cover group-hover:scale-110 transition-transform duration-500"
+      onError={() => setImgSrc("/placeholder.png")}
+      unoptimized
+    />
+  );
+}
+
 export default function ServicesPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +69,7 @@ export default function ServicesPage() {
             >
               <div className="w-full aspect-[4/3] md:aspect-square relative mb-6 rounded-2xl overflow-hidden bg-gray-50">
                 {service.image_url || service.image ? (
-                  <Image src={service.image_url || service.image} alt={service.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" unoptimized />
+                  <ServiceCardImage src={service.image_url || service.image} alt={service.name} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
                     <FontAwesomeIcon icon={faBox} className="text-4xl" />

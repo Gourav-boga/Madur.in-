@@ -8,6 +8,21 @@ import { faFilter, faSearch, faTimes, faBox } from "@fortawesome/free-solid-svg-
 import Link from "next/link";
 import Image from "next/image";
 
+function SafeImg({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  const [imgSrc, setImgSrc] = useState(src);
+  useEffect(() => setImgSrc(src), [src]);
+  return (
+    <Image
+      src={imgSrc}
+      alt={alt}
+      fill
+      className={className || "object-cover"}
+      onError={() => setImgSrc("/placeholder.png")}
+      unoptimized
+    />
+  );
+}
+
 function Content() {
   const searchParams = useSearchParams();
   const categoryFilter = searchParams.get("category");
@@ -19,7 +34,7 @@ function Content() {
   const [searchTerm, setSearchTerm] = useState(urlSearchTerm);
 
   const normalizeImageUrl = (url: string) => {
-    if (!url) return "/logo.png";
+    if (!url) return "/placeholder.png";
     if (url.startsWith("http") || url.startsWith("data:") || url.startsWith("/")) return url;
     return `/api/admin/proxy-image?url=${encodeURIComponent(url)}`;
   };
@@ -83,7 +98,7 @@ function Content() {
               <>
                 {(currentCategory?.image_url || currentCategory?.image) ? (
                   <div className="relative w-12 h-12 md:w-24 md:h-24 rounded-xl md:rounded-2xl overflow-hidden shadow-md bg-gray-50 flex-shrink-0">
-                    <Image src={normalizeImageUrl(currentCategory.image_url || currentCategory.image)} alt={currentCategory.name} fill className="object-cover" />
+                    <SafeImg src={normalizeImageUrl(currentCategory.image_url || currentCategory.image)} alt={currentCategory.name} />
                   </div>
                 ) : (
                   <div className="w-12 h-12 md:w-24 md:h-24 rounded-lg md:rounded-2xl bg-gray-100 flex items-center justify-center text-gray-300">
@@ -145,7 +160,7 @@ function Content() {
                   {(cat.image_url || cat.image) ? (
                     <div className="flex items-center gap-3 text-left">
                       <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50">
-                        <Image src={normalizeImageUrl(cat.image_url || cat.image)} alt={cat.name} fill className="object-cover" />
+                        <SafeImg src={normalizeImageUrl(cat.image_url || cat.image)} alt={cat.name} />
                       </div>
                       <span className="text-xs font-black uppercase tracking-tight">{cat.name}</span>
                     </div>

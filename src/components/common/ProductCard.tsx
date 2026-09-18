@@ -41,8 +41,13 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   const displayImage = normalizeImageUrl(product.image_url || product.image);
+  const [imgSrc, setImgSrc] = useState(displayImage);
   const displayCategory = product.categories?.name || product.category || "General";
   const isOutOfStock = product.is_out_of_stock;
+
+  React.useEffect(() => {
+    setImgSrc(displayImage);
+  }, [displayImage]);
 
   const handleOpenModal = async () => {
     if (isOutOfStock) return;
@@ -87,12 +92,13 @@ export default function ProductCard({ product }: { product: Product }) {
       >
         {/* Product Image */}
         <div className="relative aspect-square w-full rounded-lg md:rounded-2xl overflow-hidden bg-accent/50 mb-1.5 md:mb-3.5 border border-gray-50">
-          {displayImage ? (
+          {imgSrc ? (
             <Image 
-              src={displayImage} 
+              src={imgSrc} 
               alt={product.name || "Product"} 
               fill 
               className={`object-cover transition-transform duration-700 ${!isOutOfStock ? "group-hover:scale-110" : ""}`} 
+              onError={() => setImgSrc("/placeholder.png")}
               unoptimized
             />
           ) : (

@@ -6,12 +6,28 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBox, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
+function CategoryCardImage({ src, alt }: { src: string; alt: string }) {
+  const [imgSrc, setImgSrc] = useState(src);
+  useEffect(() => setImgSrc(src), [src]);
+  return (
+    <Image
+      src={imgSrc}
+      alt={alt}
+      fill
+      className="object-cover group-hover:scale-110 transition-transform duration-500"
+      sizes="(max-width: 768px) 50vw, 25vw"
+      onError={() => setImgSrc("/placeholder.png")}
+      unoptimized
+    />
+  );
+}
+
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const normalizeImageUrl = (url: string) => {
-    if (!url) return "/logo.png";
+    if (!url) return "/placeholder.png";
     if (url.startsWith("http") || url.startsWith("data:") || url.startsWith("/")) return url;
     return `/api/admin/proxy-image?url=${encodeURIComponent(url)}`;
   };
@@ -62,13 +78,9 @@ export default function CategoriesPage() {
             >
               <div className="w-full aspect-[4/3] sm:aspect-square relative overflow-hidden bg-gray-50">
                 {cat.image_url || cat.image ? (
-                  <Image
+                  <CategoryCardImage
                     src={normalizeImageUrl(cat.image_url || cat.image)}
                     alt={cat.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    unoptimized
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100">
