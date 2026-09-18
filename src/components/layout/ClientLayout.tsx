@@ -2,35 +2,17 @@
 
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/layout/Navbar";
-import StreamingTagline from "@/components/layout/StreamingTagline";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/common/WhatsAppButton";
-import MobileCartButton from "@/components/common/MobileCartButton";
-import SplashScreen from "@/components/layout/SplashScreen";
-
+import BottomNavigation from "@/components/layout/BottomNavigation";
+import CartToast from "@/components/common/CartToast";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
-
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
-import { useState, useEffect } from "react";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [showContent, setShowContent] = useState(false);
   const isHome = pathname === "/";
   const isAdmin = pathname?.startsWith("/admin");
-
-  useEffect(() => {
-    // If we've already visited this session, show content immediately
-    const hasVisited = sessionStorage.getItem("hasVisited");
-    if (hasVisited || isAdmin) {
-      setShowContent(true);
-    }
-  }, [isAdmin]);
-
-  const handleSplashComplete = () => {
-    setShowContent(true);
-  };
 
   if (isAdmin) {
     return (
@@ -45,19 +27,16 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   return (
     <CartProvider>
       <SubscriptionProvider>
-        {!isAdmin && <SplashScreen onComplete={handleSplashComplete} />}
-        
-        {showContent && (
-          <div className="animate-in fade-in duration-700">
-            <Navbar />
-            <main className={`min-h-screen ${isHome ? "pt-[180px] md:pt-[190px]" : "pt-[180px] md:pt-[190px]"}`}>
-              {children}
-            </main>
-            <Footer />
-            <MobileCartButton />
-            <WhatsAppButton />
-          </div>
-        )}
+        <div className="animate-in fade-in duration-300">
+          <Navbar />
+          <CartToast />
+          <main className={`min-h-screen pb-16 md:pb-0 ${isHome ? "pt-[85px] sm:pt-[110px] md:pt-[125px]" : "pt-[90px] sm:pt-[115px] md:pt-[130px]"}`}>
+            {children}
+          </main>
+          <Footer />
+          <BottomNavigation />
+          <WhatsAppButton />
+        </div>
       </SubscriptionProvider>
     </CartProvider>
   );

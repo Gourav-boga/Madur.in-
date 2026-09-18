@@ -20,12 +20,17 @@ interface CartContextType {
   clearCart: () => void;
   cartTotal: number;
   cartCount: number;
+  cartToastItem: CartItem | null;
+  clearCartToast: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartToastItem, setCartToastItem] = useState<CartItem | null>(null);
+
+  const clearCartToast = () => setCartToastItem(null);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -58,6 +63,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return [...prev, item];
     });
+    // Trigger the top alert toast
+    setCartToastItem({ ...item });
   };
 
   const removeFromCart = (id: string, selectedUnit?: string) => {
@@ -89,6 +96,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearCart,
         cartTotal,
         cartCount,
+        cartToastItem,
+        clearCartToast,
       }}
     >
       {children}

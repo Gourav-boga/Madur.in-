@@ -84,14 +84,14 @@ export default function HomeContent() {
   };
 
   return (
-    <div className="flex flex-col gap-3 md:gap-16 pb-0 md:pb-20">
+    <div className="flex flex-col gap-0 md:gap-12 pb-0 md:pb-20">
       <Hero />
       
       {/* Featured Products */}
-      <section className="bg-secondary/5 pt-4 pb-2 md:py-16">
+      <section className="bg-secondary/5 pt-2 pb-2 md:py-16">
         <div className="container">
           {/* Mobile Search Bar */}
-          <div className="md:hidden mt-2 mb-6">
+          <div className="md:hidden mt-1.5 mb-3">
             <form 
               onSubmit={handleSearch}
               className="flex items-center bg-white border border-secondary/20 rounded-xl px-4 py-3 shadow-md"

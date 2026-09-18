@@ -89,12 +89,20 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 shadow-md bg-white ${
-        isHome && !isScrolled ? "py-3 md:py-5" : "py-1 md:py-2"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
+        isScrolled ? "py-1 shadow-md" : "py-0 shadow-sm"
       }`}
     >
-      <StreamingTagline />
-      <div className="container mt-2 flex items-center justify-between gap-4 relative">
+      {/* Horizontal Announcement Bar (Collapses smoothly on scroll) */}
+      <div
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+          isScrolled ? "max-h-0 opacity-0 -translate-y-2 pointer-events-none" : "max-h-14 opacity-100 translate-y-0"
+        }`}
+      >
+        <StreamingTagline />
+      </div>
+
+      <div className={`container transition-all duration-300 flex items-center justify-between gap-4 relative ${isScrolled ? "py-1" : "py-1 md:py-2"}`}>
         {/* Mobile Left Section (Menu) */}
         <div className="flex items-center md:hidden z-50">
           <button
@@ -109,15 +117,17 @@ export default function Navbar() {
           {/* Logo - CENTERED ON MOBILE, LEFT ON DESKTOP */}
           <Link 
             href="/" 
-            className="flex items-center p-0 m-0 leading-none z-10 transition-transform active:scale-95 -my-8 md:-my-8"
+            className="flex items-center p-0 m-0 leading-none z-10 transition-transform active:scale-95 -my-5 md:-my-6"
           >
             <Image 
               src="/madur-logo-2026.png" 
               alt="MADUR.IN Logo" 
-              width={350}
-              height={120}
-              sizes="(max-width: 768px) 150px, 350px"
-              className="h-44 md:h-44 w-auto object-contain select-none mix-blend-multiply"
+              width={300}
+              height={100}
+              sizes="(max-width: 768px) 140px, 300px"
+              className={`w-auto object-contain select-none mix-blend-multiply transition-all duration-300 ${
+                isScrolled ? "h-24 md:h-28" : "h-28 md:h-36"
+              }`}
               priority
               loading="eager"
             />

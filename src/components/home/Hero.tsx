@@ -61,9 +61,9 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative w-full max-w-7xl mx-auto h-[210px] md:h-[450px] bg-white p-1.5 md:p-4 shadow-sm mt-0 md:mt-6">
-      {/* Background Swiper with Border effect */}
-      <div className="absolute inset-1.5 md:inset-4 z-0 overflow-hidden rounded-xl md:rounded-3xl border-2 md:border-4 border-white shadow-inner">
+    <section className="relative w-full h-[220px] sm:h-[340px] md:h-[460px] lg:h-[520px] overflow-hidden bg-gray-100">
+      {/* Edge-to-Edge Full Width Background Swiper */}
+      <div className="absolute inset-0 z-0 w-full h-full overflow-hidden">
         <Swiper
           modules={[Autoplay, EffectFade]}
           effect="fade"
@@ -79,40 +79,32 @@ export default function Hero() {
               <div className="relative w-full h-full">
                 <Image 
                   src={src} 
-                  alt={`Hero Background ${index + 1}`} 
+                  alt={`Hero Banner ${index + 1}`} 
                   fill 
-                  className="object-cover object-center sm:object-[center_20%]"
+                  className="object-cover object-center"
                   priority={index === 0}
-                  sizes="(max-width: 768px) 100vw, 1200px"
+                  sizes="100vw"
                 />
-                {/* Dark Overlay - slightly softened */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent"></div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
       
-      {/* Content Overlay - Adjusted for shorter height */}
-      <div className="container relative z-10 h-full flex flex-col justify-center items-start px-4 md:px-12">
-        <div className="max-w-2xl space-y-1.5 md:space-y-4">
-          <h1 className="text-[1.2rem] leading-[1.1] sm:text-2xl md:text-3xl lg:text-4xl font-black text-white italic uppercase tracking-tighter">
-            Pure <span className="text-primary inline-block underline decoration-primary decoration-2 md:decoration-4 underline-offset-[2px] md:underline-offset-[6px]">Natural Products</span> <br />
-            delivered to <br />
-            <span className="underline decoration-white decoration-2 md:decoration-4 underline-offset-[2px] md:underline-offset-[6px]">your home</span>
-          </h1>
-          
-          <div className="pt-3 md:pt-10">
-            <Link 
-              href="/products" 
-              className="group bg-secondary text-white font-black px-3 py-1.5 md:px-8 md:py-4 rounded-lg shadow-xl hover:opacity-90 transition-all flex items-center gap-2 md:gap-4 w-fit active:scale-95"
-            >
-              <div className="w-5 h-5 md:w-10 md:h-10 bg-white/10 rounded-full flex items-center justify-center text-white group-hover:bg-black transition-colors">
-                <FontAwesomeIcon icon={faArrowRight} className="text-[10px] md:text-lg" />
-              </div>
-              <span className="text-[10px] md:text-lg uppercase tracking-wider md:tracking-widest">Shop Now</span>
-            </Link>
-          </div>
+      {/* Content Overlay: Only Shop Now Button */}
+      <div className="container relative z-10 h-full flex items-end sm:items-center px-6 sm:px-12 md:px-20 pb-5 sm:pb-0 pointer-events-none">
+        <div className="pointer-events-auto">
+          <Link 
+            href="/products" 
+            className="group bg-secondary text-white font-black px-4 py-2 sm:px-7 sm:py-3.5 md:px-8 md:py-4 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:bg-[#255732] hover:shadow-[0_15px_35px_rgba(0,0,0,0.4)] transition-all flex items-center gap-2.5 sm:gap-4 w-fit active:scale-95 border border-white/20"
+          >
+            <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/20 rounded-full flex items-center justify-center text-white group-hover:bg-white group-hover:text-secondary transition-colors">
+              <FontAwesomeIcon icon={faArrowRight} className="text-[10px] sm:text-xs md:text-sm" />
+            </div>
+            <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-wider md:tracking-widest">
+              Shop Now
+            </span>
+          </Link>
         </div>
       </div>
     </section>
